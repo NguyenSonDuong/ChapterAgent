@@ -10,6 +10,8 @@ from rich.panel import Panel
 import src.core.config as config
 from src.models.story import StoryMeta
 from src.core.state import AgentState
+from src.utils.session_manager import session_manager
+from src.utils.socket_emitter import emit_event, emit_agent_log
 
 console = Console()
 
@@ -27,7 +29,7 @@ def get_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.7):
 
 def classify_exception(e: Exception) -> int:
     """Phân loại exception của Google API thành HTTP status code tương ứng.
-    Trả về status code (401, 403, 429, 500, 503, 504) hoặc 0 nếu không xác định.
+    Trả về status code (401, 403, 404, 429, 500, 503, 504) hoặc 0 nếu không xác định.
     """
     err_str = str(e).lower()
     
@@ -64,6 +66,8 @@ def classify_exception(e: Exception) -> int:
         return 504
     if "500" in err_str or "internal server error" in err_str or "internal_server_error" in err_str:
         return 500
+    if "404" in err_str or "not found" in err_str or "not_found" in err_str or "notfound" in err_str:
+        return 404
         
     return 0
 
@@ -104,7 +108,9 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             runnable = llm.with_structured_output(output_schema) if output_schema else llm
         except Exception as e:
             console.print(f"[bold red]Lỗi khi khởi tạo LLM: {e}[/bold red]")
-            code = 401
+            code = classify_exception(e)
+            if code == 0:
+                code = 401
             e_msg = str(e)
         else:
             code = 0
@@ -116,6 +122,48 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             except Exception as e:
                 code = classify_exception(e)
                 e_msg = str(e)
+                
+        # Check if we should trigger Socket.IO model select
+        story_uuid = state.get("story_uuid")
+        session = session_manager.get_session(story_uuid) if story_uuid else None
+        should_socket_model_change = session is not None and (
+            code == 404 or (code == 429 and rate_limit_retries > 3)
+        )
+        
+        if should_socket_model_change:
+            emit_agent_log(story_uuid, f"Lỗi AI ({code}): {e_msg}. Gửi yêu cầu đổi model tới giao diện...", level="error")
+            session.status = "waiting_model_change"
+            emit_event("llm_error_select_model", {
+                "story_uuid": story_uuid,
+                "error": e_msg,
+                "current_model": model_name
+            })
+            session.input_event.clear()
+            success = session.input_event.wait(timeout=300.0)
+            if success and session.input_data:
+                new_model = str(session.input_data).strip()
+                session.input_data = None
+                session.status = "running"
+                
+                state["model"] = new_model
+                if "meta" in state:
+                    state["meta"]["model"] = new_model
+                    meta_path = config.get_meta_path(story_uuid)
+                    try:
+                        story_meta = StoryMeta(**state["meta"])
+                        meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
+                        emit_agent_log(story_uuid, f"✓ Đã cập nhật cấu hình model mới: {new_model}")
+                    except Exception as meta_err:
+                        emit_agent_log(story_uuid, f"Lỗi cập nhật cấu hình model: {meta_err}", level="warning")
+                
+                emit_agent_log(story_uuid, f"Chuyển sang model '{new_model}'. Đang thử lại...", level="info")
+                rate_limit_retries = 0
+                server_retries = 0
+                auth_retries = 0
+                continue
+            else:
+                emit_agent_log(story_uuid, "Hết thời gian chờ đổi model hoặc không nhận được model hợp lệ.", level="error")
+                raise RuntimeError(f"Lỗi AI ({code}) và không chọn model mới qua socket.")
                 
         if code in (401, 403):
             auth_retries += 1
@@ -139,6 +187,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             if server_retries <= 3:
                 console.print(f"[bold yellow]⚠️ Lỗi máy chủ Google ({code}): {e_msg}. Đang tự động thử lại lần {server_retries}/3 sau 10s...[/bold yellow]")
                 time.sleep(10.0)
+            else:
                 console.print(f"\n[bold red]❌ Gặp lỗi máy chủ Google ({code}) liên tục sau 3 lần thử lại.[/bold red]")
                 if sys.stdin is None or not sys.stdin.isatty():
                     raise RuntimeError(f"Lỗi máy chủ Google {code} liên tục sau 3 lần thử lại. Chi tiết: {e_msg}")
@@ -150,7 +199,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 console.print(" 5. [bold cyan]gemini-2.5-pro[/bold cyan]")
                 console.print(" 6. [bold cyan]Khác[/bold cyan] (Nhập thủ công)")
                 
-                model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="1")
+                model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="4")
                 if model_choice == "1":
                     new_model = "gemini-1.5-flash"
                 elif model_choice == "2":
@@ -188,6 +237,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             if rate_limit_retries <= 3:
                 console.print(f"\n[bold yellow]⚠️ Lỗi quá giới hạn lưu lượng (Rate Limit - Lỗi 429).[/bold yellow]")
                 console.print(f"[bold yellow]Chi tiết: {e_msg}[/bold yellow]")
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"Cảnh báo: Lỗi quá giới hạn lưu lượng (Rate Limit 429). Đang tự động đếm ngược thử lại lần {rate_limit_retries}/3...", level="warning")
                 for sec in range(60, 0, -1):
                     sys.stdout.write(f"\rĐang chờ thử lại lần {rate_limit_retries}/3 sau quá tải: {sec} giây... ")
                     sys.stdout.flush()
@@ -206,7 +257,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 console.print(" 5. [bold cyan]gemini-2.5-pro[/bold cyan]")
                 console.print(" 6. [bold cyan]Khác[/bold cyan] (Nhập thủ công)")
                 
-                model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="1")
+                model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="4")
                 if model_choice == "1":
                     new_model = "gemini-1.5-flash"
                 elif model_choice == "2":
@@ -239,6 +290,54 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 else:
                     raise RuntimeError("Lỗi giới hạn tốc độ 429 và không chọn model mới.")
                     
+        elif code == 404:
+            if sys.stdin is None or not sys.stdin.isatty():
+                raise RuntimeError(f"Lỗi model AI không tồn tại (404) trong môi trường không có TTY. Chi tiết: {e_msg}")
+            
+            console.print(f"\n[bold red]❌ Gặp lỗi model AI không tồn tại (404): {e_msg}[/bold red]")
+            console.print("[bold yellow]Vui lòng chọn model AI khác để tiếp tục quy trình:[/bold yellow]")
+            console.print(" 1. [bold cyan]gemini-1.5-flash[/bold cyan]")
+            console.print(" 2. [bold cyan]gemini-1.5-pro[/bold cyan]")
+            console.print(" 3. [bold cyan]gemini-2.0-flash[/bold cyan]")
+            console.print(" 4. [bold cyan]gemini-2.5-flash[/bold cyan]")
+            console.print(" 5. [bold cyan]gemini-2.5-pro[/bold cyan]")
+            console.print(" 6. [bold cyan]Khác[/bold cyan] (Nhập thủ công)")
+            
+            model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="4")
+            if model_choice == "1":
+                new_model = "gemini-1.5-flash"
+            elif model_choice == "2":
+                new_model = "gemini-1.5-pro"
+            elif model_choice == "3":
+                new_model = "gemini-2.0-flash"
+            elif model_choice == "4":
+                new_model = "gemini-2.5-flash"
+            elif model_choice == "5":
+                new_model = "gemini-2.5-pro"
+            else:
+                new_model = Prompt.ask("Nhập tên model AI")
+                
+            if new_model and new_model.strip():
+                new_model = new_model.strip()
+                state["model"] = new_model
+                if "meta" in state:
+                    state["meta"]["model"] = new_model
+                    story_uuid = state.get("story_uuid")
+                    if story_uuid:
+                        meta_path = config.get_meta_path(story_uuid)
+                        try:
+                            story_meta = StoryMeta(**state["meta"])
+                            meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
+                            console.print(f"✓ Đã lưu model mới '{new_model}' vào file cấu hình: {meta_path}")
+                        except Exception:
+                            pass
+                console.print(f"[bold green]✓ Đã chuyển sang model '{new_model}'. Đang thử lại...[/bold green]")
+                rate_limit_retries = 0
+                server_retries = 0
+                auth_retries = 0
+                continue
+            else:
+                raise RuntimeError("Lỗi model 404 và không chọn model mới.")
         else:
             console.print(f"[bold red]❌ Gặp lỗi không xác định từ API Gemini: {e_msg}[/bold red]")
             raise RuntimeError(f"Lỗi gọi API Gemini không xác định: {e_msg}")

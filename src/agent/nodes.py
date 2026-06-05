@@ -15,7 +15,7 @@ from src.core.state import AgentState
 from src.utils.helpers import ensure_string
 from src.utils.llm import invoke_with_retry
 from src.utils.session_manager import session_manager
-from src.utils.socket_emitter import emit_event
+from src.utils.socket_emitter import emit_event, emit_agent_log
 
 console = Console()
 
@@ -54,6 +54,9 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     Reads user idea & global ledger, prompts user interactively if details are missing.
     """
     console.print("\n[bold blue]=== [Node 1] Requirement Analyzer ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 1] Phân tích Yêu cầu Sáng tác Chương {state['chapter_num']} ===")
+    emit_agent_log(state["story_uuid"], f"Ý tưởng ban đầu: \"{state['user_idea']}\"")
+    emit_agent_log(state["story_uuid"], "Đang nạp bối cảnh thế giới, danh sách nhân vật và đối chiếu Sổ cái toàn cục để kiểm tra tính logic...")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -112,6 +115,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
         if result.missing_info_questions and loop_count < max_loops - 1:
             session = session_manager.get_session(state["story_uuid"])
             if session:
+                emit_agent_log(state["story_uuid"], "Phát hiện thiếu thông tin cốt truyện. Đang gửi câu hỏi làm rõ đến giao diện...", level="warning")
                 session.status = "waiting_clarification"
                 emit_event("clarify_requirements", {
                     "story_uuid": state["story_uuid"],
@@ -124,12 +128,14 @@ Hãy phân tích và trả về kết quả cấu trúc:
                 success = session.input_event.wait(timeout=300.0)
                 if not success:
                     console.print("[yellow]Hết thời gian chờ phản hồi làm rõ. Tiếp tục quy trình...[/yellow]")
+                    emit_agent_log(state["story_uuid"], "Hết thời gian chờ phản hồi làm rõ. Bỏ qua...", level="warning")
                     break
                 user_answer = session.input_data
                 session.input_data = None
                 session.status = "running"
                 if user_answer is None or not str(user_answer).strip():
                     break
+                emit_agent_log(state["story_uuid"], f"Đã nhận câu trả lời bổ sung từ tác giả: \"{user_answer}\"")
             else:
                 console.print("\n[bold yellow]Phân tích phát hiện thiếu thông tin hoặc cần làm rõ:[/bold yellow]")
                 for q in result.missing_info_questions:
@@ -148,6 +154,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
             break
             
     console.print(Panel(result.analyzed_requirements, title=f"Yêu cầu Chương {chapter_num} đã được duyệt", border_style="green"))
+    emit_agent_log(state["story_uuid"], f"Yêu cầu sáng tác Chương {chapter_num} đã được duyệt.")
     
     return {
         "analyzed_requirements": result.analyzed_requirements,
@@ -160,6 +167,7 @@ def story_drafter_node(state: AgentState) -> Dict[str, Any]:
     Generates the initial chapter draft based on context and analyzed requirements.
     """
     console.print("\n[bold blue]=== [Node 2] Story Drafter ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 2] Sáng tác Bản nháp Chương {state['chapter_num']} ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -171,6 +179,7 @@ def story_drafter_node(state: AgentState) -> Dict[str, Any]:
             "message": f"Đang sáng tác bản nháp cho Chương {state['chapter_num']}..."
         })
     console.print("Đang viết nháp chương... Vui lòng đợi trong giây lát.")
+    emit_agent_log(state["story_uuid"], "Đang viết nháp chương... Vui lòng đợi trong giây lát (có thể mất 30-60 giây)...")
     
     meta = state["meta"]
     ledger = state["ledger"]
@@ -211,6 +220,7 @@ Yêu cầu viết truyện:
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
     draft_content = ensure_string(response.content)
+    emit_agent_log(state["story_uuid"], "Đã soạn thảo xong bản nháp ban đầu.")
         
     return {"draft_content": draft_content}
 
@@ -220,6 +230,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     Saves draft to disk as temp_draft.md and asks user for feedback or 'Done'.
     """
     console.print("\n[bold blue]=== [Node 3] Human Review ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 3] Tác giả duyệt Bản nháp Chương {state['chapter_num']} ===")
     
     draft_content = state["draft_content"]
     
@@ -231,6 +242,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
         
     session = session_manager.get_session(state["story_uuid"])
     if session:
+        emit_agent_log(state["story_uuid"], "Đang chờ ý kiến phản hồi hoặc phê duyệt bản nháp...")
         session.current_node = "human_review"
         session.status = "waiting_review"
         emit_event("draft_review_needed", {
@@ -243,6 +255,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
         success = session.input_event.wait(timeout=600.0) # 10 minutes timeout
         if not success:
             console.print("[yellow]Hết thời gian chờ duyệt bản nháp. Mặc định duyệt 'Done'.[/yellow]")
+            emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt bản nháp. Tự động phê duyệt bản nháp.", level="warning")
             feedback = "Done"
         else:
             feedback = session.input_data
@@ -250,6 +263,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
             session.status = "running"
             if feedback is None or not str(feedback).strip():
                 feedback = "Done"
+            emit_agent_log(state["story_uuid"], f"Nhận được phản hồi của tác giả: \"{feedback}\"")
     else:
         console.print("\n[bold cyan]================================================================================[/bold cyan]")
         console.print(f"[bold green][Thông báo][/bold green] Bản nháp Chương {state['chapter_num']} đã được cập nhật thành công.")
@@ -270,6 +284,7 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     Edits draft_content based on user feedback and metadata.
     """
     console.print("\n[bold blue]=== [Node 3.1] Reviser ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 3.1] Sửa đổi Bản nháp theo Yêu cầu ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -281,6 +296,7 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
             "message": f"Đang sửa đổi bản nháp Chương {state['chapter_num']} theo ý kiến tác giả..."
         })
     console.print("Đang tiến hành chỉnh sửa bản nháp theo yêu cầu của bạn...")
+    emit_agent_log(state["story_uuid"], f"Đang tiến hành sửa đổi bản nháp theo phản hồi...")
     
     draft_content = state["draft_content"]
     feedback = state["revision_feedback"]
@@ -311,6 +327,7 @@ Hãy viết lại bản nháp này. Đảm bảo:
 """
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
+    emit_agent_log(state["story_uuid"], "Đã sửa đổi xong bản nháp.")
         
     return {"draft_content": revised_content}
 
@@ -320,6 +337,7 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
     Performs logic check against previous chapter's state and global ledger.
     """
     console.print("\n[bold blue]=== [Node 4] Auditor ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 4] Kiểm duyệt Logic và Sự Nhất quán cốt truyện ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -331,6 +349,7 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
             "message": f"Đang kiểm duyệt logic cốt truyện Chương {state['chapter_num']}..."
         })
     console.print("Đang kiểm duyệt logic và tính nhất quán của cốt truyện...")
+    emit_agent_log(state["story_uuid"], "Đang đối chiếu bản nháp với Sổ cái Toàn cục và Chương trước...")
     
     draft_content = state["draft_content"]
     ledger = state["ledger"]
@@ -378,6 +397,7 @@ Trả về kết quả có cấu trúc:
         console.print("\n[bold red][CẢNH BÁO LOGIC PHÁT HIỆN TỪ AUDITOR]:[/bold red]")
         for w in result.warnings:
             console.print(f" ⚠️  {w}", style="yellow")
+            emit_agent_log(state["story_uuid"], f"⚠️ Cảnh báo mâu thuẫn: {w}", level="warning")
         
         session = session_manager.get_session(state["story_uuid"])
         if session:
@@ -389,8 +409,10 @@ Trả về kết quả có cấu trúc:
             })
     else:
         console.print("\n[bold green]✓ Kiểm duyệt logic thành công: Không phát hiện lỗi nhất quán cốt truyện.[/bold green]")
+        emit_agent_log(state["story_uuid"], "✓ Kiểm duyệt logic thành công: Không phát hiện lỗi mâu thuẫn cốt truyện.")
         
     console.print(Panel(result.auditor_feedback, title="Đánh giá từ Auditor", border_style="cyan"))
+    emit_agent_log(state["story_uuid"], f"Đánh giá từ Auditor: \"{result.auditor_feedback}\"")
     
     return {
         "warnings": result.warnings,
@@ -403,6 +425,7 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
     Extracts structured ChapterState, saves files, updates global ledger, cleans up temp draft.
     """
     console.print("\n[bold blue]=== [Node 5] State & Ledger Updater ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 5] Trích xuất Trạng thái & Cập nhật Sổ cái Toàn cục ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -414,6 +437,7 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
             "message": f"Đang cập nhật trạng thái chương và sổ cái toàn cục..."
         })
     console.print("Đang trích xuất trạng thái và cập nhật sổ cái toàn cục...")
+    emit_agent_log(state["story_uuid"], "Đang trích xuất tóm tắt, trạng thái nhân vật và nút thắt từ chương truyện mới...")
     
     draft_content = state["draft_content"]
     story_uuid = state["story_uuid"]
@@ -443,8 +467,10 @@ Hãy điền đầy đủ:
     try:
         content_path.write_text(draft_content, encoding="utf-8")
         console.print(f"✓ Đã ghi nội dung chương truyện vào: [bold green]{content_path}[/bold green]")
+        emit_agent_log(story_uuid, f"✓ Đã lưu nội dung chương truyện vào file chap_{chapter_num}_content.md.")
     except Exception as e:
         console.print(f"[bold red]Lỗi ghi file nội dung chương: {e}[/bold red]")
+        emit_agent_log(story_uuid, f"Lỗi lưu nội dung chương: {e}", level="error")
         
     # 2. Ghi chap_[n]_state.md
     state_path = config.get_chapter_state_path(story_uuid, chapter_num)
@@ -470,8 +496,10 @@ Hãy điền đầy đủ:
             
         state_path.write_text(state_md, encoding="utf-8")
         console.print(f"✓ Đã ghi trạng thái logic vào: [bold green]{state_path}[/bold green]")
+        emit_agent_log(story_uuid, f"✓ Đã lưu trạng thái logic vào file chap_{chapter_num}_state.md.")
     except Exception as e:
         console.print(f"[bold red]Lỗi ghi file trạng thái chương: {e}[/bold red]")
+        emit_agent_log(story_uuid, f"Lỗi lưu trạng thái chương: {e}", level="error")
 
     # 3. Cập nhật global_ledger.json
     ledger_model = GlobalLedger(**ledger)
@@ -520,8 +548,10 @@ Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nh
     try:
         ledger_path.write_text(ledger_model.model_dump_json(indent=2), encoding="utf-8")
         console.print(f"✓ Đã cập nhật Sổ cái Toàn cục: [bold green]{ledger_path}[/bold green]")
+        emit_agent_log(story_uuid, "✓ Đã cập nhật Sổ cái Toàn cục.")
     except Exception as e:
         console.print(f"[bold red]Lỗi cập nhật file Sổ cái: {e}[/bold red]")
+        emit_agent_log(story_uuid, f"Lỗi cập nhật Sổ cái Toàn cục: {e}", level="error")
 
     # 3.5 Tự động phát hiện và trích xuất nhân vật mới
     meta_data = state["meta"]
@@ -529,6 +559,7 @@ Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nh
     existing_names = [c.get("name", "").strip() for c in existing_characters if c.get("name")]
     
     console.print("\n[bold cyan]Đang phân tích xem có nhân vật mới nào xuất hiện trong chương này hay không...[/bold cyan]")
+    emit_agent_log(story_uuid, "Đang kiểm tra xem có nhân vật mới nào xuất hiện trong chương...")
     
     char_prompt = f"""
 Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và tìm xem có nhân vật MỚI nào (có tên riêng cụ thể) xuất hiện lần đầu trong chương này hay không.
@@ -588,9 +619,11 @@ YÊU CẦU:
             
     if new_chars_to_add:
         console.print(f"\n[bold green]✨ Phát hiện {len(new_chars_to_add)} nhân vật mới trong Chương {chapter_num}:[/bold green]")
+        emit_agent_log(story_uuid, f"✨ Phát hiện {len(new_chars_to_add)} nhân vật mới:")
         for c in new_chars_to_add:
             console.print(f"  - [bold yellow]{c['name']}[/bold yellow] ({c['role']}): {c['description']}")
             console.print(f"    [dim]Hoàn cảnh gặp: {c['appearance_context']}[/dim]")
+            emit_agent_log(story_uuid, f"  + {c['name']} ({c['role']}): {c['description']}")
             
         if "characters" not in meta_data:
             meta_data["characters"] = []
@@ -601,6 +634,7 @@ YÊU CẦU:
             story_meta = StoryMeta(**meta_data)
             meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
             console.print(f"✓ Đã tự động cập nhật thông tin nhân vật mới vào file cấu hình: [bold green]{meta_path}[/bold green]")
+            emit_agent_log(story_uuid, "✓ Đã tự động cập nhật thông tin nhân vật mới vào file cấu hình.")
         except Exception as e:
             console.print(f"[bold red]Lỗi ghi file cấu hình truyện (meta.json): {e}[/bold red]")
 
@@ -620,6 +654,7 @@ YÊU CẦU:
             "status": "completed",
             "message": f"Hoàn thành sáng tác Chương {chapter_num}!"
         })
+        emit_agent_log(story_uuid, f"🎉 Hoàn thành sáng tác Chương {chapter_num}!", level="success")
         session_manager.remove_session(story_uuid)
         
     return {"meta": meta_data, "is_done": True}

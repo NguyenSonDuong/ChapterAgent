@@ -70,6 +70,21 @@ def handle_submit_review_feedback(data):
     else:
         emit('response_status', {'status': 'error', 'message': 'Session not found'})
 
+@socketio.on('submit_model_change')
+def handle_submit_model_change(data):
+    """Client provides a new model selection on LLM error/rate limit."""
+    story_uuid = data.get('story_uuid')
+    model_name = data.get('model_name')
+    print(f"Received model change for story {story_uuid}: {model_name}")
+    session = session_manager.get_session(story_uuid)
+    if session:
+        session.input_data = model_name
+        session.input_event.set()
+        emit('response_status', {'status': 'acknowledged', 'story_uuid': story_uuid})
+    else:
+        emit('response_status', {'status': 'error', 'message': 'Session not found'})
+
+
 
 # ----------------------------------------------------
 # Story HTTP APIs (CRUD)
