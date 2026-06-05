@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
@@ -28,6 +29,21 @@ def get_llm(model_name: str = "gemini-1.5-flash", temperature: float = 0.7):
         temperature=temperature,
         google_api_key=api_key
     )
+
+def invoke_with_retry(runnable, prompt, max_retries: int = 3, delay: float = 10.0):
+    """Gọi API với cơ chế thử lại nếu có lỗi xảy ra.
+    Nếu thất bại sau max_retries lần thử lại, raise RuntimeError để hủy quy trình.
+    """
+    for attempt in range(max_retries + 1):
+        try:
+            return runnable.invoke(prompt)
+        except Exception as e:
+            if attempt < max_retries:
+                console.print(f"[bold yellow]⚠️ Lỗi gọi API Gemini: {e}. Thử lại lần {attempt + 1}/{max_retries} sau {delay}s...[/bold yellow]")
+                time.sleep(delay)
+            else:
+                console.print(f"[bold red]❌ Gọi API Gemini thất bại sau {max_retries + 1} lần thử.[/bold red]")
+                raise RuntimeError(f"Không thể hoàn thành cuộc gọi Gemini API do lỗi kết nối/API: {e}")
 
 # --- Pydantic Models for Structured LLM Outputs ---
 
@@ -99,15 +115,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
 1. Nếu ý tưởng còn sơ sài, thiếu logic cốt lõi (ví dụ: giải quyết mâu thuẫn thế nào, động cơ nhân vật, vị trí địa lý bị mâu thuẫn), hãy đưa ra các câu hỏi ngắn gọn để làm rõ trong `missing_info_questions`.
 2. Nếu thông tin đã hòm hòm hoặc sau khi tác giả đã trả lời thêm, hãy tổng hợp bản yêu cầu chi tiết nhất trong `analyzed_requirements`.
 """
-        try:
-            result = structured_llm.invoke(prompt)
-        except Exception as e:
-            console.print(f"[bold red]Lỗi khi gọi API Gemini phân tích yêu cầu: {e}[/bold red]")
-            # Fallback
-            result = RequirementAnalysisResult(
-                missing_info_questions=[],
-                analyzed_requirements=f"Viết chương {chapter_num} dựa trên ý tưởng: {current_idea}"
-            )
+        result = invoke_with_retry(structured_llm, prompt)
             
         # If there are missing info questions, ask user
         if result.missing_info_questions and loop_count < max_loops - 1:
@@ -181,12 +189,8 @@ Yêu cầu viết truyện:
 4. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
 """
     
-    try:
-        response = llm.invoke(prompt)
-        draft_content = response.content
-    except Exception as e:
-        console.print(f"[bold red]Lỗi khi gọi API Gemini để viết nháp: {e}[/bold red]")
-        draft_content = f"# Chương {chapter_num}: Tiêu đề tạm thời\n\n(Lỗi tạo bản thảo: {e})"
+    response = invoke_with_retry(llm, prompt)
+    draft_content = response.content
         
     return {"draft_content": draft_content}
 
@@ -255,12 +259,8 @@ Hãy viết lại bản nháp này. Đảm bảo:
 2. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
 3. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
 """
-    try:
-        response = llm.invoke(prompt)
-        revised_content = response.content
-    except Exception as e:
-        console.print(f"[bold red]Lỗi khi gọi API Gemini để chỉnh sửa: {e}[/bold red]")
-        revised_content = draft_content # Keep original on failure
+    response = invoke_with_retry(llm, prompt)
+    revised_content = response.content
         
     return {"draft_content": revised_content}
 
@@ -315,14 +315,7 @@ Trả về kết quả có cấu trúc:
 1. `warnings`: Danh sách các câu cảnh báo lỗi logic cụ thể, ngắn gọn. Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
 2. `auditor_feedback`: Đánh giá tổng quan về chất lượng logic chương mới này.
 """
-    try:
-        result = structured_llm.invoke(prompt)
-    except Exception as e:
-        console.print(f"[bold red]Lỗi khi gọi API Gemini để kiểm duyệt: {e}[/bold red]")
-        result = AuditResult(
-            warnings=[],
-            auditor_feedback=f"Không thể thực hiện kiểm duyệt logic tự động do lỗi hệ thống: {e}"
-        )
+    result = invoke_with_retry(structured_llm, prompt)
         
     if result.warnings:
         console.print("\n[bold red][CẢNH BÁO LOGIC PHÁT HIỆN TỪ AUDITOR]:[/bold red]")
@@ -370,18 +363,7 @@ Hãy điền đầy đủ:
 4. `threads_resolved`: Danh sách các mối nối/bí ẩn đã được chương này giải đáp (ví dụ: "Tiết lộ kẻ phản bội là quản gia").
 5. `threads_introduced`: Danh sách các nút thắt/manh mối mới mở ra (ví dụ: "Bản đồ cổ chỉ dẫn tới một ngôi đền vô danh ở phía Bắc").
 """
-    try:
-        chap_state = structured_llm.invoke(prompt)
-    except Exception as e:
-        console.print(f"[bold red]Lỗi khi trích xuất trạng thái chương: {e}[/bold red]")
-        # Fallback
-        chap_state = ChapterState(
-            chapter_title=f"Chương {chapter_num}",
-            summary="Chương truyện đã được tạo nhưng gặp lỗi khi trích xuất trạng thái tự động.",
-            character_statuses={},
-            threads_resolved=[],
-            threads_introduced=[]
-        )
+    chap_state = invoke_with_retry(structured_llm, prompt)
         
     # 1. Ghi chap_[n]_content.md
     content_path = config.get_chapter_content_path(story_uuid, chapter_num)
@@ -448,8 +430,8 @@ Và các nút thắt vừa được giải quyết trong chương mới này:
 
 Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nhật). Loại bỏ những cái đã được giải quyết hoặc không còn phù hợp. Chỉ trả về mảng JSON dạng chuỗi `["nút thắt 1", "nút thắt 2"]`. Không thêm gì khác.
 """
+    refine_response = invoke_with_retry(llm, refine_prompt)
     try:
-        refine_response = llm.invoke(refine_prompt)
         # Parse JSON
         content_text = refine_response.content.strip()
         if content_text.startswith("```json"):
