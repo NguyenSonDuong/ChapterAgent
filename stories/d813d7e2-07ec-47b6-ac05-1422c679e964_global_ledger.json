@@ -1,6 +1,15 @@
 {
-  "timeline": [],
+  "timeline": [
+    {
+      "chapter": 1,
+      "title": "Sương Mù Vong Tình",
+      "summary": "Chu Niệm Phàm, một cậu bé nghèo mười tuổi ở Tử Minh trấn, phải lên ngọn núi Vong Tình nguy hiểm để hái U Minh Thảo đổi lấy thuốc cứu người mẹ đang lâm bệnh nặng. Tại đây, cậu tình cờ gặp và dũng cảm giải cứu Chu Linh Nhi - một thiên kim tiểu thư đang bị thương nặng và bị Ma lang săn đuổi. Cả hai hiện đang trốn trong một hốc đá nhỏ, nín thở chờ đợi con quái thú rời đi."
+    }
+  ],
   "unresolved_threads": [
-    "Bắt đầu cuộc phiêu lưu của nhân vật."
+    "Liệu Chu Niệm Phàm và Chu Linh Nhi có thoát khỏi sự truy lùng của con Ma lang ngay ngoài hốc đá?",
+    "Thân thế thực sự của Chu Linh Nhi và kẻ nào đã tập kích khiến cô bị trọng thương?",
+    "Chu Niệm Phàm có tìm được U Minh Thảo và trở về kịp lúc để cứu mạng mẹ mình không?",
+    "Biến động của tu tiên giới sau cái chết của vị tôn giả mạnh nhất nhân tộc và sự trỗi dậy của Ma tộc."
   ]
 }

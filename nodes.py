@@ -45,6 +45,29 @@ def invoke_with_retry(runnable, prompt, max_retries: int = 3, delay: float = 10.
                 console.print(f"[bold red]❌ Gọi API Gemini thất bại sau {max_retries + 1} lần thử.[/bold red]")
                 raise RuntimeError(f"Không thể hoàn thành cuộc gọi Gemini API do lỗi kết nối/API: {e}")
 
+def ensure_string(content) -> str:
+    """Đảm bảo nội dung trả về từ AI là dạng chuỗi (string).
+    Nếu là danh sách (list), gộp các phần tử lại thành chuỗi.
+    """
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for part in content:
+            if isinstance(part, str):
+                parts.append(part)
+            elif isinstance(part, dict):
+                if "text" in part:
+                    parts.append(part["text"])
+                else:
+                    parts.append(str(part))
+            else:
+                parts.append(str(part))
+        return "".join(parts)
+    return str(content)
+
 # --- Pydantic Models for Structured LLM Outputs ---
 
 class RequirementAnalysisResult(BaseModel):
@@ -190,7 +213,7 @@ Yêu cầu viết truyện:
 """
     
     response = invoke_with_retry(llm, prompt)
-    draft_content = response.content
+    draft_content = ensure_string(response.content)
         
     return {"draft_content": draft_content}
 
@@ -260,7 +283,7 @@ Hãy viết lại bản nháp này. Đảm bảo:
 3. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
 """
     response = invoke_with_retry(llm, prompt)
-    revised_content = response.content
+    revised_content = ensure_string(response.content)
         
     return {"draft_content": revised_content}
 
@@ -433,7 +456,7 @@ Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nh
     refine_response = invoke_with_retry(llm, refine_prompt)
     try:
         # Parse JSON
-        content_text = refine_response.content.strip()
+        content_text = ensure_string(refine_response.content).strip()
         if content_text.startswith("```json"):
             content_text = content_text.split("```json")[1].split("```")[0].strip()
         elif content_text.startswith("```"):
