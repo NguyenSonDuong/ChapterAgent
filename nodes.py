@@ -86,6 +86,15 @@ class AuditResult(BaseModel):
         description="Nhận xét chi tiết của kiểm duyệt viên về tính hợp lý, tính nhất quán của cốt truyện và đề xuất sửa đổi nếu có."
     )
 
+class ExtractedCharacter(BaseModel):
+    name: str = Field(description="Tên của nhân vật mới (bắt buộc phải có tên cụ thể, nếu là nhân vật quần chúng không tên như 'thủ hạ', 'gã bảo vệ', 'tên cướp' thì bỏ qua)")
+    role: str = Field(description="Vai trò dự kiến hoặc thực tế của nhân vật trong chương này (ví dụ: phản diện phụ, người qua đường giúp đỡ, kẻ thù mới...)")
+    description: str = Field(description="Mô tả về nhân vật dựa trên nội dung chương (ngoại hình, vũ khí, hành động, thái độ)")
+    appearance_context: str = Field(description="Hoàn cảnh gặp gỡ, thời điểm và sự kiện chính đang xảy ra ở chương này khi họ xuất hiện")
+
+class NewCharactersExtraction(BaseModel):
+    new_characters: List[ExtractedCharacter] = Field(default_factory=list, description="Danh sách các nhân vật mới xuất hiện lần đầu trong chương này. Để trống nếu không có nhân vật mới nào.")
+
 
 # --- LangGraph Node Functions ---
 
@@ -477,6 +486,88 @@ Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nh
     except Exception as e:
         console.print(f"[bold red]Lỗi cập nhật file Sổ cái: {e}[/bold red]")
 
+    # 3.5 Tự động phát hiện và trích xuất nhân vật mới
+    meta_data = state["meta"]
+    existing_characters = meta_data.get("characters", [])
+    existing_names = [c.get("name", "").strip() for c in existing_characters if c.get("name")]
+    
+    console.print("\n[bold cyan]Đang phân tích xem có nhân vật mới nào xuất hiện trong chương này hay không...[/bold cyan]")
+    
+    char_extractor_llm = llm.with_structured_output(NewCharactersExtraction)
+    char_prompt = f"""
+Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và tìm xem có nhân vật MỚI nào (có tên riêng cụ thể) xuất hiện lần đầu trong chương này hay không.
+
+THÔNG TIN TRUYỆN:
+- Tên truyện: {meta_data.get('name')}
+- Danh sách các nhân vật ĐÃ CÓ từ trước: {json.dumps(existing_names, ensure_ascii=False)}
+
+NỘI DUNG CHƯƠNG {chapter_num}:
+---
+{draft_content}
+---
+
+YÊU CẦU:
+1. Đối chiếu kỹ lưỡng các nhân vật xuất hiện trong chương với danh sách nhân vật ĐÃ CÓ.
+2. Chỉ trích xuất các nhân vật MỚI xuất hiện lần đầu trong chương này mà chưa có trong danh sách đã có.
+3. Bỏ qua các nhân vật không có tên cụ thể (ví dụ: "thủ hạ", "người qua đường", "tên cướp", "đám đông").
+4. Bỏ qua các nhân vật có tên là cách gọi khác của các nhân vật đã có (ví dụ: "Linh Nhi" hoặc "Linh nhi" chính là "Chu Linh Nhi").
+5. Mô tả hoàn cảnh gặp gỡ, thời điểm gặp gỡ và sự kiện chính đang xảy ra ở chương này khi họ xuất hiện trong `appearance_context`.
+"""
+    try:
+        extraction_result = invoke_with_retry(char_extractor_llm, char_prompt)
+        new_extracted_chars = extraction_result.new_characters
+    except Exception as e:
+        console.print(f"[bold red]Lỗi khi trích xuất nhân vật mới: {e}[/bold red]")
+        new_extracted_chars = []
+        
+    new_chars_to_add = []
+    existing_names_lower = [name.lower() for name in existing_names]
+    
+    for ext_char in new_extracted_chars:
+        ext_name = ext_char.name.strip()
+        if not ext_name:
+            continue
+        ext_name_lower = ext_name.lower()
+        
+        # Lọc trùng substring / exact match với các nhân vật hiện tại
+        is_duplicate = False
+        for ex_name in existing_names_lower:
+            if ext_name_lower == ex_name or ext_name_lower in ex_name or ex_name in ext_name_lower:
+                is_duplicate = True
+                break
+                
+        if not is_duplicate:
+            # Tránh trùng lặp ngay trong danh sách mới trích xuất
+            if any(c["name"].lower() == ext_name_lower for c in new_chars_to_add):
+                continue
+                
+            new_char = {
+                "name": ext_name,
+                "role": ext_char.role,
+                "description": ext_char.description,
+                "first_chapter": chapter_num,
+                "appearance_context": ext_char.appearance_context
+            }
+            new_chars_to_add.append(new_char)
+            
+    if new_chars_to_add:
+        console.print(f"\n[bold green]✨ Phát hiện {len(new_chars_to_add)} nhân vật mới trong Chương {chapter_num}:[/bold green]")
+        for c in new_chars_to_add:
+            console.print(f"  - [bold yellow]{c['name']}[/bold yellow] ({c['role']}): {c['description']}")
+            console.print(f"    [dim]Hoàn cảnh gặp: {c['appearance_context']}[/dim]")
+            
+        if "characters" not in meta_data:
+            meta_data["characters"] = []
+        meta_data["characters"].extend(new_chars_to_add)
+        
+        meta_path = config.get_meta_path(story_uuid)
+        try:
+            story_meta = StoryMeta(**meta_data)
+            meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
+            console.print(f"✓ Đã tự động cập nhật thông tin nhân vật mới vào file cấu hình: [bold green]{meta_path}[/bold green]")
+        except Exception as e:
+            console.print(f"[bold red]Lỗi ghi file cấu hình truyện (meta.json): {e}[/bold red]")
+
     # 4. Xóa temp_draft.md
     if config.TEMP_DRAFT_PATH.exists():
         try:
@@ -485,4 +576,4 @@ Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nh
         except Exception as e:
             console.print(f"[Warning] Không thể xóa file nháp tạm: {e}")
             
-    return {"is_done": True}
+    return {"meta": meta_data, "is_done": True}

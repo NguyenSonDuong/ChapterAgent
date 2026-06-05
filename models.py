@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 class CharacterInfo(BaseModel):
     name: str = Field(description="Tên nhân vật")
     role: str = Field(description="Vai trò trong câu chuyện (ví dụ: nhân vật chính, đối thủ, bạn bè)")
     description: str = Field(description="Mô tả đặc điểm ngoại hình, tính cách, tiểu sử")
+    first_chapter: Optional[int] = Field(default=None, description="Chương đầu tiên nhân vật xuất hiện")
+    appearance_context: Optional[str] = Field(default=None, description="Hoàn cảnh, thời điểm và sự kiện gặp gỡ lần đầu")
 
 class StoryMeta(BaseModel):
     uuid: str = Field(description="UUID định danh duy nhất của câu chuyện")
