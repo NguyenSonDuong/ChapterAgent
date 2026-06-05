@@ -13,8 +13,8 @@ import src.core.config as config
 from src.models.story import StoryMeta, GlobalLedger, ChapterState
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string
-from src.utils.llm import invoke_with_retry
-from src.utils.session_manager import session_manager
+from src.utils.llm import invoke_with_retry, check_cancellation
+from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import emit_event, emit_agent_log
 
 console = Console()
@@ -53,6 +53,7 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     """Node 1: Requirement Analyzer
     Reads user idea & global ledger, prompts user interactively if details are missing.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 1] Requirement Analyzer ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 1] Phân tích Yêu cầu Sáng tác Chương {state['chapter_num']} ===")
     emit_agent_log(state["story_uuid"], f"Ý tưởng ban đầu: \"{state['user_idea']}\"")
@@ -126,6 +127,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
                 session.input_event.clear()
                 # Wait for max 5 minutes (300 seconds)
                 success = session.input_event.wait(timeout=300.0)
+                check_cancellation(state["story_uuid"])
                 if not success:
                     console.print("[yellow]Hết thời gian chờ phản hồi làm rõ. Tiếp tục quy trình...[/yellow]")
                     emit_agent_log(state["story_uuid"], "Hết thời gian chờ phản hồi làm rõ. Bỏ qua...", level="warning")
@@ -166,6 +168,7 @@ def story_drafter_node(state: AgentState) -> Dict[str, Any]:
     """Node 2: Story Drafter
     Generates the initial chapter draft based on context and analyzed requirements.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 2] Story Drafter ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 2] Sáng tác Bản nháp Chương {state['chapter_num']} ===")
     
@@ -229,6 +232,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     """Node 3: Human Review (Interactive Breakpoint)
     Saves draft to disk as temp_draft.md and asks user for feedback or 'Done'.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 3] Human Review ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 3] Tác giả duyệt Bản nháp Chương {state['chapter_num']} ===")
     
@@ -253,6 +257,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
         # Block until review feedback is submitted
         session.input_event.clear()
         success = session.input_event.wait(timeout=600.0) # 10 minutes timeout
+        check_cancellation(state["story_uuid"])
         if not success:
             console.print("[yellow]Hết thời gian chờ duyệt bản nháp. Mặc định duyệt 'Done'.[/yellow]")
             emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt bản nháp. Tự động phê duyệt bản nháp.", level="warning")
@@ -283,6 +288,7 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     """Node 3.1: Reviser
     Edits draft_content based on user feedback and metadata.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 3.1] Reviser ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 3.1] Sửa đổi Bản nháp theo Yêu cầu ===")
     
@@ -336,6 +342,7 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
     """Node 4: Auditor
     Performs logic check against previous chapter's state and global ledger.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 4] Auditor ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 4] Kiểm duyệt Logic và Sự Nhất quán cốt truyện ===")
     
@@ -424,6 +431,7 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
     """Node 5: State & Ledger Updater
     Extracts structured ChapterState, saves files, updates global ledger, cleans up temp draft.
     """
+    check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 5] State & Ledger Updater ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 5] Trích xuất Trạng thái & Cập nhật Sổ cái Toàn cục ===")
     

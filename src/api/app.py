@@ -18,7 +18,7 @@ import src.core.config as config
 import src.models.story as models
 from src.agent.graph import app as graph_app
 from src.core.state import AgentState
-from src.utils.session_manager import session_manager
+from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import set_socketio, emit_event
 
 app = Flask(__name__)
@@ -418,6 +418,22 @@ def generate_chapter(story_uuid):
             # Execute graph app
             graph_app.invoke(initial_state)
             print(f"Background thread finished successfully for story {story_uuid}")
+        except SessionCancelledError as e:
+            print(f"LangGraph execution cancelled for story {story_uuid}: {e}")
+            # Clean up temp_draft.md
+            if config.TEMP_DRAFT_PATH.exists():
+                try:
+                    config.TEMP_DRAFT_PATH.unlink()
+                    print("✓ Dọn dẹp file nháp tạm temp_draft.md sau khi hủy.")
+                except Exception as ex:
+                    print(f"Warning: Không thể xóa file nháp tạm: {ex}")
+            emit_event("agent_status", {
+                "story_uuid": story_uuid,
+                "chapter_num": next_chap_num,
+                "status": "cancelled",
+                "message": "Tiến trình sáng tác đã bị hủy bởi tác giả."
+            })
+            session_manager.remove_session(story_uuid)
         except Exception as e:
             print(f"Error in background LangGraph execution: {e}")
             emit_event("agent_status", {
@@ -437,6 +453,19 @@ def generate_chapter(story_uuid):
         'status': 'started',
         'chapter': next_chap_num,
         'message': f"Đã bắt đầu tiến trình sáng tác Chương {next_chap_num} ngầm."
+    })
+
+@app.route('/api/stories/<story_uuid>/chapters/cancel', methods=['POST'])
+def cancel_chapter_generation(story_uuid):
+    """Cancel the active chapter generation session."""
+    session = session_manager.get_session(story_uuid)
+    if not session:
+        return jsonify({'error': 'Không có tiến trình sáng tác nào đang chạy cho truyện này.'}), 404
+        
+    session.cancel()
+    return jsonify({
+        'status': 'cancelled',
+        'message': 'Đã gửi yêu cầu hủy tiến trình sáng tác.'
     })
 
 if __name__ == '__main__':

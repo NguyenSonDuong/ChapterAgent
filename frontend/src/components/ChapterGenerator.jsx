@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, MessageSquare, Send, CheckCircle2, AlertTriangle, Eye, ArrowLeft, Terminal } from 'lucide-react';
+import { Sparkles, MessageSquare, Send, CheckCircle2, AlertTriangle, Eye, ArrowLeft, Terminal, XCircle } from 'lucide-react';
 import ProgressBar from './ProgressBar';
 
 // Sub-components for inline widget forms to keep main component clean
@@ -108,6 +108,7 @@ export default function ChapterGenerator({
   const [userIdea, setUserIdea] = useState('');
   const [model, setModel] = useState(defaultModel || 'gemini-2.5-flash');
   const [generating, setGenerating] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [status, setStatus] = useState('idle'); // idle, running, etc.
   const [messages, setMessages] = useState([]);
 
@@ -132,7 +133,7 @@ export default function ChapterGenerator({
     const onAgentStatus = (data) => {
       if (data.story_uuid !== storyUuid) return;
       
-      if (data.status !== 'completed' && data.status !== 'error') {
+      if (data.status !== 'completed' && data.status !== 'error' && data.status !== 'cancelled') {
         setStatus(data.status);
       }
 
@@ -143,6 +144,17 @@ export default function ChapterGenerator({
       } else if (data.status === 'error') {
         setStatus('error');
         setGenerating(false);
+      } else if (data.status === 'cancelled') {
+        setStatus('idle');
+        setGenerating(false);
+        setMessages((prev) => [...prev, {
+          id: `cancel-success-${Date.now()}`,
+          sender: 'system',
+          type: 'system_log',
+          text: 'Tiến trình sáng tác đã bị hủy thành công bởi tác giả.',
+          level: 'warning',
+          time: new Date().toLocaleTimeString()
+        }]);
       }
     };
 
@@ -345,6 +357,38 @@ export default function ChapterGenerator({
     });
 
     setStatus('running');
+  };
+
+  const handleCancel = async () => {
+    if (cancelling) return;
+    setCancelling(true);
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/stories/${storyUuid}/chapters/cancel`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessages((prev) => [...prev, {
+          id: `cancel-error-${Date.now()}`,
+          sender: 'system',
+          type: 'system_log',
+          text: data.error || 'Lỗi không xác định khi hủy tiến trình.',
+          level: 'error',
+          time: new Date().toLocaleTimeString()
+        }]);
+      }
+    } catch (err) {
+      setMessages((prev) => [...prev, {
+        id: `cancel-error-${Date.now()}`,
+        sender: 'system',
+        type: 'system_log',
+        text: `Không thể kết nối đến backend API: ${err.message}`,
+        level: 'error',
+        time: new Date().toLocaleTimeString()
+      }]);
+    } finally {
+      setCancelling(false);
+    }
   };
 
   const renderMessage = (msg, index) => {
@@ -560,7 +604,7 @@ export default function ChapterGenerator({
                 </div>
               )}
 
-              <div className="chat-input-wrapper">
+              <div className="chat-input-wrapper" style={{ display: 'flex', gap: '10px' }}>
                 <input
                   type="text"
                   className="chat-input-bar"
@@ -574,7 +618,19 @@ export default function ChapterGenerator({
                       ? "Hãy đổi model AI inline phía trên..."
                       : "Tiến trình chạy nền đang được thực thi ngầm..."
                   }
+                  style={{ flex: 1 }}
                 />
+                {generating && (
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    disabled={cancelling}
+                    className="btn-cancel"
+                    title="Hủy tiến trình sáng tác"
+                  >
+                    <XCircle className="icon-xs" /> Hủy sáng tác
+                  </button>
+                )}
               </div>
             </div>
           </div>

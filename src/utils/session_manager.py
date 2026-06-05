@@ -1,15 +1,26 @@
 import threading
 from typing import Dict, Any, Optional
 
+class SessionCancelledError(Exception):
+    """Exception raised when a generation session is cancelled by the user."""
+    pass
+
 class GenerationSession:
     """Represents an active LangGraph generation session for a story."""
     def __init__(self, story_uuid: str, chapter_num: int):
         self.story_uuid = story_uuid
         self.chapter_num = chapter_num
         self.input_event = threading.Event()
+        self.cancel_event = threading.Event()
         self.input_data: Any = None
-        self.status = "idle"         # idle, running, waiting_clarification, waiting_review, completed, error
+        self.status = "idle"         # idle, running, waiting_clarification, waiting_review, completed, error, cancelled
         self.current_node: Optional[str] = None
+
+    def cancel(self):
+        """Signal cancellation and unblock any waiting events."""
+        self.cancel_event.set()
+        self.input_event.set()
+
 
 class SessionManager:
     """Manages concurrent generation sessions in background threads."""

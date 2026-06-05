@@ -10,10 +10,17 @@ from rich.panel import Panel
 import src.core.config as config
 from src.models.story import StoryMeta
 from src.core.state import AgentState
-from src.utils.session_manager import session_manager
+from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import emit_event, emit_agent_log
 
 console = Console()
+
+def check_cancellation(story_uuid: str):
+    if not story_uuid:
+        return
+    session = session_manager.get_session(story_uuid)
+    if session and session.cancel_event.is_set():
+        raise SessionCancelledError("Tiến trình sáng tác đã bị hủy bởi người dùng.")
 
 def get_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.7):
     api_key = os.getenv("GOOGLE_API_KEY")
@@ -97,11 +104,15 @@ def update_env_api_key(new_key: str):
 def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, output_schema = None):
     """Gọi API với cơ chế tự động thử lại và xử lý lỗi theo từng nhóm mã trạng thái HTTP.
     """
+    story_uuid = state.get("story_uuid")
+    check_cancellation(story_uuid)
+    
     auth_retries = 0
     server_retries = 0
     rate_limit_retries = 0
     
     while True:
+        check_cancellation(story_uuid)
         model_name = state.get("model", "gemini-2.5-flash")
         try:
             llm = get_llm(model_name, temperature)
@@ -140,6 +151,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             })
             session.input_event.clear()
             success = session.input_event.wait(timeout=300.0)
+            check_cancellation(story_uuid)
             if success and session.input_data:
                 new_model = str(session.input_data).strip()
                 session.input_data = None
@@ -169,9 +181,13 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             auth_retries += 1
             if auth_retries > 3:
                 console.print(f"[bold red]❌ Lỗi xác thực API Gemini liên tục quá 3 lần. Hủy tiến trình sáng tác chương.[/bold red]")
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"Lỗi xác thực API Gemini liên tục quá 3 lần. Hủy tiến trình sáng tác chương.", level="error")
                 raise RuntimeError("Lỗi xác thực API Gemini quá 3 lần.")
                 
             if sys.stdin is None or not sys.stdin.isatty():
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"Lỗi xác thực API Gemini ({code}). Chi tiết: {e_msg}", level="error")
                 raise RuntimeError(f"Lỗi xác thực API Gemini {code}. Chi tiết: {e_msg}")
             new_key = Prompt.ask("API Key mới", password=True)
             if not new_key.strip():
@@ -186,9 +202,15 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             server_retries += 1
             if server_retries <= 3:
                 console.print(f"[bold yellow]⚠️ Lỗi máy chủ Google ({code}): {e_msg}. Đang tự động thử lại lần {server_retries}/3 sau 10s...[/bold yellow]")
-                time.sleep(10.0)
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"⚠️ Lỗi máy chủ Google ({code}): {e_msg}. Đang tự động thử lại lần {server_retries}/3 sau 10s...", level="warning")
+                for _ in range(10):
+                    check_cancellation(story_uuid)
+                    time.sleep(1.0)
             else:
                 console.print(f"\n[bold red]❌ Gặp lỗi máy chủ Google ({code}) liên tục sau 3 lần thử lại.[/bold red]")
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"❌ Gặp lỗi máy chủ Google ({code}) liên tục sau 3 lần thử lại.", level="error")
                 if sys.stdin is None or not sys.stdin.isatty():
                     raise RuntimeError(f"Lỗi máy chủ Google {code} liên tục sau 3 lần thử lại. Chi tiết: {e_msg}")
                 console.print("[bold yellow]Vui lòng chọn model AI khác để tiếp tục quy trình:[/bold yellow]")
@@ -240,6 +262,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 if story_uuid:
                     emit_agent_log(story_uuid, f"Cảnh báo: Lỗi quá giới hạn lưu lượng (Rate Limit 429). Đang tự động đếm ngược thử lại lần {rate_limit_retries}/3...", level="warning")
                 for sec in range(60, 0, -1):
+                    check_cancellation(story_uuid)
                     sys.stdout.write(f"\rĐang chờ thử lại lần {rate_limit_retries}/3 sau quá tải: {sec} giây... ")
                     sys.stdout.flush()
                     time.sleep(1)
@@ -247,6 +270,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 console.print("[bold green]Bắt đầu thử lại...[/bold green]")
             else:
                 console.print(f"\n[bold red]❌ Gặp lỗi Rate Limit (429) liên tục sau 3 lần chờ đợi.[/bold red]")
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"❌ Gặp lỗi Rate Limit (429) liên tục sau 3 lần chờ đợi.", level="error")
                 if sys.stdin is None or not sys.stdin.isatty():
                     raise RuntimeError(f"Lỗi giới hạn tốc độ API Gemini (429) liên tục sau 3 lần thử lại. Chi tiết: {e_msg}")
                 console.print("[bold yellow]Vui lòng chọn model AI khác để tránh giới hạn lưu lượng hiện tại:[/bold yellow]")
@@ -292,6 +317,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                     
         elif code == 404:
             if sys.stdin is None or not sys.stdin.isatty():
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"Lỗi model AI không tồn tại (404). Chi tiết: {e_msg}", level="error")
                 raise RuntimeError(f"Lỗi model AI không tồn tại (404) trong môi trường không có TTY. Chi tiết: {e_msg}")
             
             console.print(f"\n[bold red]❌ Gặp lỗi model AI không tồn tại (404): {e_msg}[/bold red]")
@@ -340,4 +367,6 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 raise RuntimeError("Lỗi model 404 và không chọn model mới.")
         else:
             console.print(f"[bold red]❌ Gặp lỗi không xác định từ API Gemini: {e_msg}[/bold red]")
+            if story_uuid:
+                emit_agent_log(story_uuid, f"❌ Gặp lỗi không xác định từ API Gemini: {e_msg}", level="error")
             raise RuntimeError(f"Lỗi gọi API Gemini không xác định: {e_msg}")
