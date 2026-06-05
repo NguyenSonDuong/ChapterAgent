@@ -23,13 +23,25 @@ Dự án này được thiết kế để giải quyết những thách thức t
 
 ```text
 ChapterAgent/
-├── config.py             # Cấu hình các đường dẫn file và thư mục lưu trữ dữ liệu
-├── models.py             # Định nghĩa cấu trúc dữ liệu Pydantic (Meta, Ledger, State)
-├── state.py              # Định nghĩa AgentState (trạng thái truyền trong LangGraph)
-├── nodes.py              # Xử lý logic tại các bước (nodes) trong đồ thị
-├── graph.py              # Thiết lập cấu trúc đồ thị StateGraph và rẽ nhánh điều kiện
 ├── main.py               # Giao diện dòng lệnh (CLI) tương tác chính với tác giả
 ├── requirements.txt      # Khai báo các thư viện phụ thuộc của dự án
+├── src/                  # Thư mục chứa mã nguồn chính (Modularized)
+│   ├── __init__.py
+│   ├── core/             # Cấu hình hệ thống và trạng thái dùng chung
+│   │   ├── __init__.py
+│   │   ├── config.py     # Quản lý đường dẫn file/thư mục và cấu hình hệ thống
+│   │   └── state.py      # Định nghĩa AgentState (trạng thái truyền trong LangGraph)
+│   ├── models/           # Định nghĩa cấu trúc dữ liệu Pydantic
+│   │   ├── __init__.py
+│   │   └── story.py      # Định nghĩa các mô hình CharacterInfo, StoryMeta, GlobalLedger, ChapterState
+│   ├── agent/            # Xử lý luồng đi và các Node trong đồ thị LangGraph
+│   │   ├── __init__.py
+│   │   ├── nodes.py      # Logic xử lý tại các Nodes
+│   │   └── graph.py      # Sơ đồ và biên dịch StateGraph
+│   └── utils/            # Các tiện ích bổ trợ dùng chung
+│       ├── __init__.py
+│       ├── llm.py        # Quản lý gọi LLM, xử lý lỗi API và tự động thử lại (retry)
+│       └── helpers.py    # Các hàm trợ giúp chuyển đổi kiểu dữ liệu
 └── stories/              # Thư mục chứa dữ liệu các bộ truyện đang sáng tác
     └── <story_uuid>/     # Thư mục cụ thể của từng bộ truyện (định danh bằng UUID)
         ├── <uuid>_meta.json            # Cấu hình bối cảnh, nhân vật chính, phong cách...
@@ -65,76 +77,67 @@ graph TD
 
 ## 🛠️ Chức năng các Module và Lớp trong dự án
 
-### 1. `config.py`
-Module quản lý cấu hình hệ thống và tạo lập môi trường.
-* **Mục đích:** Cung cấp giải pháp đường dẫn động để quản lý độc lập nhiều tác phẩm khác nhau.
-* **Chức năng chính:**
-  * Xác định thư mục gốc (`BASE_DIR`) và thư mục chứa truyện (`STORIES_DIR`).
-  * Định vị file nháp tạm `temp_draft.md` dùng cho quá trình duyệt của tác giả.
-  * Cung cấp các hàm tạo thư mục và lấy đường dẫn file tự động: `get_story_dir()`, `get_chapters_dir()`, `get_states_dir()`, `get_meta_path()`, `get_ledger_path()`, `get_chapter_content_path()`, `get_chapter_state_path()`.
-  * Hàm `check_api_key()` kiểm tra xem tác giả đã cài đặt khóa API Gemini hay chưa.
+### 1. Thư mục `src/core/`
+* **[src/core/config.py](file:///e:/Chapter/ChapterAgent/src/core/config.py)**:
+  * Quản lý các biến cấu hình thư mục: `BASE_DIR`, `STORIES_DIR`, `TEMP_DRAFT_PATH`.
+  * Cung cấp các hàm tạo thư mục và lấy đường dẫn file tự động dựa trên mã truyện: `get_story_dir()`, `get_chapters_dir()`, `get_states_dir()`, `get_meta_path()`, `get_ledger_path()`, `get_chapter_content_path()`, `get_chapter_state_path()`.
+  * Hàm `check_api_key()` kiểm tra sự tồn tại của khóa API Gemini.
+* **[src/core/state.py](file:///e:/Chapter/ChapterAgent/src/core/state.py)**:
+  * Định nghĩa `AgentState` (kế thừa từ `TypedDict`): Lưu trữ toàn bộ thông tin trạng thái chạy trong suốt vòng đời của đồ thị (uuid truyện, số chương, ý tưởng tác giả, văn bản bản nháp, phản hồi ý kiến...).
 
-### 2. `models.py`
-Chứa các lớp cấu trúc dữ liệu chính kế thừa từ `pydantic.BaseModel` để đảm bảo dữ liệu luôn được chuẩn hóa và dễ dàng chuyển đổi qua lại với định dạng JSON.
-* **`CharacterInfo`**:
-  * Lưu trữ thông tin chi tiết về từng nhân vật bao gồm: Tên (`name`), vai trò trong truyện (`role`), mô tả đặc điểm, ngoại hình, tính cách (`description`), chương xuất hiện đầu tiên (`first_chapter`) và hoàn cảnh gặp gỡ đầu tiên (`appearance_context`).
-* **`StoryMeta`**:
-  * Quản lý metadata toàn cục của bộ truyện: Định danh duy nhất (`uuid`), tên tác phẩm (`name`), danh sách nhân vật chính (`characters`), bối cảnh thế giới/cốt truyện chung (`context`), phong cách kể chuyện (`style`), các thẻ nhãn phân loại (`tags`), số chương tối đa dự kiến (`max_chapters`), giới hạn từ mỗi chương (`max_words_per_chapter`), và model AI được chỉ định (`model`).
-* **`GlobalLedger`**:
-  * Đóng vai trò là "cuốn sổ cái" ghi chép lịch sử diễn biến. Gồm:
-    * `timeline`: Danh sách các chương đã viết, mỗi chương gồm số chương, tiêu đề chương, và tóm tắt ngắn gọn.
-    * `unresolved_threads`: Danh sách các nút thắt, bí ẩn hoặc manh mối chưa được giải quyết trong mạch truyện chung.
-* **`ChapterState`**:
-  * Trạng thái chi tiết ngay sau khi một chương kết thúc: Tiêu đề chương (`chapter_title`), tóm tắt chi tiết (`summary`), trạng thái hiện tại của từng nhân vật (`character_statuses` - vị trí, chấn thương, tâm lý...), các nút thắt đã được giải quyết (`threads_resolved`) và các nút thắt mới mở ra (`threads_introduced`).
+### 2. Thư mục `src/models/`
+* **[src/models/story.py](file:///e:/Chapter/ChapterAgent/src/models/story.py)**:
+  * Kế thừa từ `pydantic.BaseModel` để đảm bảo dữ liệu luôn được chuẩn hóa và kiểm tra kiểu chặt chẽ:
+    * `CharacterInfo`: Lưu thông tin chi tiết từng nhân vật (tên, vai trò, mô tả, chương gặp lần đầu...).
+    * `StoryMeta`: Metadata toàn cục của truyện (tên tác phẩm, bối cảnh thế giới, phong cách viết, model AI...).
+    * `GlobalLedger`: Lưu dòng thời gian cốt truyện (`timeline`) và các bí ẩn chưa giải quyết (`unresolved_threads`).
+    * `ChapterState`: Trạng thái chi tiết tại một chương (tóm tắt chương, trạng thái từng nhân vật sau chương, nút thắt được gỡ hoặc mở ra).
 
-### 3. `state.py`
-* **`AgentState`** (kế thừa từ `TypedDict`):
-  * Cấu trúc lưu trữ trạng thái chạy trong suốt vòng đời của đồ thị LangGraph. State này lưu giữ toàn bộ dữ liệu cần thiết của chương hiện tại như: `story_uuid`, `chapter_num`, `user_idea`, `model`, các thông tin meta và ledger tải từ file lên, bản phân tích yêu cầu, nội dung nháp, phản hồi chỉnh sửa của con người, các cảnh báo mâu thuẫn từ kiểm duyệt viên, và cờ báo hoàn thành `is_done`.
+### 3. Thư mục `src/utils/`
+* **[src/utils/helpers.py](file:///e:/Chapter/ChapterAgent/src/utils/helpers.py)**:
+  * Cung cấp các tiện ích xử lý định dạng chuỗi, đặc biệt là `ensure_string` đảm bảo câu trả lời từ các mô hình AI khác nhau luôn ở dạng chuỗi văn bản sạch.
+* **[src/utils/llm.py](file:///e:/Chapter/ChapterAgent/src/utils/llm.py)**:
+  * Quản lý khởi tạo mô hình Chat Google Gemini (`get_llm`).
+  * `classify_exception()`: Phân loại ngoại lệ API thành mã lỗi HTTP tương ứng để chuẩn bị phản ứng (401 - Lỗi API Key, 429 - Vượt hạn mức, 5xx - Lỗi máy chủ).
+  * `invoke_with_retry()`: Gọi API thông minh. Khi gặp lỗi 401/403, tạm dừng và yêu cầu tác giả cập nhật API Key mới ngay trên terminal; khi gặp lỗi 429 hoặc 5xx, cho phép đổi model AI sử dụng (ví dụ chuyển từ `gemini-1.5-flash` sang `gemini-2.5-flash`) lập tức để tiếp tục luồng viết truyện.
 
-### 4. `nodes.py`
-Module quan trọng nhất chứa mã nguồn xử lý logic của từng Node trong đồ thị và các tiện ích hỗ trợ API.
-* **Cơ chế xử lý lỗi API thông minh:**
-  * `classify_exception()`: Phân loại lỗi trả về từ thư viện Google Gemini API thành các mã trạng thái HTTP tiêu chuẩn (401 - Lỗi xác thực, 429 - Quá tải lưu lượng, 5xx - Lỗi máy chủ).
-  * `invoke_with_retry()`: Gọi API với cơ chế tự động thử lại. Đặc biệt:
-    * Khi gặp lỗi xác thực API Key (401/403), chương trình sẽ tạm dừng và yêu cầu tác giả nhập key mới trực tiếp từ console, sau đó tự động ghi đè vào `.env` để tiếp tục.
-    * Khi gặp lỗi quá tải (429) hoặc lỗi hệ thống Google (5xx), chương trình sẽ đếm ngược chờ thử lại hoặc cho phép tác giả nhanh chóng chuyển sang một model khác (như chuyển từ `gemini-1.5-flash` sang `gemini-2.5-flash`) ngay lập tức mà không làm mất tiến trình viết chương.
-* **Chi tiết các Nodes:**
-  * **`requirement_analyzer_node`**: Đối chiếu ý tưởng của tác giả với sổ cái toàn cục và chương trước. Nếu phát hiện thiếu thông tin cốt lõi (động cơ nhân vật, cách thức giải quyết mâu thuẫn...), Node sẽ đưa ra các câu hỏi tương tác yêu cầu tác giả bổ sung trực tiếp tại terminal. Cuối cùng, tổng hợp thành một bản phân tích yêu cầu chi tiết.
-  * **`story_drafter_node`**: Đóng vai trò là nhà văn mạng, kết hợp cấu hình cốt truyện, bối cảnh, văn phong, sổ cái lịch sử, và tham khảo 2000 ký tự cuối của chương trước để viết nên bản nháp chương mới một cách liền mạch, mượt mà dưới dạng Markdown.
-  * **`human_review_node`**: Lưu bản nháp vào file `temp_draft.md` trong thư mục dự án và đưa ra thông báo. Tác giả mở file bằng Text Editor bất kỳ để chỉnh sửa hoặc đọc kiểm tra, sau đó phản hồi lại yêu cầu chỉnh sửa hoặc nhập `Done` tại terminal để đi tiếp.
-  * **`reviser_node`**: Biên tập lại nội dung dựa trên ý kiến chỉnh sửa của tác giả và bản nháp trước đó mà không làm ảnh hưởng đến logic bối cảnh chung.
-  * **`auditor_node`**: Đóng vai trò là biên tập viên kiểm duyệt cốt truyện độc lập. Đối chiếu bản nháp với trạng thái chương trước và sổ cái toàn cục để phát hiện các lỗi logic (như vị trí địa lý sai lệch, trạng thái vật phẩm mâu thuẫn, nhân vật thay đổi quan hệ đột ngột...). Trả về danh sách cảnh báo `warnings` và nhận xét.
-  * **`state_ledger_updater_node`**: Trích xuất dữ liệu chương mới để tạo `ChapterState`. Lưu file nội dung truyện (`chap_x_content.md`), file trạng thái logic (`chap_x_state.md`). Cập nhật sổ cái toàn cục (thêm vào timeline và lọc cập nhật các nút thắt chưa giải quyết). Đồng thời, tự động quét phát hiện các nhân vật mới xuất hiện trong chương để cập nhật vào file cấu hình `meta.json`. Cuối cùng, dọn dẹp file nháp tạm `temp_draft.md`.
+### 4. Thư mục `src/agent/`
+* **[src/agent/nodes.py](file:///e:/Chapter/ChapterAgent/src/agent/nodes.py)**:
+  * `requirement_analyzer_node`: Phân tích ý tưởng và tương tác đặt câu hỏi làm rõ đề cương chương truyện.
+  * `story_drafter_node`: Đóng vai trò là nhà văn mạng viết nháp chương truyện Markdown (tham chiếu 2000 ký tự cuối chương trước).
+  * `human_review_node`: Lưu file `temp_draft.md` để tác giả mở chỉnh sửa và nhận phản hồi.
+  * `reviser_node`: Biên tập và viết lại truyện dựa trên ý kiến chỉnh sửa.
+  * `auditor_node`: Kiểm duyệt lỗi logic (nhất quán cốt truyện) và đưa ra các cảnh báo cụ thể.
+  * `state_ledger_updater_node`: Cập nhật file trạng thái, file nội dung, timeline sổ cái, và tự động quét cập nhật nhân vật mới phát hiện vào file meta.
+* **[src/agent/graph.py](file:///e:/Chapter/ChapterAgent/src/agent/graph.py)**:
+  * Xây dựng đồ thị `StateGraph`, đăng ký các node và thiết lập đường đi. Định nghĩa rẽ nhánh có điều kiện `route_after_human_review` để quyết định quay lại sửa đổi hay đi tiếp tới kiểm duyệt.
 
-### 5. `graph.py`
-* **Mục đích:** Khai báo và biên dịch đồ thị LangGraph.
-* **Chức năng chính:**
-  * Khởi tạo `StateGraph(AgentState)`.
-  * Đăng ký các hàm node từ `nodes.py` vào đồ thị.
-  * Thiết lập luồng chạy cố định: `Requirement Analyzer` ➔ `Story Drafter` ➔ `Human Review`.
-  * Thiết lập liên kết rẽ nhánh có điều kiện (`Conditional Edge`) sau bước `Human Review` thông qua hàm `route_after_human_review(state)`: Nếu nhận phản hồi là `"done"`, chuyển tiếp đến `Auditor` ➔ `Updater` ➔ `END`; nếu nhận phản hồi chỉnh sửa, quay trở lại node `Reviser` ➔ `Human Review` để lặp lại chu kỳ biên tập.
-
-### 6. `main.py`
-* **Mục đích:** Điểm khởi đầu của ứng dụng, chịu trách nhiệm xử lý các tham số dòng lệnh CLI và tương tác trực tiếp với người dùng.
-* **Các lệnh chính:**
-  * `python main.py init`: Khởi tạo tác phẩm mới (nhập tên, bối cảnh, văn phong, các thẻ tag, cấu hình giới hạn và thêm danh sách các nhân vật chính ban đầu).
-  * `python main.py list`: Liệt kê tất cả các truyện hiện có dưới dạng bảng thông tin trực quan.
-  * `python main.py write [--uuid UUID] [--model MODEL]`: Sáng tác chương tiếp theo. Nếu không truyền `uuid`, chương trình sẽ hiển thị danh sách để tác giả chọn. Lệnh này sẽ tự động xác định số chương tiếp theo cần viết, tải dữ liệu lịch sử và khởi chạy đồ thị LangGraph.
-  * `python main.py ledger [--uuid UUID]`: Xem chi tiết sổ cái toàn cục bao gồm danh sách các nút thắt chưa giải quyết và dòng thời gian tóm tắt của các chương trước.
-  * `python main.py meta [--uuid UUID]`: Xem thông tin cấu hình bối cảnh, phong cách và danh sách nhân vật chi tiết của tác phẩm.
-  * `python main.py set-model [--uuid UUID] [--model MODEL]`: Thay đổi model AI sử dụng cho tác phẩm.
+### 5. File `main.py` ở thư mục gốc
+CLI entrypoint xử lý dòng lệnh của tác giả. Tích hợp các chức năng:
+* `init`: Khởi tạo câu chuyện mới.
+* `list`: Liệt kê các tác phẩm đang viết.
+* `write`: Sáng tác chương kế tiếp.
+* `ledger`: Xem dòng thời gian cốt truyện và các nút thắt của tác phẩm.
+* `meta`: Xem thông tin chi tiết cấu hình truyện.
+* `set-model`: Thay đổi model AI mặc định của truyện.
 
 ---
 
 ## 🚀 Hướng dẫn Cài đặt & Sử dụng
 
 ### 1. Chuẩn bị môi trường
-Yêu cầu hệ thống đã cài đặt Python (phiên bản khuyến nghị từ 3.10 trở lên) hoặc công cụ quản lý package Python cực nhanh `uv`.
+Yêu cầu hệ thống đã cài đặt Python (phiên bản khuyến nghị từ 3.10 trở lên).
 
-Cài đặt các thư viện phụ thuộc:
+Cài đặt các thư viện phụ thuộc vào môi trường ảo `.venv`:
 ```bash
-pip install -r requirements.txt
-# Hoặc nếu sử dụng uv:
+# Tạo môi trường ảo (nếu chưa có)
+python -m venv .venv
+# Hoặc dùng uv:
+uv venv
+
+# Cài đặt thư viện phụ thuộc
+.\.venv\Scripts\pip install -r requirements.txt
+# Hoặc dùng uv:
 uv pip install -r requirements.txt
 ```
 
@@ -144,25 +147,25 @@ Tạo file `.env` tại thư mục gốc của dự án và điền khóa API Ge
 GOOGLE_API_KEY=your_gemini_api_key_here
 ```
 
-### 3. Các lệnh chạy chính
+### 3. Các lệnh chạy chính (sử dụng Python trong `.venv`)
 * **Khởi tạo truyện mới:**
-  ```bash
-  python main.py init
+  ```powershell
+  .\.venv\Scripts\python.exe main.py init
   ```
-  Nhập các thông tin theo hướng dẫn trên màn hình. Sau khi hoàn tất, hệ thống sẽ cấp một mã UUID duy nhất cho truyện của bạn.
+  Nhập các thông tin theo hướng dẫn trên màn hình. Sau khi hoàn tất, hệ thống sẽ cấp một mã UUID duy nhất cho truyện.
 
 * **Sáng tác chương tiếp theo:**
-  ```bash
-  python main.py write
+  ```powershell
+  .\.venv\Scripts\python.exe main.py write
   ```
   Chọn bộ truyện muốn viết, nhập ý tưởng sơ bộ của bạn và thực hiện quy trình duyệt bản nháp tương tác tại terminal.
 
 * **Xem sổ cái của truyện:**
-  ```bash
-  python main.py ledger
+  ```powershell
+  .\.venv\Scripts\python.exe main.py ledger
   ```
 
 * **Thay đổi model AI sử dụng cho truyện:**
-  ```bash
-  python main.py set-model
+  ```powershell
+  .\.venv\Scripts\python.exe main.py set-model
   ```

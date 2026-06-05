@@ -6,7 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Define project directories
-BASE_DIR = Path(__file__).resolve().parent
+# Path(__file__) is src/core/config.py
+# .parent is src/core
+# .parent.parent is src
+# .parent.parent.parent is the root directory ChapterAgent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STORIES_DIR = BASE_DIR / "stories"
 
 # Ensure stories directory exists

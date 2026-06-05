@@ -23,10 +23,10 @@ from rich.prompt import Prompt, IntPrompt
 from rich.columns import Columns
 
 
-import config
-import models
-from graph import app
-from state import AgentState
+import src.core.config as config
+import src.models.story as models
+from src.agent.graph import app
+from src.core.state import AgentState
 
 console = Console()
 

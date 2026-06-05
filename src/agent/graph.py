@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, END
-from state import AgentState
-import nodes
+from src.core.state import AgentState
+import src.agent.nodes as nodes
 
 # Khởi tạo đồ thị trạng thái LangGraph
 workflow = StateGraph(AgentState)

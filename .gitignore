@@ -11,3 +11,20 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 .env
+
+### Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+*.md.tmp
+
+### IDEs
+.vscode/
+.idea/
+.project
+.pydevproject
+.settings/
