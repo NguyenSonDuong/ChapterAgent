@@ -1,0 +1,27 @@
+{
+  "uuid": "d813d7e2-07ec-47b6-ac05-1422c679e964",
+  "name": "Sinh vân tử",
+  "characters": [
+    {
+      "name": "Chu Niệm Phàm",
+      "role": "Nam chính",
+      "description": "trầm tính, tốt bụng. kiên định trung thủy linh căn tư chất bình thường. Một đứa bé có gia cảnh cực khổ, Bố mất lâu, mẹ bênh tật cũng khó qua khỏi. Niệm phàm 1 đứa bé phải làm nhiều công việc cố gắng từng ngày để mua thuốc cho mẹ. nhờ có Nữ chính anh có quyết tâm sống và thành tiên để tiến bước cùng Nữ chính.  Chu Linh Nhi nữ chính - là một cô gái có xuất thân cao quý trong 1 lần đi lịch luyện cùng thủ hạ bị địch tập kích, bị trọng thương và được Niệm Phàm cứu, nhờ nam chính cô cảm nhận được tấm lòng thuần khiết và sự quan tâm dịu dàng mà trước giờ ở gia tộc cô chưa hề cảm nhận được"
+    },
+    {
+      "name": "Chu Linh Nhi",
+      "role": "Nữ chính",
+      "description": "Một cô gái có xuất thân cao quý trong 1 lần đi lịch luyện cùng thủ hạ bị địch tập kích, bị trọng thương và được Niệm Phàm cứu, nhờ nam chính cô cảm nhận được tấm lòng thuần khiết và sự quan tâm dịu dàng mà trước giờ ở gia tộc cô chưa hề cảm nhận được. tính cách hoạt bát sôi nổi. ý thức bảo vệ cao"
+    }
+  ],
+  "context": "Vào thời kỳ tu tiên đang tháo trào, ma tộc hoành hành. Nhân tộc và yêu tộc phải cùng nhau chống lại ma tộc. Tại thời kỳ đó Nhân tộc và yêu tộc đang rơi vào tình thế khó khăn khi mà vị tôn giả mạnh nhất của họ đã tọa hóa. thế cân bằng giữa nhân yêu và ma tộc bị thay đổi. ma tộc rục rịch tổng tiến công. Nam chính Chu niệm phàm - Một đứa bé có gia cảnh cực khổ, Bố mất lâu, mẹ bênh tật cũng khó qua khỏi. Niệm phàm 1 đứa bé phải làm nhiều công việc cố gắng từng ngày để mua thuốc cho mẹ. Chu Linh Nhi nữ chính - là một cô gái có xuất thân cao quý trong 1 lần đi lịch luyện cùng thủ hạ bị địch tập kích, bị trọng thương và được Niệm Phàm cứu. 2 con người với 2 tính cách trái ngược nhau nhưng lại thu hút nhau. Nam chính dần dần bước chân vòa con được tu luyện để có thể sánh bước cùng nữ chính. trải qua sinh ly tử biệt muôn vàn trắc trở cuối cùng họ cũng đến được với nhau",
+  "style": "Tu tiên, Hài hước, Tình cảm, Thực tế, Trần trụ, Cảm động, Triết lý. Chung thủy",
+  "tags": [
+    "Tiên hiệp",
+    "Kiếm hiệp",
+    "Chung tình",
+    "Đơn nữ chính"
+  ],
+  "max_chapters": 400,
+  "max_words_per_chapter": 1500,
+  "model": "gemini-1.5-pro"
+}

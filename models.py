@@ -1,0 +1,44 @@
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any
+
+class CharacterInfo(BaseModel):
+    name: str = Field(description="Tên nhân vật")
+    role: str = Field(description="Vai trò trong câu chuyện (ví dụ: nhân vật chính, đối thủ, bạn bè)")
+    description: str = Field(description="Mô tả đặc điểm ngoại hình, tính cách, tiểu sử")
+
+class StoryMeta(BaseModel):
+    uuid: str = Field(description="UUID định danh duy nhất của câu chuyện")
+    name: str = Field(description="Tên tác phẩm")
+    characters: List[CharacterInfo] = Field(default_factory=list, description="Danh sách các nhân vật")
+    context: str = Field(description="Bối cảnh thế giới và cốt truyện chính")
+    style: str = Field(description="Phong cách và giọng điệu kể chuyện (ví dụ: u tối, hài hước, trang nghiêm)")
+    tags: List[str] = Field(default_factory=list, description="Các thẻ phân loại truyện (tags)")
+    max_chapters: int = Field(default=10, description="Số chương tối đa dự kiến")
+    max_words_per_chapter: int = Field(default=2000, description="Giới hạn số từ tối đa mỗi chương")
+    model: str = Field(default="gemini-1.5-flash", description="Model AI sử dụng cho câu chuyện")
+
+class GlobalLedger(BaseModel):
+    timeline: List[Dict[str, Any]] = Field(
+        default_factory=list, 
+        description="Lịch sử các chương đã diễn ra. Mỗi phần tử là dict chứa: chapter (int), title (str), summary (str)"
+    )
+    unresolved_threads: List[str] = Field(
+        default_factory=list, 
+        description="Các mối nối, nút thắt hoặc chi tiết cốt truyện chưa được giải quyết"
+    )
+
+class ChapterState(BaseModel):
+    chapter_title: str = Field(description="Tiêu đề của chương")
+    summary: str = Field(description="Tóm tắt nội dung chính diễn ra trong chương")
+    character_statuses: Dict[str, str] = Field(
+        default_factory=dict, 
+        description="Trạng thái hiện tại của các nhân vật sau chương này (ví dụ: vị trí địa lý, hành trang, sức khỏe, tâm lý)"
+    )
+    threads_resolved: List[str] = Field(
+        default_factory=list, 
+        description="Các nút thắt đã được giải quyết hoặc hé lộ câu trả lời trong chương này"
+    )
+    threads_introduced: List[str] = Field(
+        default_factory=list, 
+        description="Các nút thắt, bí ẩn hoặc mối lo mới được mở ra trong chương này"
+    )
