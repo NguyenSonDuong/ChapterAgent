@@ -138,7 +138,9 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
         story_uuid = state.get("story_uuid")
         session = session_manager.get_session(story_uuid) if story_uuid else None
         should_socket_model_change = session is not None and (
-            code == 404 or (code == 429 and rate_limit_retries > 3)
+            code == 404 or 
+            (code == 429 and rate_limit_retries >= 3) or
+            (code in (500, 503, 504) and server_retries >= 3)
         )
         
         if should_socket_model_change:
