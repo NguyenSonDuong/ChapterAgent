@@ -13,12 +13,12 @@ from src.core.state import AgentState
 
 console = Console()
 
-def get_llm(model_name: str = "gemini-1.5-flash", temperature: float = 0.7):
+def get_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.7):
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY environment variable not set. Please check your .env file.")
     if not model_name:
-        model_name = "gemini-1.5-flash"
+        model_name = "gemini-2.5-flash"
     return ChatGoogleGenerativeAI(
         model=model_name,
         temperature=temperature,
@@ -98,7 +98,7 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
     rate_limit_retries = 0
     
     while True:
-        model_name = state.get("model", "gemini-1.5-flash")
+        model_name = state.get("model", "gemini-2.5-flash")
         try:
             llm = get_llm(model_name, temperature)
             runnable = llm.with_structured_output(output_schema) if output_schema else llm
@@ -123,10 +123,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 console.print(f"[bold red]❌ Lỗi xác thực API Gemini liên tục quá 3 lần. Hủy tiến trình sáng tác chương.[/bold red]")
                 raise RuntimeError("Lỗi xác thực API Gemini quá 3 lần.")
                 
-            console.print(f"\n[bold red]⚠️ Lỗi xác thực (API Key không hợp lệ hoặc không có quyền truy cập - Lỗi {code}).[/bold red]")
-            console.print(f"[bold yellow]Chi tiết lỗi: {e_msg}[/bold yellow]")
-            console.print(f"[bold cyan]Nhập lại GOOGLE_API_KEY mới (Lần thử lại {auth_retries}/3):[/bold cyan]")
-            
+            if sys.stdin is None or not sys.stdin.isatty():
+                raise RuntimeError(f"Lỗi xác thực API Gemini {code}. Chi tiết: {e_msg}")
             new_key = Prompt.ask("API Key mới", password=True)
             if not new_key.strip():
                 console.print("[bold red]API Key trống. Hủy tiến trình sáng tác.[/bold red]")
@@ -141,8 +139,9 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             if server_retries <= 3:
                 console.print(f"[bold yellow]⚠️ Lỗi máy chủ Google ({code}): {e_msg}. Đang tự động thử lại lần {server_retries}/3 sau 10s...[/bold yellow]")
                 time.sleep(10.0)
-            else:
                 console.print(f"\n[bold red]❌ Gặp lỗi máy chủ Google ({code}) liên tục sau 3 lần thử lại.[/bold red]")
+                if sys.stdin is None or not sys.stdin.isatty():
+                    raise RuntimeError(f"Lỗi máy chủ Google {code} liên tục sau 3 lần thử lại. Chi tiết: {e_msg}")
                 console.print("[bold yellow]Vui lòng chọn model AI khác để tiếp tục quy trình:[/bold yellow]")
                 console.print(" 1. [bold cyan]gemini-1.5-flash[/bold cyan]")
                 console.print(" 2. [bold cyan]gemini-1.5-pro[/bold cyan]")
@@ -197,6 +196,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                 console.print("[bold green]Bắt đầu thử lại...[/bold green]")
             else:
                 console.print(f"\n[bold red]❌ Gặp lỗi Rate Limit (429) liên tục sau 3 lần chờ đợi.[/bold red]")
+                if sys.stdin is None or not sys.stdin.isatty():
+                    raise RuntimeError(f"Lỗi giới hạn tốc độ API Gemini (429) liên tục sau 3 lần thử lại. Chi tiết: {e_msg}")
                 console.print("[bold yellow]Vui lòng chọn model AI khác để tránh giới hạn lưu lượng hiện tại:[/bold yellow]")
                 console.print(" 1. [bold cyan]gemini-1.5-flash[/bold cyan]")
                 console.print(" 2. [bold cyan]gemini-1.5-pro[/bold cyan]")

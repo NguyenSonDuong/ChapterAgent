@@ -17,7 +17,7 @@ class StoryMeta(BaseModel):
     tags: List[str] = Field(default_factory=list, description="Các thẻ phân loại truyện (tags)")
     max_chapters: int = Field(default=10, description="Số chương tối đa dự kiến")
     max_words_per_chapter: int = Field(default=2000, description="Giới hạn số từ tối đa mỗi chương")
-    model: str = Field(default="gemini-1.5-flash", description="Model AI sử dụng cho câu chuyện")
+    model: str = Field(default="gemini-2.5-flash", description="Model AI sử dụng cho câu chuyện")
 
 class GlobalLedger(BaseModel):
     timeline: List[Dict[str, Any]] = Field(
