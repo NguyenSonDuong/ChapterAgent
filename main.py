@@ -1,5 +1,15 @@
-import os
 import sys
+import io
+
+# Đảm bảo UTF-8 cho Windows console để hiển thị tiếng Việt không bị lỗi
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    except Exception:
+        pass
+
+import os
 import uuid
 import json
 import argparse
@@ -11,6 +21,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt
 from rich.columns import Columns
+
 
 import config
 import models
