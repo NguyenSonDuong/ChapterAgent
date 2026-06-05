@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import sys
 from pathlib import Path
 
@@ -444,10 +447,8 @@ def generate_chapter(story_uuid):
             })
             session_manager.remove_session(story_uuid)
 
-    # Launch thread
-    thread = threading.Thread(target=run_graph_flow)
-    thread.daemon = True
-    thread.start()
+    # Launch background task via socketio to ensure compatibility with eventlet/gevent
+    socketio.start_background_task(run_graph_flow)
 
     return jsonify({
         'status': 'started',
