@@ -73,27 +73,56 @@ function ReviewReplyForm({ onSubmit }) {
 }
 
 function ModelChangeForm({ onSubmit, currentModel }) {
-  const [selectedModel, setSelectedModel] = useState(currentModel || 'gemini-2.5-flash');
+  const standardModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+  const isStandard = standardModels.includes(currentModel);
+  const [selectedOption, setSelectedOption] = useState(isStandard ? currentModel : (currentModel ? 'other' : 'gemini-2.5-flash'));
+  const [customModel, setCustomModel] = useState(!isStandard && currentModel ? currentModel : '');
+
+  const handleConfirm = () => {
+    const finalModel = selectedOption === 'other' ? customModel.trim() : selectedOption;
+    if (selectedOption === 'other' && !customModel.trim()) {
+      alert('Vui lòng nhập tên model AI!');
+      return;
+    }
+    onSubmit(finalModel);
+  };
+
   return (
     <div className="widget-reply-area">
       <p className="instruction-text text-muted">Vui lòng lựa chọn model AI dự phòng để tiếp tục tiến trình:</p>
-      <div className="form-row align-items-center" style={{ display: 'flex', gap: '10px' }}>
-        <select 
-          className="form-select flex-1" 
-          value={selectedModel} 
-          onChange={e => setSelectedModel(e.target.value)}
-        >
-          <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng)</option>
-          <option value="gemini-2.5-pro">gemini-2.5-pro (Mạnh mẽ)</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash (Mới)</option>
-          <option value="gemini-1.5-pro">gemini-1.5-pro (Thông minh)</option>
-        </select>
-        <button 
-          onClick={() => onSubmit(selectedModel)} 
-          className="btn-primary-sm btn-red"
-        >
-          <Sparkles className="icon-xs" /> Xác nhận & Thử lại
-        </button>
+      <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
+          <select 
+            className="form-select flex-1" 
+            value={selectedOption} 
+            onChange={e => setSelectedOption(e.target.value)}
+          >
+            <option value="gemini-1.5-flash">1. gemini-1.5-flash</option>
+            <option value="gemini-1.5-pro">2. gemini-1.5-pro</option>
+            <option value="gemini-2.0-flash">3. gemini-2.0-flash</option>
+            <option value="gemini-2.5-flash">4. gemini-2.5-flash</option>
+            <option value="gemini-2.5-pro">5. gemini-2.5-pro</option>
+            <option value="other">6. Khác (Nhập thủ công)</option>
+          </select>
+          <button 
+            onClick={handleConfirm} 
+            className="btn-primary-sm btn-red"
+          >
+            <Sparkles className="icon-xs" /> Xác nhận & Thử lại
+          </button>
+        </div>
+        {selectedOption === 'other' && (
+          <div className="custom-model-input-row fade-in" style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
+            <input 
+              type="text" 
+              className="form-input-sm" 
+              style={{ flex: 1 }}
+              value={customModel} 
+              onChange={e => setCustomModel(e.target.value)} 
+              placeholder="Nhập tên Model AI (Ví dụ: gemini-2.5-pro-experimental)..."
+            />
+          </div>
+        )}
       </div>
     </div>
   );
