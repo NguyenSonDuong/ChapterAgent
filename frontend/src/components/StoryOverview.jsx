@@ -135,6 +135,32 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     }
   };
 
+  // API Call: Resolve Thread manually
+  const handleResolveThread = async (index) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/stories/${storyMeta.uuid}/ledger/threads/${index}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          chapter_resolved: resolvingThreadChapter ? parseInt(resolvingThreadChapter) : null,
+          resolution_note: resolvingThreadNote.trim()
+        })
+      });
+      if (res.ok) {
+        setResolvingThreadIndex(null);
+        setResolvingThreadNote('');
+        setResolvingThreadChapter('');
+        if (onRefreshDetails) onRefreshDetails();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Lỗi khi giải quyết nút thắt.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Không thể kết nối đến backend server.');
+    }
+  };
+
   // API Call: Add Character
   const handleAddCharacter = async () => {
     if (!newChar.name.trim() || !newChar.role.trim()) {
@@ -452,137 +478,275 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
           </div>
         </div>
 
-        {/* Right column: Unresolved Threads */}
+        {/* Right column: Threads (Unresolved/Resolved tabs) */}
         <div className="overview-col glass">
-          <div className="col-header">
-            <HelpCircle className="icon-sm text-yellow" />
-            <h3>Nút Thắt Cốt Truyện Chưa Giải Quyết ({unresolved.length})</h3>
+          <div className="col-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <HelpCircle className="icon-sm text-yellow" />
+              <h3 style={{ margin: 0 }}>Nút Thắt Cốt Truyện</h3>
+            </div>
+            <div className="tab-switcher" style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', padding: '2px' }}>
+              <button
+                className={`tab-btn ${threadsTab === 'unresolved' ? 'active' : ''}`}
+                onClick={() => setThreadsTab('unresolved')}
+                style={{
+                  border: 'none',
+                  background: threadsTab === 'unresolved' ? 'var(--color-cyan)' : 'transparent',
+                  color: threadsTab === 'unresolved' ? '#10141f' : 'var(--text-secondary)',
+                  padding: '4px 12px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Chưa giải ({unresolved.length})
+              </button>
+              <button
+                className={`tab-btn ${threadsTab === 'resolved' ? 'active' : ''}`}
+                onClick={() => setThreadsTab('resolved')}
+                style={{
+                  border: 'none',
+                  background: threadsTab === 'resolved' ? 'var(--color-cyan)' : 'transparent',
+                  color: threadsTab === 'resolved' ? '#10141f' : 'var(--text-secondary)',
+                  padding: '4px 12px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Đã giải ({storyLedger?.resolved_threads?.length || 0})
+              </button>
+            </div>
           </div>
-          <div className="unresolved-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '450px', paddingRight: '4px' }}>
-            {unresolved.map((thread, index) => {
-              const isEditing = editingThreadIndex === index;
-              
-              // Support both string (old data) and object (new data)
-              const threadText = typeof thread === 'object' && thread !== null ? thread.thread : thread;
-              const threadChapter = typeof thread === 'object' && thread !== null ? thread.chapter : null;
 
-              return (
-                <div key={index} className="unresolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-yellow)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-start' }}>
-                    <div style={{ display: 'flex', gap: '12px', flex: 1, alignItems: 'flex-start' }}>
-                      <span className="thread-number" style={{ color: 'var(--color-yellow)', fontWeight: '600', fontSize: '13px' }}>#{index + 1}</span>
-                      {isEditing ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-                          <div>
-                            <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Nội dung nút thắt</label>
-                            <textarea
-                              value={editingThreadText}
-                              onChange={(e) => setEditingThreadText(e.target.value)}
-                              className="form-control"
-                              rows={2}
-                              style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }}
-                            />
-                          </div>
-                          <div>
-                            <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Chương xuất hiện</label>
-                            <input
-                              type="number"
-                              placeholder="Số chương..."
-                              value={editingThreadChapter}
-                              onChange={(e) => setEditingThreadChapter(e.target.value)}
-                              style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', outline: 'none' }}
-                            />
-                          </div>
+          <div className="threads-list-container" style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '450px', paddingRight: '4px' }}>
+            {threadsTab === 'unresolved' ? (
+              <>
+                {unresolved.map((thread, index) => {
+                  const isEditing = editingThreadIndex === index;
+                  const isResolving = resolvingThreadIndex === index;
+                  
+                  // Support both string (old data) and object (new data)
+                  const threadText = typeof thread === 'object' && thread !== null ? thread.thread : thread;
+                  const threadChapter = typeof thread === 'object' && thread !== null ? thread.chapter : null;
+
+                  if (isResolving) {
+                    return (
+                      <div key={index} className="unresolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-green)' }}>
+                        <div>
+                          <span style={{ color: 'var(--color-green)', fontWeight: '600', fontSize: '13px' }}>Giải quyết: </span>
+                          <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>"{threadText}"</span>
                         </div>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <p className="thread-text" style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.5' }}>{threadText}</p>
-                          {threadChapter !== null && threadChapter !== undefined && (
-                            <span className="meta-badge chapter-badge" style={{ fontSize: '11px', padding: '2px 6px', background: 'rgba(234, 179, 8, 0.1)', borderColor: 'rgba(234, 179, 8, 0.2)', color: 'var(--color-yellow)', alignSelf: 'flex-start' }}>
-                              Xuất hiện: Chương {threadChapter}
-                            </span>
+                        <div>
+                          <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Cách giải quyết / Ghi chú</label>
+                          <textarea
+                            placeholder="Mô tả cách nút thắt này được giải quyết..."
+                            value={resolvingThreadNote}
+                            onChange={(e) => setResolvingThreadNote(e.target.value)}
+                            className="form-control"
+                            rows={2}
+                            style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Chương giải quyết (Bỏ trống nếu không rõ)</label>
+                          <input
+                            type="number"
+                            placeholder="Nhập số chương giải quyết..."
+                            value={resolvingThreadChapter}
+                            onChange={(e) => setResolvingThreadChapter(e.target.value)}
+                            style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', outline: 'none' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
+                          <button onClick={() => setResolvingThreadIndex(null)} className="btn-secondary-sm">Hủy</button>
+                          <button onClick={() => handleResolveThread(index)} className="btn-primary-sm" style={{ background: 'var(--color-green)', borderColor: 'var(--color-green)', color: '#10141f' }}>Xác nhận</button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={index} className="unresolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-yellow)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', gap: '12px', flex: 1, alignItems: 'flex-start' }}>
+                          <span className="thread-number" style={{ color: 'var(--color-yellow)', fontWeight: '600', fontSize: '13px' }}>#{index + 1}</span>
+                          {isEditing ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                              <div>
+                                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Nội dung nút thắt</label>
+                                <textarea
+                                  value={editingThreadText}
+                                  onChange={(e) => setEditingThreadText(e.target.value)}
+                                  className="form-control"
+                                  rows={2}
+                                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }}
+                                />
+                              </div>
+                              <div>
+                                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Chương xuất hiện</label>
+                                <input
+                                  type="number"
+                                  placeholder="Số chương..."
+                                  value={editingThreadChapter}
+                                  onChange={(e) => setEditingThreadChapter(e.target.value)}
+                                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', outline: 'none' }}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <p className="thread-text" style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.5' }}>{threadText}</p>
+                              {threadChapter !== null && threadChapter !== undefined && (
+                                <span className="meta-badge chapter-badge" style={{ fontSize: '11px', padding: '2px 6px', background: 'rgba(234, 179, 8, 0.1)', borderColor: 'rgba(234, 179, 8, 0.2)', color: 'var(--color-yellow)', alignSelf: 'flex-start' }}>
+                                  Xuất hiện: Chương {threadChapter}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
-                      )}
+                        <div style={{ display: 'flex', gap: '4px', marginLeft: '12px' }}>
+                          {isEditing ? (
+                            <>
+                              <button onClick={() => handleSaveThread(index)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Lưu">
+                                <Check className="icon-xs text-green" />
+                              </button>
+                              <button onClick={() => setEditingThreadIndex(null)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Hủy">
+                                <X className="icon-xs text-red" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button 
+                                onClick={() => {
+                                  setResolvingThreadIndex(index);
+                                  setResolvingThreadNote('');
+                                  setResolvingThreadChapter('');
+                                }}
+                                className="btn-icon"
+                                style={{ width: '28px', height: '28px' }}
+                                title="Giải quyết nút thắt"
+                              >
+                                <Check className="icon-xs text-green" />
+                              </button>
+                              <button 
+                                onClick={() => { 
+                                  setEditingThreadIndex(index); 
+                                  setEditingThreadText(threadText); 
+                                  setEditingThreadChapter(threadChapter !== null ? String(threadChapter) : ''); 
+                                }} 
+                                className="btn-icon" 
+                                style={{ width: '28px', height: '28px' }} 
+                                title="Sửa"
+                              >
+                                <Edit className="icon-xs" />
+                              </button>
+                              <button onClick={() => handleDeleteThread(index)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Xóa">
+                                <Trash2 className="icon-xs text-red" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '4px', marginLeft: '12px' }}>
-                      {isEditing ? (
-                        <>
-                          <button onClick={() => handleSaveThread(index)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Lưu">
-                            <Check className="icon-xs text-green" />
-                          </button>
-                          <button onClick={() => setEditingThreadIndex(null)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Hủy">
-                            <X className="icon-xs text-red" />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button 
-                            onClick={() => { 
-                              setEditingThreadIndex(index); 
-                              setEditingThreadText(threadText); 
-                              setEditingThreadChapter(threadChapter !== null ? String(threadChapter) : ''); 
-                            }} 
-                            className="btn-icon" 
-                            style={{ width: '28px', height: '28px' }} 
-                            title="Sửa"
-                          >
-                            <Edit className="icon-xs" />
-                          </button>
-                          <button onClick={() => handleDeleteThread(index)} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Xóa">
-                            <Trash2 className="icon-xs text-red" />
-                          </button>
-                        </>
-                      )}
+                  );
+                })}
+
+                {/* Form thêm mới Thread */}
+                {isAddingThread ? (
+                  <div className="unresolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-yellow)' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Nội dung nút thắt</label>
+                      <textarea
+                        placeholder="Nhập nút thắt cốt truyện mới cần giải quyết..."
+                        value={newThreadText}
+                        onChange={(e) => setNewThreadText(e.target.value)}
+                        className="form-control"
+                        rows={2}
+                        style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Chương xuất hiện (Bỏ trống nếu không rõ)</label>
+                      <input
+                        type="number"
+                        placeholder="Nhập số chương..."
+                        value={newThreadChapter}
+                        onChange={(e) => setNewThreadChapter(e.target.value)}
+                        style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
+                      <button onClick={() => { setIsAddingThread(false); setNewThreadChapter(''); setNewThreadText(''); }} className="btn-secondary-sm">Hủy</button>
+                      <button onClick={handleAddThread} className="btn-primary-sm">Thêm</button>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                ) : (
+                  <button 
+                    onClick={() => setIsAddingThread(true)} 
+                    className="btn-secondary-sm" 
+                    style={{ width: '100%', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                  >
+                    <Plus className="icon-xs" /> Thêm Nút Thắt Mới
+                  </button>
+                )}
 
-            {/* Form thêm mới Thread */}
-            {isAddingThread ? (
-              <div className="unresolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-yellow)' }}>
-                <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Nội dung nút thắt</label>
-                  <textarea
-                    placeholder="Nhập nút thắt cốt truyện mới cần giải quyết..."
-                    value={newThreadText}
-                    onChange={(e) => setNewThreadText(e.target.value)}
-                    className="form-control"
-                    rows={2}
-                    style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Chương xuất hiện (Bỏ trống nếu không rõ)</label>
-                  <input
-                    type="number"
-                    placeholder="Nhập số chương..."
-                    value={newThreadChapter}
-                    onChange={(e) => setNewThreadChapter(e.target.value)}
-                    style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '8px', fontSize: '13px', outline: 'none' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
-                  <button onClick={() => { setIsAddingThread(false); setNewThreadChapter(''); setNewThreadText(''); }} className="btn-secondary-sm">Hủy</button>
-                  <button onClick={handleAddThread} className="btn-primary-sm">Thêm</button>
-                </div>
-              </div>
+                {unresolved.length === 0 && !isAddingThread && (
+                  <div className="unresolved-empty" style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <p className="text-green">✓ Tất cả các nút thắt đã được giải quyết!</p>
+                  </div>
+                )}
+              </>
             ) : (
-              <button 
-                onClick={() => setIsAddingThread(true)} 
-                className="btn-secondary-sm" 
-                style={{ width: '100%', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
-              >
-                <Plus className="icon-xs" /> Thêm Nút Thắt Mới
-              </button>
-            )}
+              <>
+                {(storyLedger?.resolved_threads || []).map((thread, index) => {
+                  const threadText = typeof thread === 'object' && thread !== null ? thread.thread : thread;
+                  const threadChapIntro = typeof thread === 'object' && thread !== null ? thread.chapter_introduced : null;
+                  const threadChapResolved = typeof thread === 'object' && thread !== null ? thread.chapter_resolved : null;
+                  const threadNote = typeof thread === 'object' && thread !== null ? thread.resolution_note : '';
 
-            {unresolved.length === 0 && !isAddingThread && (
-              <div className="unresolved-empty">
-                <p className="text-green">✓ Tất cả các nút thắt đã được giải quyết!</p>
-              </div>
+                  return (
+                    <div key={index} className="resolved-item glass-light" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', borderRadius: '8px', borderLeft: '3px solid var(--color-green)' }}>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <span className="thread-number" style={{ color: 'var(--color-green)', fontWeight: '600', fontSize: '13px' }}>#{index + 1}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+                          <p className="thread-text" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'line-through', lineHeight: '1.5' }}>{threadText}</p>
+                          
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
+                            {threadChapIntro !== null && threadChapIntro !== undefined && (
+                              <span className="meta-badge chapter-badge" style={{ fontSize: '10px', padding: '1px 4px', background: 'rgba(234, 179, 8, 0.05)', borderColor: 'rgba(234, 179, 8, 0.1)', color: 'rgba(234, 179, 8, 0.8)' }}>
+                                Xuất hiện: Chương {threadChapIntro}
+                              </span>
+                            )}
+                            {threadChapResolved !== null && threadChapResolved !== undefined && (
+                              <span className="meta-badge chapter-badge" style={{ fontSize: '10px', padding: '1px 4px', background: 'rgba(34, 197, 94, 0.1)', borderColor: 'rgba(34, 197, 94, 0.2)', color: 'var(--color-green)' }}>
+                                Giải quyết: Chương {threadChapResolved}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {threadNote && (
+                            <div style={{ marginTop: '6px', padding: '6px 10px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '4px', borderLeft: '2px solid rgba(34, 197, 94, 0.3)' }}>
+                              <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', fontWeight: '600', marginBottom: '2px' }}>Cách giải quyết:</span>
+                              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4', margin: 0 }}>{threadNote}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {(!storyLedger?.resolved_threads || storyLedger.resolved_threads.length === 0) && (
+                  <div className="unresolved-empty" style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <p className="text-muted">Chưa có nút thắt nào được giải quyết.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
