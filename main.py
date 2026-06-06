@@ -304,7 +304,14 @@ def handle_ledger(args):
     # Unresolved threads panel
     threads_text = ""
     for idx, t in enumerate(ledger.get("unresolved_threads", [])):
-        threads_text += f"[bold yellow]{idx+1}.[/bold yellow] {t}\n"
+        if isinstance(t, dict):
+            thread_text_item = t.get("thread", "")
+            chap = t.get("chapter")
+            if chap is not None:
+                thread_text_item += f" [dim](Chương {chap})[/dim]"
+        else:
+            thread_text_item = str(t)
+        threads_text += f"[bold yellow]{idx+1}.[/bold yellow] {thread_text_item}\n"
     if not threads_text:
         threads_text = "[green]Tất cả các nút thắt đã được giải quyết![/green]"
     console.print(Panel(threads_text.strip(), title="Nút thắt chưa giải quyết", border_style="yellow"))

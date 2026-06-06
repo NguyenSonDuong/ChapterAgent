@@ -218,6 +218,8 @@ export default function App() {
                 <StoryOverview 
                   storyMeta={storyMeta} 
                   storyLedger={storyLedger} 
+                  backendUrl={BACKEND_URL}
+                  onRefreshDetails={() => fetchStoryDetails(selectedStoryId)}
                 />
               )}
               {activeTab === 'reader' && (

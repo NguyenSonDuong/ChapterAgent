@@ -237,6 +237,286 @@ def update_story_ledger(story_uuid):
 
 
 # ----------------------------------------------------
+# Global Ledger & Meta Details management APIs
+# ----------------------------------------------------
+
+def is_main_character(role: str) -> bool:
+    if not role:
+        return False
+    return role.strip().lower() in ["chính", "nhân vật chính", "main", "protagonist"]
+
+@app.route('/api/stories/<story_uuid>/model', methods=['PUT'])
+def update_story_model(story_uuid):
+    """Update only the default AI model for a story."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story not found'}), 404
+
+    data = request.json
+    if not data or 'model' not in data:
+        return jsonify({'error': 'Missing model field in request body'}), 400
+
+    new_model = data['model'].strip()
+    if not new_model:
+        return jsonify({'error': 'Model name cannot be empty'}), 400
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        meta['model'] = new_model
+        # Validate and save
+        validated_meta = models.StoryMeta(**meta)
+        meta_path.write_text(validated_meta.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({'message': 'Model updated successfully', 'model': validated_meta.model})
+    except Exception as e:
+        return jsonify({'error': f'Failed to update model: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/threads', methods=['POST'])
+def add_ledger_thread(story_uuid):
+    """Add a new unresolved thread to the ledger."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+
+    data = request.json
+    if not data or 'thread' not in data:
+        return jsonify({'error': 'Missing thread field in request body'}), 400
+
+    new_thread = data['thread'].strip()
+    if not new_thread:
+        return jsonify({'error': 'Thread text cannot be empty'}), 400
+
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        if 'unresolved_threads' not in ledger:
+            ledger['unresolved_threads'] = []
+            
+        new_chapter = data.get('chapter')
+        thread_item = {
+            'thread': new_thread,
+            'chapter': int(new_chapter) if new_chapter is not None and str(new_chapter).strip() != "" else None
+        }
+        ledger['unresolved_threads'].append(thread_item)
+
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Thread added successfully',
+            'unresolved_threads': [t.model_dump() for t in validated_ledger.unresolved_threads]
+        }), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add thread: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/threads/<int:index>', methods=['PUT'])
+def edit_ledger_thread(story_uuid, index):
+    """Edit an unresolved thread in the ledger by index."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+
+    data = request.json
+    if not data or 'thread' not in data:
+        return jsonify({'error': 'Missing thread field in request body'}), 400
+
+    updated_thread = data['thread'].strip()
+    if not updated_thread:
+        return jsonify({'error': 'Thread text cannot be empty'}), 400
+
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        threads = ledger.get('unresolved_threads', [])
+        if index < 0 or index >= len(threads):
+            return jsonify({'error': f'Invalid thread index {index}'}), 400
+
+        updated_chapter = data.get('chapter')
+        threads[index] = {
+            'thread': updated_thread,
+            'chapter': int(updated_chapter) if updated_chapter is not None and str(updated_chapter).strip() != "" else None
+        }
+        ledger['unresolved_threads'] = threads
+
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Thread updated successfully',
+            'unresolved_threads': [t.model_dump() for t in validated_ledger.unresolved_threads]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to update thread: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/threads/<int:index>', methods=['DELETE'])
+def delete_ledger_thread(story_uuid, index):
+    """Delete an unresolved thread from the ledger by index."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        threads = ledger.get('unresolved_threads', [])
+        if index < 0 or index >= len(threads):
+            return jsonify({'error': f'Invalid thread index {index}'}), 400
+
+        threads.pop(index)
+        ledger['unresolved_threads'] = threads
+
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Thread deleted successfully',
+            'unresolved_threads': [t.model_dump() for t in validated_ledger.unresolved_threads]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete thread: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/characters', methods=['POST'])
+def add_story_character(story_uuid):
+    """Add a new character to the story (excluding main character roles)."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    data = request.json or {}
+    char_name = data.get('name', '').strip()
+    char_role = data.get('role', '').strip()
+    char_description = data.get('description', '').strip()
+
+    if not char_name:
+        return jsonify({'error': 'Character name is required'}), 400
+    if not char_role:
+        return jsonify({'error': 'Character role is required'}), 400
+
+    if is_main_character(char_role):
+        return jsonify({'error': 'Không thể thêm nhân vật chính mới tại đây'}), 400
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        characters = meta.get('characters', [])
+
+        # Check if name duplicate (case-insensitive)
+        if any(c.get('name', '').strip().lower() == char_name.lower() for c in characters):
+            return jsonify({'error': f'Nhân vật có tên {char_name} đã tồn tại'}), 400
+
+        new_char = {
+            'name': char_name,
+            'role': char_role,
+            'description': char_description,
+            'first_chapter': data.get('first_chapter'),
+            'appearance_context': data.get('appearance_context', '')
+        }
+        characters.append(new_char)
+        meta['characters'] = characters
+
+        validated_meta = models.StoryMeta(**meta)
+        meta_path.write_text(validated_meta.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Character added successfully',
+            'characters': [c.model_dump() for c in validated_meta.characters]
+        }), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add character: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/characters/<name>', methods=['PUT'])
+def edit_story_character(story_uuid, name):
+    """Edit a character by their name (excluding main character roles)."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    data = request.json or {}
+    new_name = data.get('name', '').strip()
+    new_role = data.get('role', '').strip()
+    new_description = data.get('description', '').strip()
+
+    if not new_name:
+        return jsonify({'error': 'Character name is required'}), 400
+    if not new_role:
+        return jsonify({'error': 'Character role is required'}), 400
+
+    if is_main_character(new_role):
+        return jsonify({'error': 'Không thể thay đổi vai trò thành nhân vật chính'}), 400
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        characters = meta.get('characters', [])
+
+        # Find character to update
+        char_index = -1
+        for i, c in enumerate(characters):
+            if c.get('name', '').strip().lower() == name.lower():
+                char_index = i
+                break
+
+        if char_index == -1:
+            return jsonify({'error': f'Không tìm thấy nhân vật {name}'}), 404
+
+        existing_char = characters[char_index]
+        if is_main_character(existing_char.get('role', '')):
+            return jsonify({'error': 'Không thể chỉnh sửa thông tin của nhân vật chính'}), 400
+
+        # Check name conflict if name changed
+        if new_name.lower() != name.lower():
+            if any(c.get('name', '').strip().lower() == new_name.lower() for i, c in enumerate(characters) if i != char_index):
+                return jsonify({'error': f'Tên nhân vật {new_name} đã bị trùng'}), 400
+
+        existing_char['name'] = new_name
+        existing_char['role'] = new_role
+        existing_char['description'] = new_description
+        if 'first_chapter' in data:
+            existing_char['first_chapter'] = data.get('first_chapter')
+        if 'appearance_context' in data:
+            existing_char['appearance_context'] = data.get('appearance_context')
+
+        characters[char_index] = existing_char
+        meta['characters'] = characters
+
+        validated_meta = models.StoryMeta(**meta)
+        meta_path.write_text(validated_meta.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Character updated successfully',
+            'characters': [c.model_dump() for c in validated_meta.characters]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to update character: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/characters/<name>', methods=['DELETE'])
+def delete_story_character(story_uuid, name):
+    """Delete a character by name (excluding main character roles)."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        characters = meta.get('characters', [])
+
+        # Find character
+        char_index = -1
+        for i, c in enumerate(characters):
+            if c.get('name', '').strip().lower() == name.lower():
+                char_index = i
+                break
+
+        if char_index == -1:
+            return jsonify({'error': f'Không tìm thấy nhân vật {name}'}), 404
+
+        existing_char = characters[char_index]
+        if is_main_character(existing_char.get('role', '')):
+            return jsonify({'error': 'Không thể xóa nhân vật chính'}), 400
+
+        characters.pop(char_index)
+        meta['characters'] = characters
+
+        validated_meta = models.StoryMeta(**meta)
+        meta_path.write_text(validated_meta.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Character deleted successfully',
+            'characters': [c.model_dump() for c in validated_meta.characters]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete character: {str(e)}'}), 500
+
+
+# ----------------------------------------------------
 # Chapter HTTP APIs (CRUD)
 # ----------------------------------------------------
 
@@ -424,9 +704,10 @@ def generate_chapter(story_uuid):
         except SessionCancelledError as e:
             print(f"LangGraph execution cancelled for story {story_uuid}: {e}")
             # Clean up temp_draft.md
-            if config.TEMP_DRAFT_PATH.exists():
+            temp_draft_path = config.get_temp_draft_path(story_uuid)
+            if temp_draft_path.exists():
                 try:
-                    config.TEMP_DRAFT_PATH.unlink()
+                    temp_draft_path.unlink()
                     print("✓ Dọn dẹp file nháp tạm temp_draft.md sau khi hủy.")
                 except Exception as ex:
                     print(f"Warning: Không thể xóa file nháp tạm: {ex}")

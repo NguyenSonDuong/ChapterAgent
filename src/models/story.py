@@ -1,5 +1,26 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from typing import List, Dict, Any, Optional
+
+class UnresolvedThread(BaseModel):
+    thread: str = Field(description="Nội dung nút thắt")
+    chapter: Optional[int] = Field(default=None, description="Chương xuất hiện")
+
+    @model_validator(mode='before')
+    @classmethod
+    def convert_string_to_dict(cls, data: Any) -> Any:
+        if isinstance(data, str):
+            return {"thread": data, "chapter": None}
+        return data
+
+class GlobalLedger(BaseModel):
+    timeline: List[Dict[str, Any]] = Field(
+        default_factory=list, 
+        description="Lịch sử các chương đã diễn ra. Mỗi phần tử là dict chứa: chapter (int), title (str), summary (str)"
+    )
+    unresolved_threads: List[UnresolvedThread] = Field(
+        default_factory=list, 
+        description="Các mối nối, nút thắt hoặc chi tiết cốt truyện chưa được giải quyết"
+    )
 
 class CharacterInfo(BaseModel):
     name: str = Field(description="Tên nhân vật")
@@ -19,15 +40,7 @@ class StoryMeta(BaseModel):
     max_words_per_chapter: int = Field(default=2000, description="Giới hạn số từ tối đa mỗi chương")
     model: str = Field(default="gemini-2.5-flash", description="Model AI sử dụng cho câu chuyện")
 
-class GlobalLedger(BaseModel):
-    timeline: List[Dict[str, Any]] = Field(
-        default_factory=list, 
-        description="Lịch sử các chương đã diễn ra. Mỗi phần tử là dict chứa: chapter (int), title (str), summary (str)"
-    )
-    unresolved_threads: List[str] = Field(
-        default_factory=list, 
-        description="Các mối nối, nút thắt hoặc chi tiết cốt truyện chưa được giải quyết"
-    )
+
 
 class ChapterState(BaseModel):
     chapter_title: str = Field(description="Tiêu đề của chương")

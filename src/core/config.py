@@ -23,6 +23,12 @@ def get_story_dir(story_uuid: str) -> Path:
     """Get the subdirectory for a specific story's chapters and states."""
     return STORIES_DIR / story_uuid
 
+def get_temp_draft_path(story_uuid: str) -> Path:
+    """Get the path to the temp draft file for a specific story."""
+    d = get_story_dir(story_uuid)
+    d.mkdir(parents=True, exist_ok=True)
+    return d / "temp_draft.md"
+
 def get_chapters_dir(story_uuid: str) -> Path:
     """Get chapters directory for a story."""
     d = get_story_dir(story_uuid) / "chapters"

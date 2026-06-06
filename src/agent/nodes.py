@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 
 import src.core.config as config
-from src.models.story import StoryMeta, GlobalLedger, ChapterState
+from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string
 from src.utils.llm import invoke_with_retry, check_cancellation
@@ -239,8 +239,9 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     draft_content = state["draft_content"]
     
     # Save the draft content to temp_draft.md
+    temp_draft_path = config.get_temp_draft_path(state["story_uuid"])
     try:
-        config.TEMP_DRAFT_PATH.write_text(draft_content, encoding="utf-8")
+        temp_draft_path.write_text(draft_content, encoding="utf-8")
     except Exception as e:
         console.print(f"[bold red]Không thể ghi file nháp tạm: {e}[/bold red]")
         
@@ -272,7 +273,7 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     else:
         console.print("\n[bold cyan]================================================================================[/bold cyan]")
         console.print(f"[bold green][Thông báo][/bold green] Bản nháp Chương {state['chapter_num']} đã được cập nhật thành công.")
-        console.print(f"Nội dung hiện tại đã được lưu tạm vào file: [bold yellow]{config.TEMP_DRAFT_PATH.absolute()}[/bold yellow]")
+        console.print(f"Nội dung hiện tại đã được lưu tạm vào file: [bold yellow]{temp_draft_path.absolute()}[/bold yellow]")
         console.print("Bạn hãy mở file này bằng Text Editor (VS Code, Notepad...) để đọc và đánh giá.")
         console.print("[bold cyan]================================================================================[/bold cyan]\n")
         
@@ -520,36 +521,69 @@ Hãy điền đầy đủ:
     })
     
     # Cập nhật unresolved threads
-    # Thêm các thread mới mở ra
-    for ti in chap_state.threads_introduced:
-        if ti not in ledger_model.unresolved_threads:
-            ledger_model.unresolved_threads.append(ti)
-            
-    # Xóa các thread đã được giải quyết
-    refine_prompt = f"""
-Dựa trên danh sách các nút thắt chưa giải quyết cũ:
-{json.dumps(ledger_model.unresolved_threads, ensure_ascii=False)}
+    # Chuẩn bị danh sách cũ dưới dạng chuỗi JSON
+    old_threads_json = json.dumps([ut.model_dump() for ut in ledger_model.unresolved_threads], ensure_ascii=False)
 
-And các nút thắt vừa được giải quyết trong chương mới này:
+    refine_prompt = f"""
+Dựa trên danh sách các nút thắt chưa giải quyết cũ (mỗi nút thắt có nội dung "thread" và chương xuất hiện "chapter"):
+{old_threads_json}
+
+Các nút thắt vừa được giải quyết trong chương {chapter_num} mới này:
 {json.dumps(chap_state.threads_resolved, ensure_ascii=False)}
 
-Hãy trả về danh sách các nút thắt chưa giải quyết mới (cập nhật). Loại bỏ những cái đã được giải quyết hoặc không còn phù hợp. Chỉ trả về mảng JSON dạng chuỗi `["nút thắt 1", "nút thắt 2"]`. Không thêm gì khác.
+Các nút thắt mới được giới thiệu trong chương {chapter_num} này:
+{json.dumps(chap_state.threads_introduced, ensure_ascii=False)}
+
+Hãy cập nhật danh sách các nút thắt chưa giải quyết:
+1. Loại bỏ những nút thắt cũ đã được giải quyết ở chương này hoặc không còn phù hợp.
+2. Giữ lại các nút thắt cũ chưa được giải quyết và GIỮ NGUYÊN chương xuất hiện ban đầu của chúng (không thay đổi "chapter" của chúng).
+3. Thêm các nút thắt mới được giới thiệu trong chương này với chương xuất hiện "chapter" là {chapter_num}.
+
+Trả về mảng JSON chứa các đối tượng có thuộc tính "thread" và "chapter" (số nguyên hoặc null) dưới dạng:
+[
+  {{"thread": "nội dung nút thắt", "chapter": {chapter_num}}},
+  ...
+]
+Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay markdown code block nào.
 """
     refine_response = invoke_with_retry(state, refine_prompt, temperature=0.2)
     try:
-        # Parse JSON
         content_text = ensure_string(refine_response.content).strip()
         if content_text.startswith("```json"):
             content_text = content_text.split("```json")[1].split("```")[0].strip()
         elif content_text.startswith("```"):
             content_text = content_text.split("```")[1].split("```")[0].strip()
-        new_threads = json.loads(content_text)
+        new_threads_data = json.loads(content_text)
+        
+        # Chuyển đổi thành các đối tượng UnresolvedThread
+        new_threads = []
+        for item in new_threads_data:
+            if isinstance(item, dict) and 'thread' in item:
+                new_threads.append(UnresolvedThread(
+                    thread=item['thread'],
+                    chapter=item.get('chapter')
+                ))
+            elif isinstance(item, str):
+                new_threads.append(UnresolvedThread(thread=item, chapter=chapter_num))
         ledger_model.unresolved_threads = new_threads
     except Exception as e:
-        # Fallback: remove direct matches
-        for tr in chap_state.threads_resolved:
-            if tr in ledger_model.unresolved_threads:
-                ledger_model.unresolved_threads.remove(tr)
+        console.print(f"[Warning] Lỗi phân tích LLM cập nhật nút thắt: {e}. Sử dụng fallback python.")
+        # Fallback:
+        updated_threads = []
+        resolved_lower = [tr.lower() for tr in chap_state.threads_resolved]
+        for ut in ledger_model.unresolved_threads:
+            is_resolved = False
+            for rl in resolved_lower:
+                if rl in ut.thread.lower() or ut.thread.lower() in rl:
+                    is_resolved = True
+                    break
+            if not is_resolved:
+                updated_threads.append(ut)
+        # Thêm nút thắt mới
+        for ti in chap_state.threads_introduced:
+            if not any(ut.thread.lower() == ti.lower() for ut in updated_threads):
+                updated_threads.append(UnresolvedThread(thread=ti, chapter=chapter_num))
+        ledger_model.unresolved_threads = updated_threads
                 
     # Ghi lại ledger.json
     ledger_path = config.get_ledger_path(story_uuid)
@@ -647,9 +681,10 @@ YÊU CẦU:
             console.print(f"[bold red]Lỗi ghi file cấu hình truyện (meta.json): {e}[/bold red]")
 
     # 4. Xóa temp_draft.md
-    if config.TEMP_DRAFT_PATH.exists():
+    temp_draft_path = config.get_temp_draft_path(story_uuid)
+    if temp_draft_path.exists():
         try:
-            config.TEMP_DRAFT_PATH.unlink()
+            temp_draft_path.unlink()
             console.print("✓ Đã dọn dẹp file nháp tạm temp_draft.md.")
         except Exception as e:
             console.print(f"[Warning] Không thể xóa file nháp tạm: {e}")
