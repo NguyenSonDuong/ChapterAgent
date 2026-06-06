@@ -236,6 +236,8 @@ export default function App() {
                 <ChapterGenerator
                   storyUuid={selectedStoryId}
                   defaultModel={storyMeta?.model}
+                  storyMeta={storyMeta}
+                  storyLedger={storyLedger}
                   socket={socket}
                   onGenerationComplete={handleGenerationComplete}
                 />

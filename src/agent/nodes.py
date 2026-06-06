@@ -19,6 +19,56 @@ from src.utils.socket_emitter import emit_event, emit_agent_log
 
 console = Console()
 
+def format_user_idea(user_idea: Any) -> str:
+    if not isinstance(user_idea, dict):
+        return str(user_idea)
+    
+    nodes = user_idea.get("nodes", [])
+    connections = user_idea.get("connections", [])
+    
+    res = "Ý tưởng chương mới (dạng sơ đồ sự kiện):\n"
+    res += "1. Các sự kiện chính trong chương:\n"
+    for n in nodes:
+        node_id = n.get("id")
+        title = n.get("title", "Không tiêu đề")
+        desc = n.get("description", "Không mô tả")
+        chars = ", ".join(n.get("characters", []))
+        
+        # resolved thread
+        res_thread = n.get("resolved_thread", {})
+        res_text = ""
+        res_note = ""
+        if isinstance(res_thread, dict):
+            res_text = res_thread.get("thread", "")
+            res_note = res_thread.get("resolution_note", "")
+        elif res_thread:
+            res_text = str(res_thread)
+            
+        links = n.get("links", [])
+        
+        res += f"  - Sự kiện [{node_id}]: {title}\n"
+        res += f"    * Mô tả diễn biến: {desc}\n"
+        res += f"    * Nhân vật tham gia: {chars}\n"
+        
+        if res_text:
+            res += f"    * Giải quyết nút thắt: \"{res_text}\"\n"
+            if res_note:
+                res += f"      -> Cách giải quyết: {res_note}\n"
+            
+        if links:
+            res += "    * Liên kết với chương trước:\n"
+            for link in links:
+                linked_chap = link.get("chapter")
+                linked_nodes = ", ".join(link.get("nodes", []))
+                res += f"      + Từ Chương {linked_chap}, liên kết đến các sự kiện: {linked_nodes}\n"
+                
+    if connections:
+        res += "\n2. Trình tự và luồng kể truyện (các sự kiện tiếp nối):\n"
+        for conn in connections:
+            res += f"  - [{conn.get('from')}] dẫn tới [{conn.get('to')}]\n"
+            
+    return res
+
 # --- Pydantic Models for Structured LLM Outputs ---
 
 class RequirementAnalysisResult(BaseModel):
@@ -56,7 +106,9 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     check_cancellation(state["story_uuid"])
     console.print("\n[bold blue]=== [Node 1] Requirement Analyzer ===[/bold blue]")
     emit_agent_log(state["story_uuid"], f"=== [Bước 1] Phân tích Yêu cầu Sáng tác Chương {state['chapter_num']} ===")
-    emit_agent_log(state["story_uuid"], f"Ý tưởng ban đầu: \"{state['user_idea']}\"")
+    initial_idea = state["user_idea"]
+    idea_log = f"Sơ đồ sự kiện ({len(initial_idea.get('nodes', []))} nodes)" if isinstance(initial_idea, dict) else f"\"{initial_idea}\""
+    emit_agent_log(state["story_uuid"], f"Ý tưởng ban đầu: {idea_log}")
     emit_agent_log(state["story_uuid"], "Đang nạp bối cảnh thế giới, danh sách nhân vật và đối chiếu Sổ cái toàn cục để kiểm tra tính logic...")
     
     session = session_manager.get_session(state["story_uuid"])
@@ -88,7 +140,7 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
 
     loop_count = 0
     max_loops = 3
-    current_idea = user_idea
+    current_idea = format_user_idea(user_idea)
     
     while loop_count < max_loops:
         prompt = f"""
@@ -210,6 +262,9 @@ TIẾN TRÌNH CỐT TRUYỆN HIỆN TẠI (LỊCH SỬ):
 {json.dumps(ledger.get('timeline'), ensure_ascii=False, indent=2)}
 Các nút thắt chưa giải quyết: {json.dumps(ledger.get('unresolved_threads'), ensure_ascii=False)}
 {prev_chapter_context}
+
+SƠ ĐỒ SỰ KIỆN GỐC (Ý tưởng của tác giả):
+{format_user_idea(state.get("user_idea"))}
 
 YÊU CẦU CHI TIẾT CHO CHƯƠNG {chapter_num}:
 {reqs}
@@ -514,11 +569,27 @@ Hãy điền đầy đủ:
     ledger_model = GlobalLedger(**ledger)
     
     # Thêm chương vào timeline
-    ledger_model.timeline.append({
+    user_idea = state.get("user_idea")
+    timeline_entry = {
         "chapter": chapter_num,
         "title": chap_state.chapter_title,
         "summary": chap_state.summary
-    })
+    }
+    
+    if isinstance(user_idea, dict):
+        nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
+        try:
+            nodes_path.write_text(json.dumps(user_idea, ensure_ascii=False, indent=2), encoding="utf-8")
+            console.print(f"✓ Đã ghi sơ đồ chương truyện vào: [bold green]{nodes_path}[/bold green]")
+            emit_agent_log(story_uuid, f"✓ Đã lưu sơ đồ sự kiện chương vào file chap_{chapter_num}_nodes.json.")
+        except Exception as e:
+            console.print(f"[bold red]Lỗi ghi file sơ đồ chương: {e}[/bold red]")
+            emit_agent_log(story_uuid, f"Lỗi lưu sơ đồ chương: {e}", level="error")
+            
+        timeline_entry["nodes"] = user_idea.get("nodes", [])
+        timeline_entry["connections"] = user_idea.get("connections", [])
+        
+    ledger_model.timeline.append(timeline_entry)
     
     # Cập nhật unresolved threads
     # Chuẩn bị danh sách cũ dưới dạng chuỗi JSON

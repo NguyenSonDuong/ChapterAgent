@@ -567,6 +567,31 @@ def get_chapter(story_uuid, chapter_num):
         'state': state_desc
     })
 
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/nodes', methods=['GET'])
+def get_chapter_nodes(story_uuid, chapter_num):
+    """Get the event nodes & connections for a specific chapter."""
+    nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
+    if not nodes_path.exists():
+        # Try to find it in timeline if not separate file (fallback)
+        ledger_path = config.get_ledger_path(story_uuid)
+        if ledger_path.exists():
+            try:
+                ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+                for item in ledger.get("timeline", []):
+                    if item.get("chapter") == chapter_num and "nodes" in item:
+                        return jsonify({
+                            "nodes": item.get("nodes", []),
+                            "connections": item.get("connections", [])
+                        })
+            except Exception:
+                pass
+        return jsonify({"nodes": [], "connections": []})
+    try:
+        data = json.loads(nodes_path.read_text(encoding="utf-8"))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': f'Failed to read nodes: {str(e)}'}), 500
+
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>', methods=['PUT'])
 def update_chapter(story_uuid, chapter_num):
     """Edit the chapter content manually."""
@@ -640,7 +665,9 @@ def generate_chapter(story_uuid):
 
     data = request.json or {}
     user_idea = data.get('user_idea')
-    if not user_idea or not user_idea.strip():
+    if not user_idea:
+        return jsonify({'error': 'Missing user_idea in payload'}), 400
+    if isinstance(user_idea, str) and not user_idea.strip():
         return jsonify({'error': 'Missing user_idea in payload'}), 400
 
     # Resolve story metadata and ledger
