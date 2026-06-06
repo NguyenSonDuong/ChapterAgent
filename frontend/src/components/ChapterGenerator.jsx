@@ -1255,7 +1255,128 @@ export default function ChapterGenerator({
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
+                        {/* 1. Visual Preview & Quick Delete for Linked Chapters and Nodes */}
+                        {nodeForm.links?.length > 0 && (
+                          <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '10px' }}>
+                            <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>Xem trực quan liên kết chương cũ:</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
+                              {nodeForm.links.map((link) => {
+                                const chapNum = link.chapter;
+                                const chapTimeline = storyLedger?.timeline?.find(t => t.chapter === chapNum);
+                                const cachedData = chapterNodesCache[chapNum];
+                                
+                                return (
+                                  <div key={chapNum} style={{ padding: '8px', background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--border-glass)', borderRadius: '6px', fontSize: '11px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                      <div style={{ fontWeight: '600', color: 'var(--color-cyan)' }}>
+                                        Chương {chapNum}: {chapTimeline?.title || 'Không rõ tiêu đề'}
+                                      </div>
+                                      <button 
+                                        type="button" 
+                                        onClick={() => handleChapterLinkToggle(chapNum)}
+                                        className="btn-icon" 
+                                        style={{ width: '18px', height: '18px' }}
+                                        title="Xóa liên kết chương"
+                                      >
+                                        <X className="icon-xs text-red" style={{ width: '12px', height: '12px' }} />
+                                      </button>
+                                    </div>
+                                    <p className="text-muted" style={{ fontSize: '10px', marginTop: '2px', marginBottom: '6px', fontStyle: 'italic' }}>
+                                      Tóm tắt: {chapTimeline?.summary || 'Chưa có tóm tắt.'}
+                                    </p>
+                                    
+                                    {/* Linked nodes of this chapter */}
+                                    {link.nodes?.length > 0 && (
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '4px' }}>
+                                        {link.nodes.map(nodeId => {
+                                          const pn = cachedData?.nodes?.find(n => n.id === nodeId);
+                                          return (
+                                            <div key={nodeId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', padding: '4px', borderRadius: '4px' }}>
+                                              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                                <span style={{ fontWeight: '500' }}>📍 {pn?.title || nodeId}</span>
+                                                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{pn?.description || 'Không có mô tả.'}</span>
+                                              </div>
+                                              <button 
+                                                type="button" 
+                                                onClick={() => handleLinkedNodeToggle(chapNum, nodeId)}
+                                                className="btn-icon" 
+                                                style={{ width: '16px', height: '16px' }}
+                                                title="Xóa liên kết sự kiện"
+                                              >
+                                                <X className="icon-xs text-red" style={{ width: '10px', height: '10px' }} />
+                                              </button>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 2. Visual Preview & Quick Delete for Current Chapter Connections */}
+                        {(() => {
+                          const nodeConnectionsFrom = connections.filter(c => c.from === editingNodeId);
+                          const nodeConnectionsTo = connections.filter(c => c.to === editingNodeId);
+                          
+                          if (nodeConnectionsFrom.length === 0 && nodeConnectionsTo.length === 0) return null;
+
+                          return (
+                            <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '10px' }}>
+                              <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>Các luồng liên kết trong chương:</label>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '150px', overflowY: 'auto' }}>
+                                {nodeConnectionsFrom.map((c, idx) => {
+                                  const targetNode = nodes.find(n => n.id === c.to);
+                                  return (
+                                    <div key={`from-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(6,182,212,0.05)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '270px' }}>
+                                        Đầu ra &rarr; {targetNode?.title || c.to}
+                                      </span>
+                                      <button 
+                                        type="button" 
+                                        onClick={() => {
+                                          setConnections(prev => prev.filter(conn => !(conn.from === c.from && conn.to === c.to)));
+                                        }} 
+                                        className="btn-icon" 
+                                        style={{ width: '20px', height: '20px' }}
+                                        title="Xóa liên kết luồng đầu ra"
+                                      >
+                                        <X className="icon-xs text-red" style={{ width: '12px', height: '12px' }} />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+
+                                {nodeConnectionsTo.map((c, idx) => {
+                                  const sourceNode = nodes.find(n => n.id === c.from);
+                                  return (
+                                    <div key={`to-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(16,185,129,0.05)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '270px' }}>
+                                        Đầu vào &larr; {sourceNode?.title || c.from}
+                                      </span>
+                                      <button 
+                                        type="button" 
+                                        onClick={() => {
+                                          setConnections(prev => prev.filter(conn => !(conn.from === c.from && conn.to === c.to)));
+                                        }} 
+                                        className="btn-icon" 
+                                        style={{ width: '20px', height: '20px' }}
+                                        title="Xóa liên kết luồng đầu vào"
+                                      >
+                                        <X className="icon-xs text-red" style={{ width: '12px', height: '12px' }} />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
                           <button type="button" onClick={() => setEditingNodeId(null)} className="btn-secondary-sm">Hủy</button>
                           <button type="button" onClick={handleSaveNodeForm} className="btn-primary-sm btn-cyan">Cập nhật</button>
                         </div>
