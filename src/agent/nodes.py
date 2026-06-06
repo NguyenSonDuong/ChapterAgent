@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 
 import src.core.config as config
-from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread
+from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string
 from src.utils.llm import invoke_with_retry, check_cancellation
@@ -591,8 +591,45 @@ Hãy điền đầy đủ:
         
     ledger_model.timeline.append(timeline_entry)
     
-    # Cập nhật unresolved threads
-    # Chuẩn bị danh sách cũ dưới dạng chuỗi JSON
+    # Initialize resolved_threads if it doesn't exist
+    if not hasattr(ledger_model, "resolved_threads") or ledger_model.resolved_threads is None:
+        ledger_model.resolved_threads = []
+
+    # 1. Process explicit user-selected resolutions from the canvas nodes
+    if isinstance(original_user_idea, dict):
+        for n in original_user_idea.get("nodes", []):
+            res_thread = n.get("resolved_thread", {})
+            if isinstance(res_thread, dict):
+                res_text = res_thread.get("thread", "").strip()
+                res_note = res_thread.get("resolution_note", "").strip()
+                if res_text:
+                    # Look up in unresolved_threads to remove it and put in resolved_threads
+                    matched_unresolved = None
+                    for ut in ledger_model.unresolved_threads:
+                        if ut.thread.strip().lower() == res_text.lower():
+                            matched_unresolved = ut
+                            break
+                    
+                    if matched_unresolved:
+                        ledger_model.unresolved_threads.remove(matched_unresolved)
+                        if not any(rt.thread.strip().lower() == res_text.lower() for rt in ledger_model.resolved_threads):
+                            ledger_model.resolved_threads.append(ResolvedThread(
+                                thread=matched_unresolved.thread,
+                                chapter_introduced=matched_unresolved.chapter,
+                                chapter_resolved=chapter_num,
+                                resolution_note=res_note if res_note else "Giải quyết qua sơ đồ sự kiện."
+                            ))
+                    else:
+                        if not any(rt.thread.strip().lower() == res_text.lower() for rt in ledger_model.resolved_threads):
+                            ledger_model.resolved_threads.append(ResolvedThread(
+                                thread=res_text,
+                                chapter_introduced=None,
+                                chapter_resolved=chapter_num,
+                                resolution_note=res_note if res_note else "Giải quyết qua sơ đồ sự kiện."
+                            ))
+
+    # 2. Update unresolved threads using LLM
+    # Prepare old unresolved list under json format
     old_threads_json = json.dumps([ut.model_dump() for ut in ledger_model.unresolved_threads], ensure_ascii=False)
 
     refine_prompt = f"""
@@ -626,7 +663,7 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
             content_text = content_text.split("```")[1].split("```")[0].strip()
         new_threads_data = json.loads(content_text)
         
-        # Chuyển đổi thành các đối tượng UnresolvedThread
+        # Converted to UnresolvedThread list
         new_threads = []
         for item in new_threads_data:
             if isinstance(item, dict) and 'thread' in item:
@@ -636,6 +673,22 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
                 ))
             elif isinstance(item, str):
                 new_threads.append(UnresolvedThread(thread=item, chapter=chapter_num))
+                
+        # Compare old unresolved with new unresolved list to discover auto-resolved ones
+        for old_ut in list(ledger_model.unresolved_threads):
+            is_still_unresolved = any(
+                new_ut.thread.strip().lower() == old_ut.thread.strip().lower()
+                for new_ut in new_threads
+            )
+            if not is_still_unresolved:
+                if not any(rt.thread.strip().lower() == old_ut.thread.strip().lower() for rt in ledger_model.resolved_threads):
+                    ledger_model.resolved_threads.append(ResolvedThread(
+                        thread=old_ut.thread,
+                        chapter_introduced=old_ut.chapter,
+                        chapter_resolved=chapter_num,
+                        resolution_note="Tự động phát hiện giải quyết bởi AI."
+                    ))
+                    
         ledger_model.unresolved_threads = new_threads
     except Exception as e:
         console.print(f"[Warning] Lỗi phân tích LLM cập nhật nút thắt: {e}. Sử dụng fallback python.")
@@ -647,6 +700,13 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
             for rl in resolved_lower:
                 if rl in ut.thread.lower() or ut.thread.lower() in rl:
                     is_resolved = True
+                    if not any(rt.thread.strip().lower() == ut.thread.strip().lower() for rt in ledger_model.resolved_threads):
+                        ledger_model.resolved_threads.append(ResolvedThread(
+                            thread=ut.thread,
+                            chapter_introduced=ut.chapter,
+                            chapter_resolved=chapter_num,
+                            resolution_note="Tự động phát hiện giải quyết bởi AI (fallback)."
+                        ))
                     break
             if not is_resolved:
                 updated_threads.append(ut)

@@ -19,6 +19,12 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
   const [editingThreadText, setEditingThreadText] = useState('');
   const [editingThreadChapter, setEditingThreadChapter] = useState('');
 
+  // Resolved Thread States
+  const [threadsTab, setThreadsTab] = useState('unresolved'); // unresolved, resolved
+  const [resolvingThreadIndex, setResolvingThreadIndex] = useState(null);
+  const [resolvingThreadNote, setResolvingThreadNote] = useState('');
+  const [resolvingThreadChapter, setResolvingThreadChapter] = useState('');
+
   if (!storyMeta) {
     return (
       <div className="center-content">

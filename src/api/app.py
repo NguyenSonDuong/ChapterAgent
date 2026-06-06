@@ -368,6 +368,70 @@ def delete_ledger_thread(story_uuid, index):
     except Exception as e:
         return jsonify({'error': f'Failed to delete thread: {str(e)}'}), 500
 
+@app.route('/api/stories/<story_uuid>/ledger/resolved-threads', methods=['GET'])
+def get_ledger_resolved_threads(story_uuid):
+    """Get the list of resolved threads."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify([])
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        return jsonify(ledger.get('resolved_threads', []))
+    except Exception as e:
+        return jsonify({'error': f'Failed to read resolved threads: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/threads/<int:index>/resolve', methods=['POST'])
+def resolve_ledger_thread(story_uuid, index):
+    """Manually move an unresolved thread to resolved threads list by index."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+
+    data = request.json or {}
+    chap_resolved = data.get('chapter_resolved')
+    res_note = data.get('resolution_note', '').strip()
+
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        unresolved = ledger.get('unresolved_threads', [])
+        if index < 0 or index >= len(unresolved):
+            return jsonify({'error': f'Invalid thread index {index}'}), 400
+
+        # Extract the unresolved thread
+        thread_to_resolve = unresolved.pop(index)
+        
+        # Get thread contents (could be dict or string)
+        thread_text = ""
+        thread_chap_intro = None
+        if isinstance(thread_to_resolve, dict):
+            thread_text = thread_to_resolve.get('thread', '')
+            thread_chap_intro = thread_to_resolve.get('chapter')
+        else:
+            thread_text = str(thread_to_resolve)
+
+        if 'resolved_threads' not in ledger:
+            ledger['resolved_threads'] = []
+
+        # Add to resolved threads
+        ledger['resolved_threads'].append({
+            'thread': thread_text,
+            'chapter_introduced': thread_chap_intro,
+            'chapter_resolved': int(chap_resolved) if chap_resolved is not None and str(chap_resolved).strip() != "" else None,
+            'resolution_note': res_note if res_note else "Giải quyết thủ công."
+        })
+
+        ledger['unresolved_threads'] = unresolved
+
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Thread resolved successfully',
+            'unresolved_threads': [t.model_dump() for t in validated_ledger.unresolved_threads],
+            'resolved_threads': [t.model_dump() for t in validated_ledger.resolved_threads]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to resolve thread: {str(e)}'}), 500
+
 @app.route('/api/stories/<story_uuid>/characters', methods=['POST'])
 def add_story_character(story_uuid):
     """Add a new character to the story (excluding main character roles)."""

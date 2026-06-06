@@ -12,6 +12,19 @@ class UnresolvedThread(BaseModel):
             return {"thread": data, "chapter": None}
         return data
 
+class ResolvedThread(BaseModel):
+    thread: str = Field(description="Nội dung nút thắt")
+    chapter_introduced: Optional[int] = Field(default=None, description="Chương xuất hiện")
+    chapter_resolved: int = Field(description="Chương giải quyết")
+    resolution_note: Optional[str] = Field(default=None, description="Cách giải quyết / ghi chú")
+
+    @model_validator(mode='before')
+    @classmethod
+    def convert_string_to_dict(cls, data: Any) -> Any:
+        if isinstance(data, str):
+            return {"thread": data, "chapter_introduced": None, "chapter_resolved": 0, "resolution_note": None}
+        return data
+
 class GlobalLedger(BaseModel):
     timeline: List[Dict[str, Any]] = Field(
         default_factory=list, 
@@ -20,6 +33,10 @@ class GlobalLedger(BaseModel):
     unresolved_threads: List[UnresolvedThread] = Field(
         default_factory=list, 
         description="Các mối nối, nút thắt hoặc chi tiết cốt truyện chưa được giải quyết"
+    )
+    resolved_threads: List[ResolvedThread] = Field(
+        default_factory=list, 
+        description="Các mối nối, nút thắt hoặc chi tiết cốt truyện đã được giải quyết"
     )
 
 class CharacterInfo(BaseModel):
