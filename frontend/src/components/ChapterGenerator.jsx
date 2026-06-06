@@ -73,7 +73,11 @@ function ReviewReplyForm({ onSubmit }) {
 }
 
 function ModelChangeForm({ onSubmit, currentModel }) {
-  const standardModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+  const standardModels = [
+    'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-lite',
+    'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.1-pro', 'gemini-2.5-flash-lite',
+    'gemini-3.0-flash', 'gemma-4-26b', 'gemma-4-31b', 'gemini-1.5-flash', 'gemini-1.5-pro'
+  ];
   const isStandard = standardModels.includes(currentModel);
   const [selectedOption, setSelectedOption] = useState(isStandard ? currentModel : (currentModel ? 'other' : 'gemini-2.5-flash'));
   const [customModel, setCustomModel] = useState(!isStandard && currentModel ? currentModel : '');
@@ -97,12 +101,20 @@ function ModelChangeForm({ onSubmit, currentModel }) {
             value={selectedOption} 
             onChange={e => setSelectedOption(e.target.value)}
           >
-            <option value="gemini-1.5-flash">1. gemini-1.5-flash</option>
-            <option value="gemini-1.5-pro">2. gemini-1.5-pro</option>
-            <option value="gemini-2.0-flash">3. gemini-2.0-flash</option>
-            <option value="gemini-2.5-flash">4. gemini-2.5-flash</option>
-            <option value="gemini-2.5-pro">5. gemini-2.5-pro</option>
-            <option value="other">6. Khác (Nhập thủ công)</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+            <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
+            <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+            <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+            <option value="gemini-3.0-flash">Gemini 3 Flash</option>
+            <option value="gemma-4-26b">Gemma 4 26B</option>
+            <option value="gemma-4-31b">Gemma 4 31B</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            <option value="other">Khác (Nhập thủ công)</option>
           </select>
           <button 
             onClick={handleConfirm} 
@@ -328,9 +340,9 @@ export default function ChapterGenerator({
     const startY = e.clientY - node.y;
 
     const handleMouseMove = (moveEvent) => {
-      // Boundaries check (Canvas dimension: e.g. 100% width, 500px height)
-      const newX = Math.max(10, Math.min(800, moveEvent.clientX - startX));
-      const newY = Math.max(10, Math.min(410, moveEvent.clientY - startY));
+      // Boundaries check (Expanded Canvas dimension: 2400px width, 1600px height)
+      const newX = Math.max(10, Math.min(2200, moveEvent.clientX - startX));
+      const newY = Math.max(10, Math.min(1450, moveEvent.clientY - startY));
 
       setNodes(prev => prev.map(n => n.id === nodeId ? { ...n, x: newX, y: newY } : n));
     };
@@ -832,21 +844,43 @@ export default function ChapterGenerator({
   };
 
   return (
-    <div className="chapter-generator fade-in">
+    <div className={`chapter-generator ${status === 'idle' ? 'setup-mode' : ''} fade-in`}>
       {/* Insert Localized CSS for Event Nodes Canvas */}
       <style>{`
-        .canvas-wrapper {
+        .canvas-container {
           position: relative;
           width: 100%;
-          height: 480px;
+          height: 100%;
           background-color: #0d121f;
+          border: 1px solid var(--border-glass);
+          border-radius: 12px;
+          overflow: auto;
+          box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        .canvas-container::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .canvas-container::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 4px;
+        }
+        .canvas-container::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .canvas-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(6, 182, 212, 0.3);
+        }
+        .canvas-wrapper {
+          position: relative;
+          width: 2400px;
+          height: 1600px;
           background-image: 
             radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
           background-size: 20px 20px;
-          border: 1px solid var(--border-glass);
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+          background-color: transparent;
         }
         .canvas-svg {
           position: absolute;
@@ -941,7 +975,7 @@ export default function ChapterGenerator({
           grid-template-columns: 1fr 350px;
           gap: 20px;
           margin-top: 12px;
-          height: 480px;
+          height: 650px;
         }
         .canvas-inspector {
           display: flex;
@@ -1013,6 +1047,27 @@ export default function ChapterGenerator({
           </div>
 
           <form onSubmit={handleStartGeneration} className="setup-form">
+            {/* AI Model selection at the very top */}
+            <div className="form-row" style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid var(--border-glass)', paddingBottom: '16px' }}>
+              <div className="form-group" style={{ width: '100%', maxWidth: '320px' }}>
+                <label className="form-label" style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Model AI</label>
+                <select className="form-select" value={model} onChange={e => setModel(e.target.value)}>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Khuyên dùng)</option>
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro (Chất lượng cao)</option>
+                  <option value="gemini-2.0-flash">Gemini 2 Flash (2.0) (Mới)</option>
+                  <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
+                  <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                  <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+                  <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+                  <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                  <option value="gemini-3.0-flash">Gemini 3 Flash</option>
+                  <option value="gemma-4-26b">Gemma 4 26B</option>
+                  <option value="gemma-4-31b">Gemma 4 31B</option>
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                  <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                </select>
+              </div>
+            </div>
             {mode === 'text' ? (
               // Old Text Flow
               <div className="form-group" style={{ marginBottom: '20px' }}>
@@ -1049,82 +1104,83 @@ export default function ChapterGenerator({
 
                 <div className="canvas-editor-layout">
                   {/* Visual Node Canvas Workspace */}
-                  <div className="canvas-wrapper">
-                    {/* SVG Layer for Connections */}
-                    <svg className="canvas-svg">
-                      <defs>
-                        <marker
-                          id="arrow"
-                          viewBox="0 0 10 10"
-                          refX="6"
-                          refY="5"
-                          markerWidth="6"
-                          markerHeight="6"
-                          orient="auto-start-reverse"
-                        >
-                          <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--color-cyan)" />
-                        </marker>
-                      </defs>
-                      {renderConnections()}
-                    </svg>
+                  <div className="canvas-container">
+                    <div className="canvas-wrapper">
+                      {/* SVG Layer for Connections */}
+                      <svg className="canvas-svg">
+                        <defs>
+                          <marker
+                            id="arrow"
+                            viewBox="0 0 10 10"
+                            refX="6"
+                            refY="5"
+                            markerWidth="6"
+                            markerHeight="6"
+                            orient="auto-start-reverse"
+                          >
+                            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--color-cyan)" />
+                          </marker>
+                        </defs>
+                        {renderConnections()}
+                      </svg>
 
-                    {/* Nodes Loop */}
-                    {nodes.map((n) => {
-                      const isSource = linkingSourceNodeId === n.id;
-                      const isEditing = editingNodeId === n.id;
-                      const charText = n.characters?.length > 0 ? n.characters.join(', ') : 'Chưa có nhân vật';
-                      
-                      return (
-                        <div
-                          key={n.id}
-                          className={`canvas-node ${isSource ? 'linking-source' : ''} ${isEditing ? 'editing-node' : ''}`}
-                          style={{ left: `${n.x}px`, top: `${n.y}px` }}
-                          onMouseDown={(e) => handleNodeMouseDown(e, n.id)}
-                        >
-                          <div className="canvas-node-title" title={n.title}>{n.title}</div>
-                          <div className="canvas-node-meta">
-                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>👤 {charText}</span>
-                            {n.resolved_thread?.thread && (
-                              <span className="text-yellow" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🔑 Giải quyết nút thắt</span>
-                            )}
-                            {n.links?.length > 0 && (
-                              <span className="text-cyan" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🔗 Có liên kết chương cũ</span>
-                            )}
+                      {/* Nodes Loop */}
+                      {nodes.map((n) => {
+                        const isSource = linkingSourceNodeId === n.id;
+                        const isEditing = editingNodeId === n.id;
+                        const charText = n.characters?.length > 0 ? n.characters.join(', ') : 'Chưa có nhân vật';
+                        
+                        return (
+                          <div
+                            key={n.id}
+                            className={`canvas-node ${isSource ? 'linking-source' : ''} ${isEditing ? 'editing-node' : ''}`}
+                            style={{ left: `${n.x}px`, top: `${n.y}px` }}
+                            onMouseDown={(e) => handleNodeMouseDown(e, n.id)}
+                          >
+                            <div className="canvas-node-title" title={n.title}>{n.title}</div>
+                            <div className="canvas-node-meta">
+                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>👤 {charText}</span>
+                              {n.resolved_thread?.thread && (
+                                <span className="text-yellow" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🔑 Giải quyết nút thắt</span>
+                              )}
+                              {n.links?.length > 0 && (
+                                <span className="text-cyan" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🔗 Có liên kết chương cũ</span>
+                              )}
+                            </div>
+                            
+                            <div className="canvas-node-actions">
+                              <button
+                                type="button"
+                                onClick={() => handleNodeLinkClick(n.id)}
+                                className={`canvas-node-btn ${isSource ? 'text-yellow' : ''}`}
+                                title="Tạo liên kết luồng đến node khác"
+                              >
+                                <Link className="icon-xs" style={{ width: '10px', height: '10px' }} /> 
+                                {isSource ? 'Nối...' : 'Liên kết'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingNodeId(n.id)}
+                                className="canvas-node-btn text-cyan"
+                                title="Sửa chi tiết sự kiện"
+                              >
+                                <Edit className="icon-xs" style={{ width: '10px', height: '10px' }} /> Sửa
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteNode(n.id)}
+                                className="canvas-node-btn text-red"
+                                title="Xóa sự kiện"
+                              >
+                                <Trash2 className="icon-xs" style={{ width: '10px', height: '10px' }} /> Xóa
+                              </button>
+                            </div>
                           </div>
-                          
-                          <div className="canvas-node-actions">
-                            <button
-                              type="button"
-                              onClick={() => handleNodeLinkClick(n.id)}
-                              className={`canvas-node-btn ${isSource ? 'text-yellow' : ''}`}
-                              title="Tạo liên kết luồng đến node khác"
-                            >
-                              <Link className="icon-xs" style={{ width: '10px', height: '10px' }} /> 
-                              {isSource ? 'Nối...' : 'Liên kết'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingNodeId(n.id)}
-                              className="canvas-node-btn text-cyan"
-                              title="Sửa chi tiết sự kiện"
-                            >
-                              <Edit className="icon-xs" style={{ width: '10px', height: '10px' }} /> Sửa
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteNode(n.id)}
-                              className="canvas-node-btn text-red"
-                              title="Xóa sự kiện"
-                            >
-                              <Trash2 className="icon-xs" style={{ width: '10px', height: '10px' }} /> Xóa
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-
+                        );
+                      })}
+                    </div>
                     {nodes.length === 0 && (
-                      <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                      <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '13px', pointerEvents: 'none', zIndex: 10 }}>
                         Nhấp nút "Thêm Sự Kiện (Node)" ở trên để thiết lập kịch bản chương truyện.
                       </div>
                     )}
@@ -1429,17 +1485,8 @@ export default function ChapterGenerator({
               </div>
             )}
 
-            <div className="form-row align-items-center" style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
-              <div className="form-group flex-1">
-                <label className="form-label">Model AI</label>
-                <select className="form-select" value={model} onChange={e => setModel(e.target.value)}>
-                  <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng)</option>
-                  <option value="gemini-2.5-pro">gemini-2.5-pro (Chất lượng cao)</option>
-                  <option value="gemini-2.0-flash">gemini-2.0-flash (Nhanh)</option>
-                  <option value="gemini-1.5-pro">gemini-1.5-pro (Thông minh)</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary btn-generate margin-top-md" disabled={generating}>
+            <div className="form-row" style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
+              <button type="submit" className="btn-primary btn-generate" disabled={generating} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', fontSize: '14px' }}>
                 <Sparkles className="icon-xs" /> <span>Bắt đầu Sáng tác</span>
               </button>
             </div>

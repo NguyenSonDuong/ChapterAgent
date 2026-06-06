@@ -22,6 +22,7 @@ export default function App() {
   const [showNewStoryModal, setShowNewStoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 1. Setup Socket.IO connection
   useEffect(() => {
@@ -181,6 +182,8 @@ export default function App() {
         onOpenNewStoryModal={() => setShowNewStoryModal(true)}
         onRefresh={fetchStories}
         loading={loading}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Main workspace */}

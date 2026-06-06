@@ -297,6 +297,55 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  transition: width var(--transition-normal);
+  overflow: hidden;
+}
+
+/* Sidebar collapsed states */
+.sidebar.collapsed {
+  width: 72px;
+}
+
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .sidebar-content .section-title span,
+.sidebar.collapsed .btn-add-story span,
+.sidebar.collapsed .story-item-details,
+.sidebar.collapsed .footer-info span {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 0 10px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .logo-container {
+  justify-content: center;
+}
+
+.sidebar.collapsed .header-actions {
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.sidebar.collapsed .sidebar-content {
+  padding: 20px 8px;
+}
+
+.sidebar.collapsed .section-title {
+  justify-content: center;
+  padding: 0;
+}
+
+.sidebar.collapsed .story-item {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar.collapsed .footer-info {
+  justify-content: center;
 }
 
 .sidebar-header {
@@ -933,12 +982,31 @@ body {
   overflow: hidden;
 }
 
+.chapter-generator.setup-mode {
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
+.chapter-generator.setup-mode::-webkit-scrollbar {
+  width: 8px;
+}
+.chapter-generator.setup-mode::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.chapter-generator.setup-mode::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.chapter-generator.setup-mode::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.3);
+}
+
 .generator-setup-card {
-  max-width: 800px;
   width: 100%;
-  margin: 40px auto;
+  margin: 0;
   border-radius: 12px;
-  padding: 30px;
 }
 .card-header-spark {
   display: flex;

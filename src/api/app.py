@@ -713,6 +713,7 @@ def generate_chapter(story_uuid):
             "story_uuid": story_uuid,
             "chapter_num": next_chap_num,
             "user_idea": user_idea,
+            "original_user_idea": user_idea,
             "model": selected_model,
             "meta": meta_data,
             "ledger": ledger_data,

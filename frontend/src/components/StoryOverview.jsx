@@ -230,11 +230,19 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                 className="form-select-sm"
                 style={{ background: '#121621', color: 'var(--text-primary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '4px 10px', fontSize: '13px' }}
               >
-                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
+                <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
+                <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+                <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                <option value="gemini-3.0-flash">Gemini 3 Flash</option>
+                <option value="gemma-4-26b">Gemma 4 26B</option>
+                <option value="gemma-4-31b">Gemma 4 31B</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
               </select>
               <button onClick={handleSaveModel} className="btn-icon" style={{ width: '28px', height: '28px' }} title="Lưu">
                 <Check className="icon-xs text-green" />

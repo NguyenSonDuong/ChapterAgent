@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Plus, Settings, Sparkles, RefreshCw } from 'lucide-react';
+import { BookOpen, Plus, Settings, Sparkles, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Sidebar({ 
   stories, 
@@ -7,23 +7,37 @@ export default function Sidebar({
   onSelectStory, 
   onOpenNewStoryModal, 
   onRefresh, 
-  loading 
+  loading,
+  isCollapsed,
+  onToggleCollapse
 }) {
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           <Sparkles className="logo-icon text-cyan" />
           <h2 className="logo-text">Chapter<span className="text-cyan">Agent</span></h2>
         </div>
-        <button 
-          onClick={onRefresh} 
-          className="btn-icon" 
-          title="Tải lại danh sách"
-          disabled={loading}
-        >
-          <RefreshCw className={`icon-sm ${loading ? 'spin' : ''}`} />
-        </button>
+        <div className="header-actions" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+          {!isCollapsed && (
+            <button 
+              onClick={onRefresh} 
+              className="btn-icon" 
+              title="Tải lại danh sách"
+              disabled={loading}
+            >
+              <RefreshCw className={`icon-sm ${loading ? 'spin' : ''}`} />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="btn-icon"
+            title={isCollapsed ? "Mở rộng danh sách" : "Thu gọn danh sách"}
+          >
+            {isCollapsed ? <ChevronRight className="icon-sm" /> : <ChevronLeft className="icon-sm" />}
+          </button>
+        </div>
       </div>
 
       <div className="sidebar-content">
@@ -55,6 +69,7 @@ export default function Sidebar({
                   key={story.uuid}
                   className={`story-item ${isSelected ? 'active' : ''}`}
                   onClick={() => onSelectStory(story.uuid)}
+                  title={story.name}
                 >
                   <BookOpen className="story-item-icon" />
                   <div className="story-item-details">

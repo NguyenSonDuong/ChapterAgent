@@ -569,25 +569,25 @@ Hãy điền đầy đủ:
     ledger_model = GlobalLedger(**ledger)
     
     # Thêm chương vào timeline
-    user_idea = state.get("user_idea")
+    original_user_idea = state.get("original_user_idea")
     timeline_entry = {
         "chapter": chapter_num,
         "title": chap_state.chapter_title,
         "summary": chap_state.summary
     }
     
-    if isinstance(user_idea, dict):
+    if isinstance(original_user_idea, dict):
         nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
         try:
-            nodes_path.write_text(json.dumps(user_idea, ensure_ascii=False, indent=2), encoding="utf-8")
+            nodes_path.write_text(json.dumps(original_user_idea, ensure_ascii=False, indent=2), encoding="utf-8")
             console.print(f"✓ Đã ghi sơ đồ chương truyện vào: [bold green]{nodes_path}[/bold green]")
             emit_agent_log(story_uuid, f"✓ Đã lưu sơ đồ sự kiện chương vào file chap_{chapter_num}_nodes.json.")
         except Exception as e:
             console.print(f"[bold red]Lỗi ghi file sơ đồ chương: {e}[/bold red]")
             emit_agent_log(story_uuid, f"Lỗi lưu sơ đồ chương: {e}", level="error")
             
-        timeline_entry["nodes"] = user_idea.get("nodes", [])
-        timeline_entry["connections"] = user_idea.get("connections", [])
+        timeline_entry["nodes"] = original_user_idea.get("nodes", [])
+        timeline_entry["connections"] = original_user_idea.get("connections", [])
         
     ledger_model.timeline.append(timeline_entry)
     
