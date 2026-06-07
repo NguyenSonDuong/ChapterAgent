@@ -169,7 +169,10 @@ export default function ChapterGenerator({
     characters: [],
     resolvedThreadText: '',
     resolutionNote: '',
-    links: [] // [{ chapter: number, nodes: [nodeId, ...] }]
+    links: [], // [{ chapter: number, nodes: [nodeId, ...] }]
+    locations: '',
+    weapons: '',
+    techniques: ''
   });
 
   const [chapterNodesCache, setChapterNodesCache] = useState({});
@@ -199,7 +202,10 @@ export default function ChapterGenerator({
           characters: node.characters || [],
           resolvedThreadText: node.resolved_thread?.thread || '',
           resolutionNote: node.resolved_thread?.resolution_note || '',
-          links: node.links || []
+          links: node.links || [],
+          locations: Array.isArray(node.locations) ? node.locations.join(', ') : '',
+          weapons: Array.isArray(node.weapons) ? node.weapons.join(', ') : '',
+          techniques: Array.isArray(node.techniques) ? node.techniques.join(', ') : ''
         });
       }
     } else {
@@ -209,7 +215,10 @@ export default function ChapterGenerator({
         characters: [],
         resolvedThreadText: '',
         resolutionNote: '',
-        links: []
+        links: [],
+        locations: '',
+        weapons: '',
+        techniques: ''
       });
     }
   }, [editingNodeId, nodes]);
@@ -365,6 +374,9 @@ export default function ChapterGenerator({
       characters: [],
       resolved_thread: { thread: '', resolution_note: '' },
       links: [],
+      locations: [],
+      weapons: [],
+      techniques: [],
       x: 150 + Math.random() * 200,
       y: 100 + Math.random() * 150
     };
@@ -476,7 +488,10 @@ export default function ChapterGenerator({
             thread: nodeForm.resolvedThreadText,
             resolution_note: nodeForm.resolutionNote.trim()
           },
-          links: nodeForm.links
+          links: nodeForm.links,
+          locations: typeof nodeForm.locations === 'string' ? nodeForm.locations.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.locations || []),
+          weapons: typeof nodeForm.weapons === 'string' ? nodeForm.weapons.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.weapons || []),
+          techniques: typeof nodeForm.techniques === 'string' ? nodeForm.techniques.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.techniques || [])
         };
       }
       return n;
@@ -496,8 +511,8 @@ export default function ChapterGenerator({
         return;
       }
       finalIdea = {
-        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, x, y }) => ({
-          id, title, description, characters, resolved_thread, links, x, y
+        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y }) => ({
+          id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y
         })),
         connections
       };
@@ -1233,6 +1248,43 @@ export default function ChapterGenerator({
                               );
                             })}
                           </div>
+                        </div>
+
+                        {/* World Ledger Elements (Locations, Weapons, Techniques) */}
+                        <div>
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Địa điểm xuất hiện (dấu phẩy ngăn cách)</label>
+                          <input 
+                            type="text"
+                            placeholder="Ví dụ: Vạn Tượng Sơn, Độc Cô Cốc"
+                            className="form-input-sm"
+                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
+                            value={nodeForm.locations}
+                            onChange={e => setNodeForm({ ...nodeForm, locations: e.target.value })}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Binh khí / Pháp khí sử dụng (dấu phẩy ngăn cách)</label>
+                          <input 
+                            type="text"
+                            placeholder="Ví dụ: Tru Tiên Kiếm, Hỏa Diễm Đao"
+                            className="form-input-sm"
+                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
+                            value={nodeForm.weapons}
+                            onChange={e => setNodeForm({ ...nodeForm, weapons: e.target.value })}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Công pháp thi triển (dấu phẩy ngăn cách)</label>
+                          <input 
+                            type="text"
+                            placeholder="Ví dụ: Thái Cực Kiếm Pháp, Hỏa Diễm Đao Pháp"
+                            className="form-input-sm"
+                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
+                            value={nodeForm.techniques}
+                            onChange={e => setNodeForm({ ...nodeForm, techniques: e.target.value })}
+                          />
                         </div>
 
                         {/* Resolved Thread Select */}

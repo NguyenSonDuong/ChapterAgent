@@ -46,9 +46,19 @@ def format_user_idea(user_idea: Any) -> str:
             
         links = n.get("links", [])
         
+        locs = ", ".join(n.get("locations", [])) if isinstance(n.get("locations"), list) else str(n.get("locations", ""))
+        weapons_str = ", ".join(n.get("weapons", [])) if isinstance(n.get("weapons"), list) else str(n.get("weapons", ""))
+        techs = ", ".join(n.get("techniques", [])) if isinstance(n.get("techniques"), list) else str(n.get("techniques", ""))
+
         res += f"  - Sự kiện [{node_id}]: {title}\n"
         res += f"    * Mô tả diễn biến: {desc}\n"
         res += f"    * Nhân vật tham gia: {chars}\n"
+        if locs.strip():
+            res += f"    * Địa điểm xuất hiện: {locs.strip()}\n"
+        if weapons_str.strip():
+            res += f"    * Binh khí/Pháp khí sử dụng: {weapons_str.strip()}\n"
+        if techs.strip():
+            res += f"    * Công pháp thi triển: {techs.strip()}\n"
         
         if res_text:
             res += f"    * Giải quyết nút thắt: \"{res_text}\"\n"
