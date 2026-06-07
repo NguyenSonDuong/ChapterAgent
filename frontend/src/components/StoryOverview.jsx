@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin, Settings } from 'lucide-react';
+import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin, Settings, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRefreshDetails }) {
   const [isEditingModel, setIsEditingModel] = useState(false);
@@ -7,6 +7,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
 
   // Story Edit States
   const [isEditingStory, setIsEditingStory] = useState(false);
+  const [newEditStageInput, setNewEditStageInput] = useState('');
   const [editedStory, setEditedStory] = useState({
     name: '',
     context: '',
@@ -15,7 +16,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     model: '',
     max_chapters: 10,
     max_words_per_chapter: 2000,
-    cultivation_stages: ''
+    cultivation_stages: []
   });
 
   // Character States
@@ -525,6 +526,36 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     }
   };
 
+  const handleEditAddStage = () => {
+    if (newEditStageInput.trim()) {
+      setEditedStory({
+        ...editedStory,
+        cultivation_stages: [...(editedStory.cultivation_stages || []), newEditStageInput.trim()]
+      });
+      setNewEditStageInput('');
+    }
+  };
+
+  const handleEditMoveStage = (index, direction) => {
+    const newStages = [...(editedStory.cultivation_stages || [])];
+    if (direction === 'up' && index > 0) {
+      [newStages[index], newStages[index - 1]] = [newStages[index - 1], newStages[index]];
+    } else if (direction === 'down' && index < newStages.length - 1) {
+      [newStages[index], newStages[index + 1]] = [newStages[index + 1], newStages[index]];
+    }
+    setEditedStory({
+      ...editedStory,
+      cultivation_stages: newStages
+    });
+  };
+
+  const handleEditDeleteStage = (index) => {
+    setEditedStory({
+      ...editedStory,
+      cultivation_stages: (editedStory.cultivation_stages || []).filter((_, i) => i !== index)
+    });
+  };
+
   const handleStartEditStory = () => {
     setEditedStory({
       name: storyMeta.name,
@@ -534,8 +565,9 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
       model: storyMeta.model || 'gemini-2.5-flash',
       max_chapters: storyMeta.max_chapters || 10,
       max_words_per_chapter: storyMeta.max_words_per_chapter || 2000,
-      cultivation_stages: storyMeta.cultivation_stages ? storyMeta.cultivation_stages.join(', ') : ''
+      cultivation_stages: storyMeta.cultivation_stages || []
     });
+    setNewEditStageInput('');
     setIsEditingStory(true);
   };
 
@@ -556,7 +588,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
           model: editedStory.model,
           max_chapters: parseInt(editedStory.max_chapters) || 10,
           max_words_per_chapter: parseInt(editedStory.max_words_per_chapter) || 2000,
-          cultivation_stages: editedStory.cultivation_stages ? editedStory.cultivation_stages.split(',').map(s => s.trim()).filter(Boolean) : []
+          cultivation_stages: editedStory.cultivation_stages || []
         })
       });
       if (res.ok) {
@@ -1714,14 +1746,71 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
             </div>
 
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Hệ thống cấp bậc tu vi (ngăn cách bằng dấu phẩy)</label>
-              <input 
-                type="text" 
-                value={editedStory.cultivation_stages}
-                onChange={e => setEditedStory({ ...editedStory, cultivation_stages: e.target.value })}
-                style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
-                placeholder="Ví dụ: Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần"
-              />
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Hệ thống cấp bậc tu vi (Bậc từ thấp đến cao)</label>
+              <div className="cultivation-manager glass-light" style={{ border: '1px solid var(--border-glass)', borderRadius: '12px', padding: '12px', background: 'rgba(255, 255, 255, 0.01)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="stages-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                  {(editedStory.cultivation_stages || []).map((stage, idx) => (
+                    <div key={idx} className="stage-item-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '6px', padding: '6px 10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>Cấp {idx + 1}:</span>
+                        <span style={{ fontSize: '13px', color: '#fff' }}>{stage}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <button 
+                          type="button" 
+                          onClick={() => handleEditMoveStage(idx, 'up')} 
+                          disabled={idx === 0}
+                          style={{ border: 'none', background: 'transparent', cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => handleEditMoveStage(idx, 'down')} 
+                          disabled={idx === (editedStory.cultivation_stages || []).length - 1}
+                          style={{ border: 'none', background: 'transparent', cursor: idx === (editedStory.cultivation_stages || []).length - 1 ? 'not-allowed' : 'pointer', color: idx === (editedStory.cultivation_stages || []).length - 1 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => handleEditDeleteStage(idx)} 
+                          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '2px', marginLeft: '4px' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {(!editedStory.cultivation_stages || editedStory.cultivation_stages.length === 0) && (
+                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center', padding: '10px' }}>Chưa có bậc tu vi nào. Hãy thêm ở dưới.</p>
+                  )}
+                </div>
+                
+                <div className="add-stage-row" style={{ display: 'flex', gap: '8px', marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
+                  <input 
+                    type="text" 
+                    value={newEditStageInput} 
+                    onChange={e => setNewEditStageInput(e.target.value)} 
+                    placeholder="Tên cấp bậc mới (ví dụ: Hóa Thần)" 
+                    style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px' }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleEditAddStage();
+                      }
+                    }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleEditAddStage}
+                    className="btn-primary-sm" 
+                    style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                  >
+                    <Plus size={12} /> Thêm
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '12px' }}>

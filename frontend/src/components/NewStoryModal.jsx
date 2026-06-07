@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UserPlus, Trash, Sparkles } from 'lucide-react';
+import { X, UserPlus, Trash, Sparkles, ArrowUp, ArrowDown, Plus } from 'lucide-react';
 
 export default function NewStoryModal({ onClose, onCreateStory }) {
   const [name, setName] = useState('');
@@ -9,11 +9,33 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
   const [maxChapters, setMaxChapters] = useState(10);
   const [maxWords, setMaxWords] = useState(2000);
   const [model, setModel] = useState('gemini-2.5-flash');
-  const [cultivationStages, setCultivationStages] = useState('Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần');
+  const [cultivationStages, setCultivationStages] = useState(['Luyện Khí', 'Trúc Cơ', 'Kim Đan', 'Nguyên Anh', 'Hóa Thần']);
+  const [newStageInput, setNewStageInput] = useState('');
   const [characters, setCharacters] = useState([
     { name: '', role: 'Nam chính', description: '', current_cultivation: '' }
   ]);
   const [submitting, setSubmitting] = useState(false);
+
+  const handleAddStage = () => {
+    if (newStageInput.trim()) {
+      setCultivationStages([...cultivationStages, newStageInput.trim()]);
+      setNewStageInput('');
+    }
+  };
+
+  const handleMoveStage = (index, direction) => {
+    const newStages = [...cultivationStages];
+    if (direction === 'up' && index > 0) {
+      [newStages[index], newStages[index - 1]] = [newStages[index - 1], newStages[index]];
+    } else if (direction === 'down' && index < newStages.length - 1) {
+      [newStages[index], newStages[index + 1]] = [newStages[index + 1], newStages[index]];
+    }
+    setCultivationStages(newStages);
+  };
+
+  const handleDeleteStage = (index) => {
+    setCultivationStages(cultivationStages.filter((_, i) => i !== index));
+  };
 
   const handleAddCharacter = () => {
     setCharacters([...characters, { name: '', role: 'Phụ', description: '', current_cultivation: '' }]);
@@ -46,7 +68,7 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
       max_chapters: parseInt(maxChapters) || 10,
       max_words_per_chapter: parseInt(maxWords) || 2000,
       model: model,
-      cultivation_stages: cultivationStages.split(',').map(s => s.trim()).filter(Boolean),
+      cultivation_stages: cultivationStages,
       characters: characters.filter(c => c.name.trim() !== '')
     };
 
@@ -120,14 +142,72 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Hệ thống tu vi thế giới (ngăn cách bằng dấu phẩy)</label>
-            <input 
-              type="text" 
-              className="form-input" 
-              value={cultivationStages} 
-              onChange={e => setCultivationStages(e.target.value)} 
-              placeholder="Ví dụ: Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần"
-            />
+            <label className="form-label">Hệ thống tu vi thế giới (Bậc từ thấp đến cao)</label>
+            <div className="cultivation-manager glass-light" style={{ border: '1px solid var(--border-glass)', borderRadius: '12px', padding: '12px', background: 'rgba(255, 255, 255, 0.01)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="stages-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                {cultivationStages.map((stage, idx) => (
+                  <div key={idx} className="stage-item-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '6px', padding: '6px 10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>Cấp {idx + 1}:</span>
+                      <span style={{ fontSize: '13px', color: '#fff' }}>{stage}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <button 
+                        type="button" 
+                        onClick={() => handleMoveStage(idx, 'up')} 
+                        disabled={idx === 0}
+                        style={{ border: 'none', background: 'transparent', cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                      >
+                        <ArrowUp size={14} />
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => handleMoveStage(idx, 'down')} 
+                        disabled={idx === cultivationStages.length - 1}
+                        style={{ border: 'none', background: 'transparent', cursor: idx === cultivationStages.length - 1 ? 'not-allowed' : 'pointer', color: idx === cultivationStages.length - 1 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                      >
+                        <ArrowDown size={14} />
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => handleDeleteStage(idx)} 
+                        style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '2px', marginLeft: '4px' }}
+                      >
+                        <Trash size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {cultivationStages.length === 0 && (
+                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center', padding: '10px' }}>Chưa có bậc tu vi nào. Hãy thêm ở dưới.</p>
+                )}
+              </div>
+              
+              <div className="add-stage-row" style={{ display: 'flex', gap: '8px', marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
+                <input 
+                  type="text" 
+                  className="form-input-sm" 
+                  value={newStageInput} 
+                  onChange={e => setNewStageInput(e.target.value)} 
+                  placeholder="Tên cấp bậc mới (ví dụ: Hóa Thần)" 
+                  style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px' }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddStage();
+                    }
+                  }}
+                />
+                <button 
+                  type="button" 
+                  onClick={handleAddStage}
+                  className="btn-primary-sm" 
+                  style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                >
+                  <Plus size={12} /> Thêm
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="form-row">
