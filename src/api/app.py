@@ -787,8 +787,9 @@ HƯỚNG DẪN VIẾT:
 2. Giữ nguyên bối cảnh, ngôi kể và các thông tin logic đã có của tác phẩm trừ khi tác giả có yêu cầu thay đổi chúng cụ thể.
 3. Chỉ trả về nội dung đoạn văn mới đã được chỉnh sửa. Tuyệt đối không thêm bất kỳ lời bình luận, lời giới thiệu hay định dạng markdown rườm rà nào khác ngoài đoạn văn chính.
 """
+        from src.utils.helpers import ensure_string
         response = llm.invoke(prompt)
-        revised_paragraph = response.content.strip()
+        revised_paragraph = ensure_string(response.content).strip()
         
         # Clean up any potential markdown wraps if the model returned them
         if revised_paragraph.startswith("```"):
