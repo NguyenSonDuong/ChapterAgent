@@ -746,7 +746,24 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
     # 3.4 Tự động trích xuất thực thể thế giới (Địa điểm, Binh khí, Công pháp) và cập nhật nhân vật
     meta_data = state["meta"]
     existing_characters = meta_data.get("characters", [])
-    cult_stages_str = ", ".join(meta_data.get("cultivation_stages", []))
+    cult_stages = meta_data.get("cultivation_stages", [])
+    stages_names = []
+    stages_desc = []
+    for s in cult_stages:
+        if isinstance(s, dict):
+            name = s.get("name", "")
+            desc = s.get("description", "")
+        else:
+            name = getattr(s, "name", str(s))
+            desc = getattr(s, "description", "")
+        stages_names.append(name)
+        if desc:
+            stages_desc.append(f"- {name}: {desc}")
+        else:
+            stages_desc.append(f"- {name}")
+            
+    cult_stages_str = ", ".join(stages_names)
+    cult_stages_detail = "\n".join(stages_desc)
     char_list_str = ", ".join([c.get("name", "") for c in existing_characters])
 
     console.print("\n[bold cyan]Đang phân tích sổ cái thế giới và cập nhật trạng thái nhân vật...[/bold cyan]")
@@ -757,6 +774,7 @@ Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây 
 
 HỆ THỐNG TU VI THẾ GIỚI:
 [{cult_stages_str}]
+{cult_stages_detail}
 
 DANH SÁCH NHÂN VẬT HIỆN CÓ:
 [{char_list_str}]

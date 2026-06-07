@@ -24,6 +24,29 @@ from src.core.state import AgentState
 from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import set_socketio, emit_event
 
+def parse_request_cultivation_stages(raw_stages):
+    parsed = []
+    if isinstance(raw_stages, list):
+        for s in raw_stages:
+            if isinstance(s, dict):
+                parsed.append({
+                    'name': s.get('name', '').strip(),
+                    'description': s.get('description', '').strip()
+                })
+            elif isinstance(s, str) and s.strip():
+                parsed.append({
+                    'name': s.strip(),
+                    'description': ''
+                })
+    elif isinstance(raw_stages, str):
+        for s in raw_stages.split(','):
+            if s.strip():
+                parsed.append({
+                    'name': s.strip(),
+                    'description': ''
+                })
+    return parsed
+
 app = Flask(__name__)
 # Enable CORS for all routes (important for ReactJS frontend connection)
 CORS(app)
@@ -154,7 +177,7 @@ def create_story():
         max_chapters=data.get('max_chapters', 10),
         max_words_per_chapter=data.get('max_words_per_chapter', 2000),
         model=data.get('model', 'gemini-2.5-flash'),
-        cultivation_stages=[stage.strip() for stage in data.get('cultivation_stages', []) if stage.strip()] if isinstance(data.get('cultivation_stages'), list) else ([stage.strip() for stage in data.get('cultivation_stages', '').split(',') if stage.strip()] if isinstance(data.get('cultivation_stages'), str) else [])
+        cultivation_stages=parse_request_cultivation_stages(data.get('cultivation_stages', []))
     )
 
     ledger = models.GlobalLedger(
@@ -208,11 +231,7 @@ def update_story(story_uuid):
     existing_meta['model'] = data.get('model', existing_meta.get('model', 'gemini-2.5-flash'))
     
     if 'cultivation_stages' in data:
-        stages = data.get('cultivation_stages', [])
-        if isinstance(stages, list):
-            existing_meta['cultivation_stages'] = [s.strip() for s in stages if s.strip()]
-        elif isinstance(stages, str):
-            existing_meta['cultivation_stages'] = [s.strip() for s in stages.split(',') if s.strip()]
+        existing_meta['cultivation_stages'] = parse_request_cultivation_stages(data.get('cultivation_stages', []))
     
     # Handle characters update
     if 'characters' in data:

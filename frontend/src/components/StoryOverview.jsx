@@ -7,7 +7,8 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
 
   // Story Edit States
   const [isEditingStory, setIsEditingStory] = useState(false);
-  const [newEditStageInput, setNewEditStageInput] = useState('');
+  const [newEditStageName, setNewEditStageName] = useState('');
+  const [newEditStageDesc, setNewEditStageDesc] = useState('');
   const [editedStory, setEditedStory] = useState({
     name: '',
     context: '',
@@ -527,12 +528,16 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
   };
 
   const handleEditAddStage = () => {
-    if (newEditStageInput.trim()) {
+    if (newEditStageName.trim()) {
       setEditedStory({
         ...editedStory,
-        cultivation_stages: [...(editedStory.cultivation_stages || []), newEditStageInput.trim()]
+        cultivation_stages: [...(editedStory.cultivation_stages || []), {
+          name: newEditStageName.trim(),
+          description: newEditStageDesc.trim()
+        }]
       });
-      setNewEditStageInput('');
+      setNewEditStageName('');
+      setNewEditStageDesc('');
     }
   };
 
@@ -567,7 +572,8 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
       max_words_per_chapter: storyMeta.max_words_per_chapter || 2000,
       cultivation_stages: storyMeta.cultivation_stages || []
     });
-    setNewEditStageInput('');
+    setNewEditStageName('');
+    setNewEditStageDesc('');
     setIsEditingStory(true);
   };
 
@@ -770,13 +776,13 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <select
                             className="form-select-sm"
-                            value={(storyMeta.cultivation_stages || []).includes(editingChar.current_cultivation) ? editingChar.current_cultivation : ''}
+                            value={(storyMeta.cultivation_stages || []).some(s => s.name === editingChar.current_cultivation) ? editingChar.current_cultivation : (editingChar.current_cultivation ? 'custom' : '')}
                             onChange={(e) => setEditingChar({ ...editingChar, current_cultivation: e.target.value === 'custom' ? '' : e.target.value })}
                             style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
                           >
                             <option value="">-- Chọn bậc tu vi --</option>
                             {(storyMeta.cultivation_stages || []).map((stage, idx) => (
-                              <option key={idx} value={stage}>{stage}</option>
+                              <option key={idx} value={stage.name}>{stage.name}</option>
                             ))}
                             <option value="custom">Nhập khác...</option>
                           </select>
@@ -979,13 +985,13 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <select
                         className="form-select-sm"
-                        value={(storyMeta.cultivation_stages || []).includes(newChar.current_cultivation) ? newChar.current_cultivation : (newChar.current_cultivation ? 'custom' : '')}
+                        value={(storyMeta.cultivation_stages || []).some(s => s.name === newChar.current_cultivation) ? newChar.current_cultivation : (newChar.current_cultivation ? 'custom' : '')}
                         onChange={(e) => setNewChar({ ...newChar, current_cultivation: e.target.value === 'custom' ? '' : e.target.value })}
                         style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
                       >
                         <option value="">-- Chọn bậc tu vi --</option>
                         {(storyMeta.cultivation_stages || []).map((stage, idx) => (
-                          <option key={idx} value={stage}>{stage}</option>
+                          <option key={idx} value={stage.name}>{stage.name}</option>
                         ))}
                         <option value="custom">Nhập khác...</option>
                       </select>
@@ -1748,38 +1754,45 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
             <div>
               <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Hệ thống cấp bậc tu vi (Bậc từ thấp đến cao)</label>
               <div className="cultivation-manager glass-light" style={{ border: '1px solid var(--border-glass)', borderRadius: '12px', padding: '12px', background: 'rgba(255, 255, 255, 0.01)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div className="stages-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                <div className="stages-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
                   {(editedStory.cultivation_stages || []).map((stage, idx) => (
-                    <div key={idx} className="stage-item-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '6px', padding: '6px 10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>Cấp {idx + 1}:</span>
-                        <span style={{ fontSize: '13px', color: '#fff' }}>{stage}</span>
+                    <div key={idx} className="stage-item-row" style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', padding: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>Cấp {idx + 1}:</span>
+                          <span style={{ fontSize: '13px', color: '#fff', fontWeight: '600' }}>{stage.name}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <button 
+                            type="button" 
+                            onClick={() => handleEditMoveStage(idx, 'up')} 
+                            disabled={idx === 0}
+                            style={{ border: 'none', background: 'transparent', cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => handleEditMoveStage(idx, 'down')} 
+                            disabled={idx === (editedStory.cultivation_stages || []).length - 1}
+                            style={{ border: 'none', background: 'transparent', cursor: idx === (editedStory.cultivation_stages || []).length - 1 ? 'not-allowed' : 'pointer', color: idx === (editedStory.cultivation_stages || []).length - 1 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
+                          >
+                            <ArrowDown size={14} />
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => handleEditDeleteStage(idx)} 
+                            style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '2px', marginLeft: '4px' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <button 
-                          type="button" 
-                          onClick={() => handleEditMoveStage(idx, 'up')} 
-                          disabled={idx === 0}
-                          style={{ border: 'none', background: 'transparent', cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
-                        >
-                          <ArrowUp size={14} />
-                        </button>
-                        <button 
-                          type="button" 
-                          onClick={() => handleEditMoveStage(idx, 'down')} 
-                          disabled={idx === (editedStory.cultivation_stages || []).length - 1}
-                          style={{ border: 'none', background: 'transparent', cursor: idx === (editedStory.cultivation_stages || []).length - 1 ? 'not-allowed' : 'pointer', color: idx === (editedStory.cultivation_stages || []).length - 1 ? 'rgba(255, 255, 255, 0.1)' : 'var(--text-secondary)', padding: '2px' }}
-                        >
-                          <ArrowDown size={14} />
-                        </button>
-                        <button 
-                          type="button" 
-                          onClick={() => handleEditDeleteStage(idx)} 
-                          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '2px', marginLeft: '4px' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                      {stage.description && (
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', paddingLeft: '8px', borderLeft: '2px solid rgba(0, 242, 254, 0.3)' }}>
+                          {stage.description}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {(!editedStory.cultivation_stages || editedStory.cultivation_stages.length === 0) && (
@@ -1787,13 +1800,30 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                   )}
                 </div>
                 
-                <div className="add-stage-row" style={{ display: 'flex', gap: '8px', marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
+                <div className="add-stage-row" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input 
+                      type="text" 
+                      value={newEditStageName} 
+                      onChange={e => setNewEditStageName(e.target.value)} 
+                      placeholder="Tên cấp bậc mới (ví dụ: Hóa Thần)" 
+                      style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px' }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={handleEditAddStage}
+                      className="btn-primary-sm" 
+                      style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                    >
+                      <Plus size={12} /> Thêm
+                    </button>
+                  </div>
                   <input 
                     type="text" 
-                    value={newEditStageInput} 
-                    onChange={e => setNewEditStageInput(e.target.value)} 
-                    placeholder="Tên cấp bậc mới (ví dụ: Hóa Thần)" 
-                    style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px' }}
+                    value={newEditStageDesc} 
+                    onChange={e => setNewEditStageDesc(e.target.value)} 
+                    placeholder="Mô tả về cấp bậc tu vi này..." 
+                    style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px' }}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -1801,14 +1831,6 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                       }
                     }}
                   />
-                  <button 
-                    type="button" 
-                    onClick={handleEditAddStage}
-                    className="btn-primary-sm" 
-                    style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
-                  >
-                    <Plus size={12} /> Thêm
-                  </button>
                 </div>
               </div>
             </div>

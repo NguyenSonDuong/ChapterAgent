@@ -79,6 +79,17 @@ class CharacterInfo(BaseModel):
     techniques_owned: List[str] = Field(default_factory=list, description="Các công pháp đang sở hữu")
     current_cultivation: Optional[str] = Field(default=None, description="Tu vi hiện tại")
 
+class CultivationStageInfo(BaseModel):
+    name: str = Field(description="Tên bậc tu vi")
+    description: Optional[str] = Field(default="", description="Mô tả về bậc tu vi")
+
+    @model_validator(mode='before')
+    @classmethod
+    def convert_string_to_dict(cls, data: Any) -> Any:
+        if isinstance(data, str):
+            return {"name": data, "description": ""}
+        return data
+
 class StoryMeta(BaseModel):
     uuid: str = Field(description="UUID định danh duy nhất của câu chuyện")
     name: str = Field(description="Tên tác phẩm")
@@ -89,7 +100,7 @@ class StoryMeta(BaseModel):
     max_chapters: int = Field(default=10, description="Số chương tối đa dự kiến")
     max_words_per_chapter: int = Field(default=2000, description="Giới hạn số từ tối đa mỗi chương")
     model: str = Field(default="gemini-2.5-flash", description="Model AI sử dụng cho câu chuyện")
-    cultivation_stages: List[str] = Field(default_factory=list, description="Hệ thống cấp độ tu vi của thế giới")
+    cultivation_stages: List[CultivationStageInfo] = Field(default_factory=list, description="Hệ thống cấp độ tu vi của thế giới")
 
 
 class ChapterState(BaseModel):

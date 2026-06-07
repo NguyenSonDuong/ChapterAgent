@@ -25,13 +25,24 @@ def ensure_string(content) -> str:
     return str(content)
 
 
-def parse_cultivation_score(cult_str: str, stages: List[str]) -> float:
+def parse_cultivation_score(cult_str: str, stages: List[any]) -> float:
     """Tính toán điểm số tu vi dựa trên danh sách hệ thống cấp bậc.
     Cấp bậc càng cao điểm số càng lớn.
     """
     if not cult_str:
         return -1.0
     cult_str = cult_str.strip().lower()
+    
+    # Chuẩn hóa danh sách stages thành list chứa các chuỗi tên tu vi
+    stage_names = []
+    for s in stages:
+        if isinstance(s, dict):
+            stage_names.append(s.get("name", ""))
+        elif isinstance(s, str):
+            stage_names.append(s)
+        else:
+            stage_names.append(getattr(s, "name", str(s)))
+    stages = stage_names
     
     # 1. Kiểm tra trạng thái "bán bộ" hoặc "nửa bước" (half-step)
     for idx, stage in enumerate(stages):
