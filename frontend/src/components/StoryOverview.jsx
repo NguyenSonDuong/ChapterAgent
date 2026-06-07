@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin, Settings, ArrowUp, ArrowDown } from 'lucide-react';
 
+const getStatusBadgeStyle = (status) => {
+  switch (status) {
+    case 'Mới xuất hiện':
+      return { background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.3)' };
+    case 'Đang an toàn':
+      return { background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' };
+    case 'Đang nguy hiểm':
+      return { background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)' };
+    case 'Nguy hiểm tính mạng':
+      return { background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' };
+    case 'Đã chết':
+      return { background: 'rgba(107, 114, 128, 0.15)', color: '#9ca3af', border: '1px solid rgba(107, 114, 128, 0.3)' };
+    default:
+      return { background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255, 255, 255, 0.1)' };
+  }
+};
+
 export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRefreshDetails }) {
   const [isEditingModel, setIsEditingModel] = useState(false);
   const [selectedModel, setSelectedModel] = useState('');
@@ -24,12 +41,14 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
   const [isAddingCharacter, setIsAddingCharacter] = useState(false);
   const [newChar, setNewChar] = useState({ 
     name: '', role: '', description: '', first_chapter: null, appearance_context: '',
-    current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: ''
+    current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: '',
+    current_location: '', status: 'Mới xuất hiện'
   });
   const [editingCharName, setEditingCharName] = useState(null);
   const [editingChar, setEditingChar] = useState({ 
     name: '', role: '', description: '', first_chapter: null, appearance_context: '',
-    current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: ''
+    current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: '',
+    current_location: '', status: 'Mới xuất hiện'
   });
 
   // Unresolved Thread States
@@ -210,7 +229,9 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
       ...char,
       weapons_owned: char.weapons_owned ? char.weapons_owned.join(', ') : '',
       techniques_owned: char.techniques_owned ? char.techniques_owned.join(', ') : '',
-      visited_locations: char.visited_locations ? char.visited_locations.join(', ') : ''
+      visited_locations: char.visited_locations ? char.visited_locations.join(', ') : '',
+      current_location: char.current_location || '',
+      status: char.status || 'Mới xuất hiện'
     });
   };
 
@@ -238,14 +259,17 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
           weapons_owned: newChar.weapons_owned ? newChar.weapons_owned.split(',').map(w => w.trim()).filter(Boolean) : [],
           active_technique: newChar.active_technique ? newChar.active_technique.trim() : '',
           techniques_owned: newChar.techniques_owned ? newChar.techniques_owned.split(',').map(t => t.trim()).filter(Boolean) : [],
-          visited_locations: newChar.visited_locations ? newChar.visited_locations.split(',').map(l => l.trim()).filter(Boolean) : []
+          visited_locations: newChar.visited_locations ? newChar.visited_locations.split(',').map(l => l.trim()).filter(Boolean) : [],
+          current_location: newChar.current_location ? newChar.current_location.trim() : '',
+          status: newChar.status || 'Mới xuất hiện'
         })
       });
       if (res.ok) {
         setIsAddingCharacter(false);
         setNewChar({ 
           name: '', role: '', description: '', first_chapter: null, appearance_context: '',
-          current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: ''
+          current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: '',
+          current_location: '', status: 'Mới xuất hiện'
         });
         if (onRefreshDetails) onRefreshDetails();
       } else {
@@ -282,7 +306,9 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
           weapons_owned: editingChar.weapons_owned ? editingChar.weapons_owned.split(',').map(w => w.trim()).filter(Boolean) : [],
           active_technique: editingChar.active_technique ? editingChar.active_technique.trim() : '',
           techniques_owned: editingChar.techniques_owned ? editingChar.techniques_owned.split(',').map(t => t.trim()).filter(Boolean) : [],
-          visited_locations: editingChar.visited_locations ? editingChar.visited_locations.split(',').map(l => l.trim()).filter(Boolean) : []
+          visited_locations: editingChar.visited_locations ? editingChar.visited_locations.split(',').map(l => l.trim()).filter(Boolean) : [],
+          current_location: editingChar.current_location ? editingChar.current_location.trim() : '',
+          status: editingChar.status || 'Mới xuất hiện'
         })
       });
       if (res.ok) {
@@ -640,8 +666,8 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                 <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
                 <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
                 <option value="gemini-3.0-flash">Gemini 3 Flash</option>
-                <option value="gemma-4-26b">Gemma 4 26B</option>
-                <option value="gemma-4-31b">Gemma 4 31B</option>
+                <option value="gemma-4-26b-it">Gemma 4 26B</option>
+                <option value="gemma-4-31b-it">Gemma 4 31B</option>
                 <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
                 <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
               </select>
@@ -847,6 +873,33 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                         />
                       </div>
 
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Địa điểm hiện tại</label>
+                          <input
+                            type="text"
+                            placeholder="Nhập địa điểm hiện tại..."
+                            value={editingChar.current_location || ''}
+                            onChange={(e) => setEditingChar({ ...editingChar, current_location: e.target.value })}
+                            style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Trạng thái</label>
+                          <select
+                            value={editingChar.status || 'Mới xuất hiện'}
+                            onChange={(e) => setEditingChar({ ...editingChar, status: e.target.value })}
+                            style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
+                          >
+                            <option value="Mới xuất hiện">Mới xuất hiện</option>
+                            <option value="Đang an toàn">Đang an toàn</option>
+                            <option value="Đang nguy hiểm">Đang nguy hiểm</option>
+                            <option value="Nguy hiểm tính mạng">Nguy hiểm tính mạng</option>
+                            <option value="Đã chết">Đã chết</option>
+                          </select>
+                        </div>
+                      </div>
+
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '6px' }}>
                         <button onClick={() => setEditingCharName(null)} className="btn-secondary-sm">Hủy</button>
                         <button onClick={() => handleSaveCharacter(char.name)} className="btn-primary-sm">Lưu</button>
@@ -862,7 +915,20 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                         <User className="icon-sm" />
                       </div>
                       <div className="char-name-role" style={{ flex: 1 }}>
-                        <h4 className="char-name" style={{ fontSize: '14px', fontWeight: '600' }}>{char.name}</h4>
+                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <h4 className="char-name" style={{ fontSize: '14px', fontWeight: '600' }}>{char.name}</h4>
+                          <span style={{ 
+                            fontSize: '9px', 
+                            padding: '1px 5px', 
+                            borderRadius: '12px', 
+                            marginLeft: '6px', 
+                            fontWeight: '500',
+                            display: 'inline-block',
+                            ...getStatusBadgeStyle(char.status || 'Mới xuất hiện')
+                          }}>
+                            {char.status || 'Mới xuất hiện'}
+                          </span>
+                        </div>
                         <span className="char-role" style={{ fontSize: '11px', color: isMain ? 'var(--color-yellow)' : 'var(--text-muted)' }}>
                           {char.role} {isMain && '(Nhân vật chính)'}
                         </span>
@@ -919,6 +985,12 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <BookOpen className="icon-xs text-purple" style={{ width: '12px', height: '12px' }} />
                           <span><strong>Công pháp sở hữu:</strong> {char.techniques_owned.join(', ')}</span>
+                        </div>
+                      )}
+                      {char.current_location && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <MapPin className="icon-xs text-cyan" style={{ width: '12px', height: '12px' }} />
+                          <span><strong>Vị trí hiện tại:</strong> {char.current_location}</span>
                         </div>
                       )}
                       {char.visited_locations && char.visited_locations.length > 0 && (
@@ -1026,6 +1098,33 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                     </div>
                   </div>
 
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Địa điểm hiện tại</label>
+                      <input
+                        type="text"
+                        placeholder="Nhập địa điểm hiện tại..."
+                        value={newChar.current_location || ''}
+                        onChange={(e) => setNewChar({ ...newChar, current_location: e.target.value })}
+                        style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Trạng thái</label>
+                      <select
+                        value={newChar.status || 'Mới xuất hiện'}
+                        onChange={(e) => setNewChar({ ...newChar, status: e.target.value })}
+                        style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
+                      >
+                        <option value="Mới xuất hiện">Mới xuất hiện</option>
+                        <option value="Đang an toàn">Đang an toàn</option>
+                        <option value="Đang nguy hiểm">Đang nguy hiểm</option>
+                        <option value="Nguy hiểm tính mạng">Nguy hiểm tính mạng</option>
+                        <option value="Đã chết">Đã chết</option>
+                      </select>
+                    </div>
+                  </div>
+
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '6px' }}>
                     <button onClick={() => setIsAddingCharacter(false)} className="btn-secondary-sm">Hủy</button>
                     <button onClick={handleAddCharacter} className="btn-primary-sm">Thêm</button>
@@ -1033,7 +1132,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                 </div>
               ) : (
                 <button 
-                  onClick={() => { setIsAddingCharacter(true); setNewChar({ name: '', role: '', description: '', first_chapter: null, appearance_context: '', current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: '' }); }} 
+                  onClick={() => { setIsAddingCharacter(true); setNewChar({ name: '', role: '', description: '', first_chapter: null, appearance_context: '', current_cultivation: '', active_weapon: '', weapons_owned: '', active_technique: '', techniques_owned: '', visited_locations: '', current_location: '', status: 'Mới xuất hiện' }); }} 
                   className="btn-secondary-sm" 
                   style={{ width: '100%', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
                 >
@@ -1852,8 +1951,8 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                   <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
                   <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
                   <option value="gemini-3.0-flash">Gemini 3 Flash</option>
-                  <option value="gemma-4-26b">Gemma 4 26B</option>
-                  <option value="gemma-4-31b">Gemma 4 31B</option>
+                  <option value="gemma-4-26b-it">Gemma 4 26B</option>
+                  <option value="gemma-4-31b-it">Gemma 4 31B</option>
                   <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
                   <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                 </select>

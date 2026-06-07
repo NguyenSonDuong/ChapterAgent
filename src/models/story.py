@@ -78,6 +78,8 @@ class CharacterInfo(BaseModel):
     active_technique: Optional[str] = Field(default=None, description="Công pháp đang sử dụng")
     techniques_owned: List[str] = Field(default_factory=list, description="Các công pháp đang sở hữu")
     current_cultivation: Optional[str] = Field(default=None, description="Tu vi hiện tại")
+    current_location: Optional[str] = Field(default=None, description="Địa điểm hiện tại")
+    status: Optional[str] = Field(default="Mới xuất hiện", description="Trạng thái của nhân vật (Mới xuất hiện, Đang an toàn, Đang nguy hiểm, Nguy hiểm tính mạng, Đã chết)")
 
 class CultivationStageInfo(BaseModel):
     name: str = Field(description="Tên bậc tu vi")

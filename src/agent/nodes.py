@@ -114,6 +114,8 @@ class CharacterUpdate(BaseModel):
     active_technique: Optional[str] = Field(default=None, description="Công pháp nhân vật đang thi triển/sử dụng trong chương này. Để None nếu không đổi/không có.")
     new_techniques_owned: List[str] = Field(default_factory=list, description="Các công pháp nhân vật mới sở hữu/học được trong chương này.")
     new_visited_locations: List[str] = Field(default_factory=list, description="Các địa điểm nhân vật mới đi qua trong chương này.")
+    current_location: Optional[str] = Field(default=None, description="Địa điểm hiện tại của nhân vật sau chương này. Để None nếu không thay đổi hoặc không rõ.")
+    status: Optional[str] = Field(default=None, description="Trạng thái hiện tại của nhân vật sau chương này. Phải chọn chính xác 1 trong: Mới xuất hiện, Đang an toàn, Đang nguy hiểm, Nguy hiểm tính mạng, Đã chết. Để None nếu không đổi.")
 
 class ExtractedLocation(BaseModel):
     name: str = Field(description="Tên địa điểm xuất hiện trong chương")
@@ -797,7 +799,7 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
     emit_agent_log(story_uuid, "Đang trích xuất thông tin Địa điểm, Binh khí, Công pháp và cập nhật trạng thái nhân vật từ chương...")
 
     world_prompt = f"""
-Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và trích xuất thông tin về thế giới tiên hiệp bao gồm: các địa điểm mới, các binh khí/pháp khí mới, các công pháp mới, và cập nhật trạng thái tu vi, địa điểm đi qua, binh khí và công pháp của các nhân vật tham gia chương này.
+Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và trích xuất thông tin về thế giới tiên hiệp bao gồm: các địa điểm mới, các binh khí/pháp khí mới, các công pháp mới, và cập nhật trạng thái tu vi, địa điểm đi qua, địa điểm hiện tại, trạng thái (an toàn, nguy hiểm...), binh khí và công pháp của các nhân vật tham gia chương này.
 
 HỆ THỐNG TU VI THẾ GIỚI:
 [{cult_stages_str}]
@@ -823,6 +825,8 @@ YÊU CẦU TRÍCH XUẤT:
      - Xác định công pháp họ đang sử dụng hoặc thi triển trong chương này.
      - Xác định công pháp mới họ học được hoặc sở hữu thêm trong chương này.
      - Xác định địa điểm họ đã đi qua/ghé thăm trong chương này.
+     - Xác định địa điểm hiện tại của họ sau khi kết thúc chương này.
+     - Xác định trạng thái của họ sau chương này. Phải chọn chính xác 1 trong: Mới xuất hiện, Đang an toàn, Đang nguy hiểm, Nguy hiểm tính mạng, Đã chết. Ví dụ, nếu nhân vật đang bị truy sát hoặc đánh nhau ác liệt thì ghi "Đang nguy hiểm" hoặc "Nguy hiểm tính mạng", nếu bị giết chết thì ghi "Đã chết", nếu đang ở nơi an toàn/tu luyện thì ghi "Đang an toàn".
 """
     try:
         world_extraction = invoke_with_retry(state, world_prompt, temperature=0.2, output_schema=WorldEntityExtraction)
@@ -966,6 +970,39 @@ YÊU CẦU TRÍCH XUẤT:
                             visited_locs.append(nl)
                             matched_char["visited_locations"] = visited_locs
                             console.print(f"  * Thêm địa điểm đã qua của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{nl}[/bold cyan]")
+
+                # Địa điểm hiện tại
+                if update.current_location and update.current_location.strip():
+                    new_curr_loc = update.current_location.strip()
+                    matched_char["current_location"] = new_curr_loc
+                    console.print(f"  * Cập nhật địa điểm hiện tại của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{new_curr_loc}[/bold cyan]")
+                    
+                    # Đồng thời tự động thêm vào địa điểm đã đi qua nếu chưa có
+                    visited_locs = matched_char.get("visited_locations", [])
+                    if not visited_locs:
+                        visited_locs = []
+                    visited_locs_lower = [l.lower() for l in visited_locs]
+                    if new_curr_loc.lower() not in visited_locs_lower:
+                        visited_locs.append(new_curr_loc)
+                        matched_char["visited_locations"] = visited_locs
+                        console.print(f"  * Tự động thêm địa điểm đã qua: [bold cyan]{new_curr_loc}[/bold cyan]")
+
+                # Trạng thái nhân vật
+                if update.status and update.status.strip():
+                    new_status = update.status.strip()
+                    valid_statuses = ["Mới xuất hiện", "Đang an toàn", "Đang nguy hiểm", "Nguy hiểm tính mạng", "Đã chết"]
+                    if new_status in valid_statuses:
+                        matched_char["status"] = new_status
+                        console.print(f"  * Cập nhật trạng thái của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{new_status}[/bold cyan]")
+                    else:
+                        matched_status = None
+                        for vs in valid_statuses:
+                            if vs.lower() in new_status.lower() or new_status.lower() in vs.lower():
+                                matched_status = vs
+                                break
+                        if matched_status:
+                            matched_char["status"] = matched_status
+                            console.print(f"  * Cập nhật trạng thái (khớp) của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{matched_status}[/bold cyan]")
     except Exception as e:
         console.print(f"[bold red]Lỗi khi trích xuất sổ cái thế giới và nhân vật: {e}[/bold red]")
         emit_agent_log(story_uuid, f"Lỗi trích xuất sổ cái thế giới: {e}", level="warning")
@@ -1043,7 +1080,9 @@ YÊU CẦU:
                 "weapons_owned": [],
                 "active_technique": None,
                 "techniques_owned": [],
-                "current_cultivation": None
+                "current_cultivation": None,
+                "current_location": None,
+                "status": "Mới xuất hiện"
             }
             new_chars_to_add.append(new_char)
             

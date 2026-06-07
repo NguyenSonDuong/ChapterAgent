@@ -164,7 +164,9 @@ def create_story():
             weapons_owned=[w.strip() for w in c.get('weapons_owned', []) if w.strip()] if isinstance(c.get('weapons_owned'), list) else ([w.strip() for w in c.get('weapons_owned', '').split(',') if w.strip()] if isinstance(c.get('weapons_owned'), str) else []),
             active_technique=c.get('active_technique'),
             techniques_owned=[t.strip() for t in c.get('techniques_owned', []) if t.strip()] if isinstance(c.get('techniques_owned'), list) else ([t.strip() for t in c.get('techniques_owned', '').split(',') if t.strip()] if isinstance(c.get('techniques_owned'), str) else []),
-            visited_locations=[l.strip() for l in c.get('visited_locations', []) if l.strip()] if isinstance(c.get('visited_locations'), list) else ([l.strip() for l in c.get('visited_locations', '').split(',') if l.strip()] if isinstance(c.get('visited_locations'), str) else [])
+            visited_locations=[l.strip() for l in c.get('visited_locations', []) if l.strip()] if isinstance(c.get('visited_locations'), list) else ([l.strip() for l in c.get('visited_locations', '').split(',') if l.strip()] if isinstance(c.get('visited_locations'), str) else []),
+            current_location=c.get('current_location'),
+            status=c.get('status', 'Mới xuất hiện')
         ))
 
     meta = models.StoryMeta(
@@ -770,7 +772,9 @@ def add_story_character(story_uuid):
             'weapons_owned': [w.strip() for w in data.get('weapons_owned', []) if w.strip()] if isinstance(data.get('weapons_owned'), list) else ([w.strip() for w in data.get('weapons_owned', '').split(',') if w.strip()] if isinstance(data.get('weapons_owned'), str) else []),
             'active_technique': data.get('active_technique', ''),
             'techniques_owned': [t.strip() for t in data.get('techniques_owned', []) if t.strip()] if isinstance(data.get('techniques_owned'), list) else ([t.strip() for t in data.get('techniques_owned', '').split(',') if t.strip()] if isinstance(data.get('techniques_owned'), str) else []),
-            'visited_locations': [l.strip() for l in data.get('visited_locations', []) if l.strip()] if isinstance(data.get('visited_locations'), list) else ([l.strip() for l in data.get('visited_locations', '').split(',') if l.strip()] if isinstance(data.get('visited_locations'), str) else [])
+            'visited_locations': [l.strip() for l in data.get('visited_locations', []) if l.strip()] if isinstance(data.get('visited_locations'), list) else ([l.strip() for l in data.get('visited_locations', '').split(',') if l.strip()] if isinstance(data.get('visited_locations'), str) else []),
+            'current_location': data.get('current_location'),
+            'status': data.get('status', 'Mới xuất hiện')
         }
         characters.append(new_char)
         meta['characters'] = characters
@@ -846,6 +850,10 @@ def edit_story_character(story_uuid, name):
             existing_char['techniques_owned'] = [t.strip() for t in data.get('techniques_owned', []) if t.strip()] if isinstance(data.get('techniques_owned'), list) else ([t.strip() for t in data.get('techniques_owned', '').split(',') if t.strip()] if isinstance(data.get('techniques_owned'), str) else [])
         if 'visited_locations' in data:
             existing_char['visited_locations'] = [l.strip() for l in data.get('visited_locations', []) if l.strip()] if isinstance(data.get('visited_locations'), list) else ([l.strip() for l in data.get('visited_locations', '').split(',') if l.strip()] if isinstance(data.get('visited_locations'), str) else [])
+        if 'current_location' in data:
+            existing_char['current_location'] = data.get('current_location')
+        if 'status' in data:
+            existing_char['status'] = data.get('status')
 
         characters[char_index] = existing_char
         meta['characters'] = characters

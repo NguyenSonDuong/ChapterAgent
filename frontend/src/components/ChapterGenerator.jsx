@@ -76,7 +76,7 @@ function ModelChangeForm({ onSubmit, currentModel }) {
   const standardModels = [
     'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-lite',
     'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.1-pro', 'gemini-2.5-flash-lite',
-    'gemini-3.0-flash', 'gemma-4-26b', 'gemma-4-31b', 'gemini-1.5-flash', 'gemini-1.5-pro'
+    'gemini-3.0-flash', 'gemma-4-26b-it', 'gemma-4-31b-it', 'gemini-1.5-flash', 'gemini-1.5-pro'
   ];
   const isStandard = standardModels.includes(currentModel);
   const [selectedOption, setSelectedOption] = useState(isStandard ? currentModel : (currentModel ? 'other' : 'gemini-2.5-flash'));
@@ -110,8 +110,8 @@ function ModelChangeForm({ onSubmit, currentModel }) {
             <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
             <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
             <option value="gemini-3.0-flash">Gemini 3 Flash</option>
-            <option value="gemma-4-26b">Gemma 4 26B</option>
-            <option value="gemma-4-31b">Gemma 4 31B</option>
+            <option value="gemma-4-26b-it">Gemma 4 26B IT</option>
+            <option value="gemma-4-31b-it">Gemma 4 31B IT</option>
             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
             <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
             <option value="other">Khác (Nhập thủ công)</option>
@@ -1106,8 +1106,8 @@ export default function ChapterGenerator({
                   <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
                   <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
                   <option value="gemini-3.0-flash">Gemini 3 Flash</option>
-                  <option value="gemma-4-26b">Gemma 4 26B</option>
-                  <option value="gemma-4-31b">Gemma 4 31B</option>
+                  <option value="gemma-4-26b-it">Gemma 4 26B IT</option>
+                  <option value="gemma-4-31b-it">Gemma 4 31B IT</option>
                   <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
                   <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                 </select>
