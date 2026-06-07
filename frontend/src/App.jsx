@@ -97,7 +97,12 @@ export default function App() {
         const chaptersData = await chaptersRes.json();
         setChapters(chaptersData);
         if (chaptersData.length > 0) {
-          setActiveChapterNum(chaptersData[0].chapter);
+          setActiveChapterNum(prev => {
+            if (prev && chaptersData.some(c => c.chapter === prev)) {
+              return prev;
+            }
+            return chaptersData[0].chapter;
+          });
         }
       }
     } catch (e) {
@@ -215,17 +220,16 @@ export default function App() {
               </button>
             </div>
 
-            {/* Content view based on active tab */}
-            <div className="tab-content-container">
-              {activeTab === 'overview' && (
+            <div className="tab-content-container" style={{ position: 'relative' }}>
+              <div style={{ display: activeTab === 'overview' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>
                 <StoryOverview 
                   storyMeta={storyMeta} 
                   storyLedger={storyLedger} 
                   backendUrl={BACKEND_URL}
                   onRefreshDetails={() => fetchStoryDetails(selectedStoryId)}
                 />
-              )}
-              {activeTab === 'reader' && (
+              </div>
+              <div style={{ display: activeTab === 'reader' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>
                 <ChapterReader
                   storyUuid={selectedStoryId}
                   chapters={chapters}
@@ -235,8 +239,8 @@ export default function App() {
                   onDeleteChapter={handleDeleteChapter}
                   backendUrl={BACKEND_URL}
                 />
-              )}
-              {activeTab === 'generator' && (
+              </div>
+              <div style={{ display: activeTab === 'generator' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>
                 <ChapterGenerator
                   storyUuid={selectedStoryId}
                   defaultModel={storyMeta?.model}
@@ -244,8 +248,9 @@ export default function App() {
                   storyLedger={storyLedger}
                   socket={socket}
                   onGenerationComplete={handleGenerationComplete}
+                  backendUrl={BACKEND_URL}
                 />
-              )}
+              </div>
             </div>
           </>
         ) : (

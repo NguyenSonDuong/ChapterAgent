@@ -65,56 +65,32 @@ export default function ChapterReader({
     fetchChapter();
   }, [selectedNum, storyUuid]);
 
-  // Handle text selection events
-  useEffect(() => {
-    const handleTextSelection = () => {
-      if (showEditPopup) return; // Don't clear selection if editing modal is open
-      
-      const selection = window.getSelection();
-      if (!selection) {
-        setSelectionInfo(null);
+  // Handle text selection events inside the textarea in Edit Mode
+  const handleTextareaSelect = (e) => {
+    if (!editMode) return;
+    const textarea = e.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start !== end) {
+      const selectedText = textarea.value.substring(start, end).trim();
+      if (selectedText.length > 0) {
+        setSelectionInfo({
+          text: selectedText,
+          start,
+          end,
+          isTextarea: true
+        });
         return;
       }
-      
-      const selectedText = selection.toString().trim();
-      if (selectedText.length > 0) {
-        const container = document.querySelector('.markdown-body');
-        const panel = document.querySelector('.reader-content-panel');
-        
-        if (container && panel) {
-          try {
-            const range = selection.getRangeAt(0);
-            if (container.contains(range.commonAncestorContainer)) {
-              const rect = range.getBoundingClientRect();
-              const panelRect = panel.getBoundingClientRect();
-              
-              setSelectionInfo({
-                text: selectedText,
-                rect: {
-                  top: rect.top - panelRect.top + panel.scrollTop,
-                  left: rect.left - panelRect.left + panel.scrollLeft,
-                  width: rect.width,
-                  height: rect.height
-                }
-              });
-              return;
-            }
-          } catch (e) {
-            // range selection error
-          }
-        }
-      }
-      
+    }
+    
+    if (!showEditPopup) {
       setSelectionInfo(null);
-    };
+    }
+  };
 
-    document.addEventListener('mouseup', handleTextSelection);
-    return () => {
-      document.removeEventListener('mouseup', handleTextSelection);
-    };
-  }, [showEditPopup]);
-
-  // Apply AI editing and replace text in content
+  // Apply AI editing and replace text inside the textarea content (no automatic save)
   const handleApplyAiEdit = async () => {
     if (!selectionInfo || !editInstruction.trim() || !storyUuid || !selectedNum) return;
     
@@ -134,24 +110,22 @@ export default function ChapterReader({
         const data = await res.json();
         const revisedText = data.revised_paragraph;
         
-        const oldContent = chapterData.content;
-        const newContent = oldContent.replace(selectionInfo.text, revisedText);
+        // Replace selection inside editContent state without writing to disk yet
+        const start = selectionInfo.start;
+        const end = selectionInfo.end;
+        const newContent = editContent.substring(0, start) + revisedText + editContent.substring(end);
         
-        const success = await onUpdateChapterContent(selectedNum, newContent);
-        if (success) {
-          setChapterData({
-            ...chapterData,
-            content: newContent
-          });
-          setEditContent(newContent);
-          
-          window.getSelection()?.removeAllRanges();
-          setSelectionInfo(null);
-          setShowEditPopup(false);
-          setEditInstruction('');
-        } else {
-          alert("Lưu nội dung chỉnh sửa xuống đĩa thất bại.");
+        setEditContent(newContent);
+        
+        const textarea = document.querySelector('.content-editor');
+        if (textarea) {
+          textarea.selectionStart = textarea.selectionEnd;
         }
+        
+        // Reset states
+        setSelectionInfo(null);
+        setShowEditPopup(false);
+        setEditInstruction('');
       } else {
         const errData = await res.json();
         alert(errData.error || "Không thể chỉnh sửa văn bản bằng AI.");
@@ -232,6 +206,22 @@ export default function ChapterReader({
               </button>
             ) : (
               <>
+                {selectionInfo && selectionInfo.isTextarea && (
+                  <button
+                    onClick={() => setShowEditPopup(true)}
+                    className="btn-toolbar"
+                    style={{
+                      background: 'rgba(6, 182, 212, 0.15)',
+                      border: '1px solid rgba(6, 182, 212, 0.3)',
+                      color: 'var(--color-cyan)',
+                      marginRight: '8px',
+                      boxShadow: '0 0 10px rgba(6, 182, 212, 0.1)'
+                    }}
+                    title="Chỉnh sửa phần bôi đen bằng AI"
+                  >
+                    <Edit2 className="icon-xs text-cyan" /> <span>Sửa bôi đen bằng AI</span>
+                  </button>
+                )}
                 <button 
                   onClick={() => setEditMode(false)} 
                   className="btn-toolbar btn-cancel"
@@ -270,12 +260,15 @@ export default function ChapterReader({
       ) : (
         <div className="reader-layout">
           {/* Left panel: Content */}
-          <div className="reader-content-panel glass" style={{ position: 'relative' }}>
+          <div className="reader-content-panel glass">
             {editMode ? (
               <textarea
                 className="content-editor"
                 value={editContent}
                 onChange={e => setEditContent(e.target.value)}
+                onSelect={handleTextareaSelect}
+                onKeyUp={handleTextareaSelect}
+                onMouseUp={handleTextareaSelect}
                 placeholder="Nhập nội dung truyện bằng định dạng Markdown..."
               />
             ) : (
@@ -292,35 +285,6 @@ export default function ChapterReader({
                   }
                 })}
               </div>
-            )}
-
-            {selectionInfo && !showEditPopup && (
-              <button
-                onClick={() => setShowEditPopup(true)}
-                style={{
-                  position: 'absolute',
-                  top: `${Math.max(10, selectionInfo.rect.top - 40)}px`,
-                  left: `${selectionInfo.rect.left + selectionInfo.rect.width / 2 - 60}px`,
-                  zIndex: 100,
-                  background: 'var(--color-cyan)',
-                  color: '#10141f',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(6, 182, 212, 0.4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap',
-                  animation: 'fadeIn 0.15s ease'
-                }}
-              >
-                <Edit2 className="icon-xs" style={{ width: '12px', height: '12px' }} />
-                <span>Sửa bằng AI</span>
-              </button>
             )}
           </div>
 
@@ -434,6 +398,10 @@ export default function ChapterReader({
                   setShowEditPopup(false);
                   setEditInstruction('');
                   window.getSelection()?.removeAllRanges();
+                  const textarea = document.querySelector('.content-editor');
+                  if (textarea) {
+                    textarea.selectionStart = textarea.selectionEnd;
+                  }
                   setSelectionInfo(null);
                 }}
                 disabled={aiEditing}
