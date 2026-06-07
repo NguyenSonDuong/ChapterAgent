@@ -170,9 +170,9 @@ export default function ChapterGenerator({
     resolvedThreadText: '',
     resolutionNote: '',
     links: [], // [{ chapter: number, nodes: [nodeId, ...] }]
-    locations: '',
-    weapons: '',
-    techniques: ''
+    locations: [],
+    weapons: [],
+    techniques: []
   });
 
   const [chapterNodesCache, setChapterNodesCache] = useState({});
@@ -203,9 +203,9 @@ export default function ChapterGenerator({
           resolvedThreadText: node.resolved_thread?.thread || '',
           resolutionNote: node.resolved_thread?.resolution_note || '',
           links: node.links || [],
-          locations: Array.isArray(node.locations) ? node.locations.join(', ') : '',
-          weapons: Array.isArray(node.weapons) ? node.weapons.join(', ') : '',
-          techniques: Array.isArray(node.techniques) ? node.techniques.join(', ') : ''
+          locations: Array.isArray(node.locations) ? node.locations : [],
+          weapons: Array.isArray(node.weapons) ? node.weapons : [],
+          techniques: Array.isArray(node.techniques) ? node.techniques : []
         });
       }
     } else {
@@ -216,9 +216,9 @@ export default function ChapterGenerator({
         resolvedThreadText: '',
         resolutionNote: '',
         links: [],
-        locations: '',
-        weapons: '',
-        techniques: ''
+        locations: [],
+        weapons: [],
+        techniques: []
       });
     }
   }, [editingNodeId, nodes]);
@@ -440,6 +440,36 @@ export default function ChapterGenerator({
     });
   };
 
+  const handleLocationToggle = (name) => {
+    setNodeForm(prev => {
+      const exists = prev.locations.includes(name);
+      return {
+        ...prev,
+        locations: exists ? prev.locations.filter(l => l !== name) : [...prev.locations, name]
+      };
+    });
+  };
+
+  const handleWeaponToggle = (name) => {
+    setNodeForm(prev => {
+      const exists = prev.weapons.includes(name);
+      return {
+        ...prev,
+        weapons: exists ? prev.weapons.filter(w => w !== name) : [...prev.weapons, name]
+      };
+    });
+  };
+
+  const handleTechniqueToggle = (name) => {
+    setNodeForm(prev => {
+      const exists = prev.techniques.includes(name);
+      return {
+        ...prev,
+        techniques: exists ? prev.techniques.filter(t => t !== name) : [...prev.techniques, name]
+      };
+    });
+  };
+
   const handleChapterLinkToggle = async (chapNum) => {
     const existingIndex = nodeForm.links.findIndex(l => l.chapter === chapNum);
     if (existingIndex !== -1) {
@@ -489,9 +519,9 @@ export default function ChapterGenerator({
             resolution_note: nodeForm.resolutionNote.trim()
           },
           links: nodeForm.links,
-          locations: typeof nodeForm.locations === 'string' ? nodeForm.locations.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.locations || []),
-          weapons: typeof nodeForm.weapons === 'string' ? nodeForm.weapons.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.weapons || []),
-          techniques: typeof nodeForm.techniques === 'string' ? nodeForm.techniques.split(',').map(s => s.trim()).filter(Boolean) : (nodeForm.techniques || [])
+          locations: nodeForm.locations || [],
+          weapons: nodeForm.weapons || [],
+          techniques: nodeForm.techniques || []
         };
       }
       return n;
@@ -1252,39 +1282,72 @@ export default function ChapterGenerator({
 
                         {/* World Ledger Elements (Locations, Weapons, Techniques) */}
                         <div>
-                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Địa điểm xuất hiện (dấu phẩy ngăn cách)</label>
-                          <input 
-                            type="text"
-                            placeholder="Ví dụ: Vạn Tượng Sơn, Độc Cô Cốc"
-                            className="form-input-sm"
-                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
-                            value={nodeForm.locations}
-                            onChange={e => setNodeForm({ ...nodeForm, locations: e.target.value })}
-                          />
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Địa điểm xuất hiện</label>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', background: '#10141f', padding: '6px', borderRadius: '4px', border: '1px solid var(--border-glass)', maxHeight: '90px', overflowY: 'auto' }}>
+                            {(!storyLedger?.locations || storyLedger.locations.length === 0) ? (
+                              <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '2px' }}>Chưa có địa điểm nào trong Sổ cái</span>
+                            ) : (
+                              storyLedger.locations.map((loc) => {
+                                const isChecked = Array.isArray(nodeForm.locations) && nodeForm.locations.includes(loc.name);
+                                return (
+                                  <label key={loc.name} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', cursor: 'pointer', background: isChecked ? 'rgba(0, 242, 254, 0.1)' : 'transparent', padding: '2px 6px', borderRadius: '4px' }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => handleLocationToggle(loc.name)}
+                                    />
+                                    <span>{loc.name}</span>
+                                  </label>
+                                );
+                              })
+                            )}
+                          </div>
                         </div>
 
                         <div>
-                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Binh khí / Pháp khí sử dụng (dấu phẩy ngăn cách)</label>
-                          <input 
-                            type="text"
-                            placeholder="Ví dụ: Tru Tiên Kiếm, Hỏa Diễm Đao"
-                            className="form-input-sm"
-                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
-                            value={nodeForm.weapons}
-                            onChange={e => setNodeForm({ ...nodeForm, weapons: e.target.value })}
-                          />
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Binh khí / Pháp khí sử dụng</label>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', background: '#10141f', padding: '6px', borderRadius: '4px', border: '1px solid var(--border-glass)', maxHeight: '90px', overflowY: 'auto' }}>
+                            {(!storyLedger?.weapons || storyLedger.weapons.length === 0) ? (
+                              <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '2px' }}>Chưa có binh khí nào trong Sổ cái</span>
+                            ) : (
+                              storyLedger.weapons.map((weap) => {
+                                const isChecked = Array.isArray(nodeForm.weapons) && nodeForm.weapons.includes(weap.name);
+                                return (
+                                  <label key={weap.name} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', cursor: 'pointer', background: isChecked ? 'rgba(0, 242, 254, 0.1)' : 'transparent', padding: '2px 6px', borderRadius: '4px' }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => handleWeaponToggle(weap.name)}
+                                    />
+                                    <span>{weap.name}</span>
+                                  </label>
+                                );
+                              })
+                            )}
+                          </div>
                         </div>
 
                         <div>
-                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Công pháp thi triển (dấu phẩy ngăn cách)</label>
-                          <input 
-                            type="text"
-                            placeholder="Ví dụ: Thái Cực Kiếm Pháp, Hỏa Diễm Đao Pháp"
-                            className="form-input-sm"
-                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
-                            value={nodeForm.techniques}
-                            onChange={e => setNodeForm({ ...nodeForm, techniques: e.target.value })}
-                          />
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Công pháp thi triển</label>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', background: '#10141f', padding: '6px', borderRadius: '4px', border: '1px solid var(--border-glass)', maxHeight: '90px', overflowY: 'auto' }}>
+                            {(!storyLedger?.techniques || storyLedger.techniques.length === 0) ? (
+                              <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '2px' }}>Chưa có công pháp nào trong Sổ cái</span>
+                            ) : (
+                              storyLedger.techniques.map((tech) => {
+                                const isChecked = Array.isArray(nodeForm.techniques) && nodeForm.techniques.includes(tech.name);
+                                return (
+                                  <label key={tech.name} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', cursor: 'pointer', background: isChecked ? 'rgba(0, 242, 254, 0.1)' : 'transparent', padding: '2px 6px', borderRadius: '4px' }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => handleTechniqueToggle(tech.name)}
+                                    />
+                                    <span>{tech.name}</span>
+                                  </label>
+                                );
+                              })
+                            )}
+                          </div>
                         </div>
 
                         {/* Resolved Thread Select */}
