@@ -12,7 +12,7 @@ from rich.panel import Panel
 import src.core.config as config
 from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo
 from src.core.state import AgentState
-from src.utils.helpers import ensure_string
+from src.utils.helpers import ensure_string, is_higher_cultivation
 from src.utils.llm import invoke_with_retry, check_cancellation
 from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import emit_event, emit_agent_log
@@ -843,13 +843,19 @@ YÊU CẦU TRÍCH XUẤT:
                 if update_name_lower == c_name_lower or update_name_lower in c_name_lower or c_name_lower in update_name_lower:
                     matched_char = c
                     break
-                    
             if matched_char:
                 # Tu vi
                 if update.current_cultivation and update.current_cultivation.strip():
-                    matched_char["current_cultivation"] = update.current_cultivation.strip()
-                    console.print(f"  * Cập nhật tu vi của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{update.current_cultivation.strip()}[/bold cyan]")
-                    emit_agent_log(story_uuid, f"Cập nhật tu vi {matched_char['name']}: {update.current_cultivation.strip()}")
+                    new_cult = update.current_cultivation.strip()
+                    old_cult = matched_char.get("current_cultivation", "")
+                    stages = meta_data.get("cultivation_stages", [])
+                    if is_higher_cultivation(old_cult, new_cult, stages):
+                        matched_char["current_cultivation"] = new_cult
+                        console.print(f"  * Cập nhật tu vi của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{new_cult}[/bold cyan]")
+                        emit_agent_log(story_uuid, f"Cập nhật tu vi {matched_char['name']}: {new_cult}")
+                    else:
+                        console.print(f"  * Bỏ qua cập nhật tu vi của [bold yellow]{matched_char['name']}[/bold yellow] vì tu vi mới ({new_cult}) không cao hơn tu vi hiện tại ({old_cult})")
+                        emit_agent_log(story_uuid, f"Bỏ qua cập nhật tu vi {matched_char['name']}: {new_cult} <= {old_cult}")
                 
                 # Binh khí đang dùng
                 if update.active_weapon and update.active_weapon.strip():

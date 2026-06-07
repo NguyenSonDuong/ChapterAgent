@@ -947,14 +947,15 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <select
                         className="form-select-sm"
-                        value={(storyMeta.cultivation_stages || []).includes(newChar.current_cultivation) ? newChar.current_cultivation : ''}
-                        onChange={(e) => setNewChar({ ...newChar, current_cultivation: e.target.value })}
+                        value={(storyMeta.cultivation_stages || []).includes(newChar.current_cultivation) ? newChar.current_cultivation : (newChar.current_cultivation ? 'custom' : '')}
+                        onChange={(e) => setNewChar({ ...newChar, current_cultivation: e.target.value === 'custom' ? '' : e.target.value })}
                         style={{ flex: 1, background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '6px', fontSize: '13px' }}
                       >
                         <option value="">-- Chọn bậc tu vi --</option>
                         {(storyMeta.cultivation_stages || []).map((stage, idx) => (
                           <option key={idx} value={stage}>{stage}</option>
                         ))}
+                        <option value="custom">Nhập khác...</option>
                       </select>
                       <input
                         type="text"
@@ -1655,10 +1656,9 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
           </div>
         )}
       </div>
-    </div>
-    
-    {/* Edit Story Config Modal */}
-    {isEditingStory && (
+      
+      {/* Edit Story Config Modal */}
+      {isEditingStory && (
       <div className="modal-overlay" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, alignItems: 'center', justifyContent: 'center' }}>
         <div className="modal-card glass-light" style={{ width: '90%', maxWidth: '600px', background: 'rgba(18, 22, 33, 0.95)', border: '1px solid var(--border-glass)', borderRadius: '16px', boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)' }}>
           <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-glass)' }}>
