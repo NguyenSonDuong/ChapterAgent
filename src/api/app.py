@@ -995,6 +995,7 @@ def delete_chapter(story_uuid, chapter_num):
     """Delete a chapter from disk and remove its record in global ledger timeline."""
     content_path = config.get_chapter_content_path(story_uuid, chapter_num)
     state_path = config.get_chapter_state_path(story_uuid, chapter_num)
+    nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
     ledger_path = config.get_ledger_path(story_uuid)
 
     deleted_files = []
@@ -1006,6 +1007,9 @@ def delete_chapter(story_uuid, chapter_num):
         if state_path.exists():
             state_path.unlink()
             deleted_files.append('state')
+        if nodes_path.exists():
+            nodes_path.unlink()
+            deleted_files.append('nodes')
     except Exception as e:
         return jsonify({'error': f'Failed to delete chapter files: {str(e)}'}), 500
 

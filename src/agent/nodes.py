@@ -196,8 +196,9 @@ TRẠNG THÁI CHƯƠNG TRƯỚC:
 {current_idea}
 
 Hãy phân tích và trả về kết quả cấu trúc:
-1. Nếu ý tưởng còn sơ sài, thiếu logic cốt lõi (ví dụ: giải quyết mâu thuẫn thế nào, động cơ nhân vật, vị trí địa lý bị mâu thuẫn), hãy đưa ra các câu hỏi ngắn gọn để làm rõ trong `missing_info_questions`.
-2. Nếu thông tin đã hòm hòm hoặc sau khi tác giả đã trả lời thêm, hãy tổng hợp bản yêu cầu chi tiết nhất trong `analyzed_requirements`.
+1. Đối chiếu xem các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển được hoạch định trong các sự kiện (node) có hợp lý và nhất quán với thông tin nhân vật cũng như bối cảnh thế giới hiện có hay không. Nếu phát hiện sự bất hợp lý (ví dụ: nhân vật sử dụng pháp khí chưa sở hữu, thi triển công pháp không thuộc hệ phái của họ, hoặc di chuyển đến địa điểm quá xa mà không có phương tiện hỗ trợ hợp lý), hãy đặt câu hỏi làm rõ trong `missing_info_questions`.
+2. Nếu ý tưởng còn sơ sài, thiếu logic cốt lõi khác (ví dụ: giải quyết mâu thuẫn thế nào, động cơ nhân vật), hãy đưa ra các câu hỏi ngắn gọn để làm rõ trong `missing_info_questions`.
+3. Nếu thông tin đã đầy đủ hoặc sau khi tác giả đã trả lời thêm, hãy tổng hợp bản yêu cầu chi tiết nhất trong `analyzed_requirements`, nêu rõ yêu cầu tích hợp các địa điểm, pháp khí, và công pháp cụ thể đã được hoạch định vào nội dung chương truyện.
 """
         result = invoke_with_retry(state, prompt, temperature=0.3, output_schema=RequirementAnalysisResult)
             
@@ -310,7 +311,8 @@ Yêu cầu viết truyện:
 1. Viết trực tiếp nội dung truyện bằng định dạng Markdown.
 2. Tiêu đề chương viết ở dòng đầu tiên dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`.
 3. Tập trung miêu tả sâu sắc về bối cảnh, cảm xúc, biểu cảm, hội thoại và hành động. Đảm bảo đúng phong cách: {meta.get('style')}.
-4. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
+4. Đảm bảo các diễn biến câu chuyện trong các sự kiện (nodes) tuần tự và sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi sự kiện trong SƠ ĐỒ SỰ KIỆN GỐC.
+5. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
 """
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
@@ -401,6 +403,8 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     feedback = state["revision_feedback"]
     meta = state["meta"]
     chapter_num = state["chapter_num"]
+    reqs = state.get("analyzed_requirements", "")
+    original_user_idea = state.get("original_user_idea")
     
     prompt = f"""
 Bạn là một biên tập viên xuất sắc. Nhiệm vụ của bạn là dựa vào bản nháp hiện tại của Chương {chapter_num} và yêu cầu chỉnh sửa của tác giả để viết lại bản nháp sao cho đáp ứng đúng yêu cầu đó mà không làm hỏng logic truyện.
@@ -414,6 +418,12 @@ THÔNG TIN TRUYỆN (Để giữ đúng văn phong, nhân vật, bối cảnh):
 - Phong cách hành văn: {meta.get('style')}
 - Bối cảnh: {meta.get('context')}
 
+SƠ ĐỒ SỰ KIỆN GỐC (Ý tưởng của tác giả):
+{format_user_idea(original_user_idea)}
+
+YÊU CẦU CHI TIẾT CHO CHƯƠNG {chapter_num}:
+{reqs}
+
 BẢN NHÁP HIỆN TẠI:
 ---
 {draft_content}
@@ -421,8 +431,9 @@ BẢN NHÁP HIỆN TẠI:
 
 Hãy viết lại bản nháp này. Đảm bảo:
 1. Sửa đổi đúng theo ý tác giả (thêm thắt chi tiết, sửa lời thoại, thay đổi nhịp điệu cốt truyện...).
-2. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
-3. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
+2. Đảm bảo các diễn biến câu chuyện trong các sự kiện (nodes) vẫn tuân thủ đúng các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được hoạch định trong SƠ ĐỒ SỰ KIỆN GỐC.
+3. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
+4. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
 """
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
@@ -463,6 +474,8 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
         if prev_state_path.exists():
             prev_state_str = prev_state_path.read_text(encoding="utf-8")
 
+    original_user_idea = state.get("original_user_idea")
+
     prompt = f"""
 Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu bản nháp cuối cùng của Chương {chapter_num} với thông tin lịch sử truyện, sổ cái toàn cục, và đặc biệt là trạng thái chương trước đó để tìm ra các lỗi logic tiềm ẩn.
 
@@ -476,19 +489,23 @@ SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
 TRẠNG THÁI CHƯƠNG TRƯỚC:
 {prev_state_str}
 
+SƠ ĐỒ SỰ KIỆN GỐC ĐƯỢC HOẠCH ĐỊNH (Ý tưởng của tác giả):
+{format_user_idea(original_user_idea)}
+
 NỘI DUNG CHƯƠNG MỚI:
 ---
 {draft_content}
 ---
 
 Hãy phân tích kỹ chương mới và chỉ ra các lỗi mâu thuẫn cốt truyện như:
+- Không tuân thủ hoặc bỏ sót các sự kiện chính, địa điểm xuất hiện, binh khí/pháp khí sử dụng, hoặc công pháp thi triển đã được chỉ định trong SƠ ĐỒ SỰ KIỆN GỐC ĐƯỢC HOẠCH ĐỊNH.
 - Sự thay đổi vô lý về vị trí địa lý của nhân vật (ví dụ: chương trước đang ở trong ngục, chương này tự nhiên đi dạo phố không lời giải thích).
 - Sai lệch trạng thái vật phẩm (chương trước làm mất kiếm, chương này vẫn dùng kiếm đó).
 - Quan hệ nhân vật thay đổi đột ngột không có tình tiết dẫn dắt.
 - Nhân vật đã chết hoặc bị trọng thương bỗng nhiên khỏe mạnh bình thường.
 
 Trả về kết quả có cấu trúc:
-1. `warnings`: Danh sách các câu cảnh báo lỗi logic cụ thể, ngắn gọn. Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
+1. `warnings`: Danh sách các câu cảnh báo lỗi logic cụ thể, ngắn gọn (ví dụ: "Sự kiện X bị bỏ qua", "Nhân vật A không dùng pháp khí Y tại địa điểm Z"). Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
 2. `auditor_feedback`: Đánh giá tổng quan về chất lượng logic chương mới này.
 """
     result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
