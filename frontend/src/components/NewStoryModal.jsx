@@ -9,13 +9,14 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
   const [maxChapters, setMaxChapters] = useState(10);
   const [maxWords, setMaxWords] = useState(2000);
   const [model, setModel] = useState('gemini-2.5-flash');
+  const [cultivationStages, setCultivationStages] = useState('Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần');
   const [characters, setCharacters] = useState([
-    { name: '', role: 'Nam chính', description: '' }
+    { name: '', role: 'Nam chính', description: '', current_cultivation: '' }
   ]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleAddCharacter = () => {
-    setCharacters([...characters, { name: '', role: 'Phụ', description: '' }]);
+    setCharacters([...characters, { name: '', role: 'Phụ', description: '', current_cultivation: '' }]);
   };
 
   const handleRemoveCharacter = (index) => {
@@ -45,6 +46,7 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
       max_chapters: parseInt(maxChapters) || 10,
       max_words_per_chapter: parseInt(maxWords) || 2000,
       model: model,
+      cultivation_stages: cultivationStages.split(',').map(s => s.trim()).filter(Boolean),
       characters: characters.filter(c => c.name.trim() !== '')
     };
 
@@ -114,6 +116,17 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
               placeholder="Mô tả bối cảnh thế giới tu tiên, xung đột chính, ma tộc hoành hành..."
               rows={3}
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Hệ thống tu vi thế giới (ngăn cách bằng dấu phẩy)</label>
+            <input 
+              type="text" 
+              className="form-input" 
+              value={cultivationStages} 
+              onChange={e => setCultivationStages(e.target.value)} 
+              placeholder="Ví dụ: Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần"
             />
           </div>
 
@@ -201,7 +214,16 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
                         className="form-input-sm" 
                         value={char.role} 
                         onChange={e => handleCharacterChange(index, 'role', e.target.value)}
-                        placeholder="Vai trò (Nam chính, Nữ chính, Phản diện...)"
+                        placeholder="Vai trò (Nam chính, Nữ chính...)"
+                      />
+                    </div>
+                    <div className="form-group flex-1">
+                      <input 
+                        type="text" 
+                        className="form-input-sm" 
+                        value={char.current_cultivation || ''} 
+                        onChange={e => handleCharacterChange(index, 'current_cultivation', e.target.value)}
+                        placeholder="Tu vi ban đầu (ví dụ: Luyện Khí tầng 1)"
                       />
                     </div>
                   </div>

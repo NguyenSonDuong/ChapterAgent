@@ -135,7 +135,13 @@ def create_story():
             role=c.get('role'),
             description=c.get('description'),
             first_chapter=c.get('first_chapter'),
-            appearance_context=c.get('appearance_context')
+            appearance_context=c.get('appearance_context'),
+            current_cultivation=c.get('current_cultivation'),
+            active_weapon=c.get('active_weapon'),
+            weapons_owned=[w.strip() for w in c.get('weapons_owned', []) if w.strip()] if isinstance(c.get('weapons_owned'), list) else ([w.strip() for w in c.get('weapons_owned', '').split(',') if w.strip()] if isinstance(c.get('weapons_owned'), str) else []),
+            active_technique=c.get('active_technique'),
+            techniques_owned=[t.strip() for t in c.get('techniques_owned', []) if t.strip()] if isinstance(c.get('techniques_owned'), list) else ([t.strip() for t in c.get('techniques_owned', '').split(',') if t.strip()] if isinstance(c.get('techniques_owned'), str) else []),
+            visited_locations=[l.strip() for l in c.get('visited_locations', []) if l.strip()] if isinstance(c.get('visited_locations'), list) else ([l.strip() for l in c.get('visited_locations', '').split(',') if l.strip()] if isinstance(c.get('visited_locations'), str) else [])
         ))
 
     meta = models.StoryMeta(
@@ -147,12 +153,17 @@ def create_story():
         tags=[t.strip() for t in data.get('tags', []) if t.strip()],
         max_chapters=data.get('max_chapters', 10),
         max_words_per_chapter=data.get('max_words_per_chapter', 2000),
-        model=data.get('model', 'gemini-2.5-flash')
+        model=data.get('model', 'gemini-2.5-flash'),
+        cultivation_stages=[stage.strip() for stage in data.get('cultivation_stages', []) if stage.strip()] if isinstance(data.get('cultivation_stages'), list) else ([stage.strip() for stage in data.get('cultivation_stages', '').split(',') if stage.strip()] if isinstance(data.get('cultivation_stages'), str) else [])
     )
 
     ledger = models.GlobalLedger(
         timeline=[],
-        unresolved_threads=data.get('unresolved_threads') or ["Bắt đầu cuộc phiêu lưu của nhân vật."]
+        unresolved_threads=data.get('unresolved_threads') or ["Bắt đầu cuộc phiêu lưu của nhân vật."],
+        resolved_threads=[],
+        locations=[],
+        weapons=[],
+        techniques=[]
     )
 
     # Save to files
@@ -432,6 +443,268 @@ def resolve_ledger_thread(story_uuid, index):
     except Exception as e:
         return jsonify({'error': f'Failed to resolve thread: {str(e)}'}), 500
 
+# World Ledger Entity CRUD endpoints
+# ----------------------------------------------------
+
+@app.route('/api/stories/<story_uuid>/ledger/locations', methods=['POST'])
+def add_ledger_location(story_uuid):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên địa điểm là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        locations = ledger.get('locations', [])
+        if any(l.get('name', '').strip().lower() == name.lower() for l in locations):
+            return jsonify({'error': f'Địa điểm {name} đã tồn tại'}), 400
+        locations.append({
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        })
+        ledger['locations'] = locations
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Location added successfully',
+            'locations': [l.model_dump() for l in validated_ledger.locations]
+        }), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add location: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/locations/<int:index>', methods=['PUT'])
+def edit_ledger_location(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên địa điểm là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        locations = ledger.get('locations', [])
+        if index < 0 or index >= len(locations):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        if any(i != index and l.get('name', '').strip().lower() == name.lower() for i, l in enumerate(locations)):
+            return jsonify({'error': f'Địa điểm {name} đã tồn tại ở vị trí khác'}), 400
+        locations[index] = {
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        }
+        ledger['locations'] = locations
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Location updated successfully',
+            'locations': [l.model_dump() for l in validated_ledger.locations]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to update location: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/locations/<int:index>', methods=['DELETE'])
+def delete_ledger_location(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        locations = ledger.get('locations', [])
+        if index < 0 or index >= len(locations):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        locations.pop(index)
+        ledger['locations'] = locations
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Location deleted successfully',
+            'locations': [l.model_dump() for l in validated_ledger.locations]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete location: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/weapons', methods=['POST'])
+def add_ledger_weapon(story_uuid):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên binh khí là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        weapons = ledger.get('weapons', [])
+        if any(w.get('name', '').strip().lower() == name.lower() for w in weapons):
+            return jsonify({'error': f'Binh khí {name} đã tồn tại'}), 400
+        weapons.append({
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        })
+        ledger['weapons'] = weapons
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Weapon added successfully',
+            'weapons': [w.model_dump() for w in validated_ledger.weapons]
+        }), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add weapon: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/weapons/<int:index>', methods=['PUT'])
+def edit_ledger_weapon(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên binh khí là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        weapons = ledger.get('weapons', [])
+        if index < 0 or index >= len(weapons):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        if any(i != index and w.get('name', '').strip().lower() == name.lower() for i, w in enumerate(weapons)):
+            return jsonify({'error': f'Binh khí {name} đã tồn tại ở vị trí khác'}), 400
+        weapons[index] = {
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        }
+        ledger['weapons'] = weapons
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Weapon updated successfully',
+            'weapons': [w.model_dump() for w in validated_ledger.weapons]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to update weapon: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/weapons/<int:index>', methods=['DELETE'])
+def delete_ledger_weapon(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        weapons = ledger.get('weapons', [])
+        if index < 0 or index >= len(weapons):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        weapons.pop(index)
+        ledger['weapons'] = weapons
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Weapon deleted successfully',
+            'weapons': [w.model_dump() for w in validated_ledger.weapons]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete weapon: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/techniques', methods=['POST'])
+def add_ledger_technique(story_uuid):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên công pháp là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        techniques = ledger.get('techniques', [])
+        if any(t.get('name', '').strip().lower() == name.lower() for t in techniques):
+            return jsonify({'error': f'Công pháp {name} đã tồn tại'}), 400
+        techniques.append({
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        })
+        ledger['techniques'] = techniques
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Technique added successfully',
+            'techniques': [t.model_dump() for t in validated_ledger.techniques]
+        }), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add technique: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/techniques/<int:index>', methods=['PUT'])
+def edit_ledger_technique(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    chapter = data.get('chapter')
+    description = data.get('description', '').strip()
+    if not name:
+        return jsonify({'error': 'Tên công pháp là bắt buộc'}), 400
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        techniques = ledger.get('techniques', [])
+        if index < 0 or index >= len(techniques):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        if any(i != index and t.get('name', '').strip().lower() == name.lower() for i, t in enumerate(techniques)):
+            return jsonify({'error': f'Công pháp {name} đã tồn tại ở vị trí khác'}), 400
+        techniques[index] = {
+            'name': name,
+            'chapter': int(chapter) if chapter is not None and str(chapter).strip() != "" else None,
+            'description': description
+        }
+        ledger['techniques'] = techniques
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Technique updated successfully',
+            'techniques': [t.model_dump() for t in validated_ledger.techniques]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to update technique: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/ledger/techniques/<int:index>', methods=['DELETE'])
+def delete_ledger_technique(story_uuid, index):
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({'error': 'Ledger not found'}), 404
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        techniques = ledger.get('techniques', [])
+        if index < 0 or index >= len(techniques):
+            return jsonify({'error': 'Index không hợp lệ'}), 400
+        techniques.pop(index)
+        ledger['techniques'] = techniques
+        validated_ledger = models.GlobalLedger(**ledger)
+        ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+        return jsonify({
+            'message': 'Technique deleted successfully',
+            'techniques': [t.model_dump() for t in validated_ledger.techniques]
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete technique: {str(e)}'}), 500
+
+
+# Character APIs
+# ----------------------------------------------------
+
 @app.route('/api/stories/<story_uuid>/characters', methods=['POST'])
 def add_story_character(story_uuid):
     """Add a new character to the story (excluding main character roles)."""
@@ -465,7 +738,13 @@ def add_story_character(story_uuid):
             'role': char_role,
             'description': char_description,
             'first_chapter': data.get('first_chapter'),
-            'appearance_context': data.get('appearance_context', '')
+            'appearance_context': data.get('appearance_context', ''),
+            'current_cultivation': data.get('current_cultivation', ''),
+            'active_weapon': data.get('active_weapon', ''),
+            'weapons_owned': [w.strip() for w in data.get('weapons_owned', []) if w.strip()] if isinstance(data.get('weapons_owned'), list) else ([w.strip() for w in data.get('weapons_owned', '').split(',') if w.strip()] if isinstance(data.get('weapons_owned'), str) else []),
+            'active_technique': data.get('active_technique', ''),
+            'techniques_owned': [t.strip() for t in data.get('techniques_owned', []) if t.strip()] if isinstance(data.get('techniques_owned'), list) else ([t.strip() for t in data.get('techniques_owned', '').split(',') if t.strip()] if isinstance(data.get('techniques_owned'), str) else []),
+            'visited_locations': [l.strip() for l in data.get('visited_locations', []) if l.strip()] if isinstance(data.get('visited_locations'), list) else ([l.strip() for l in data.get('visited_locations', '').split(',') if l.strip()] if isinstance(data.get('visited_locations'), str) else [])
         }
         characters.append(new_char)
         meta['characters'] = characters
@@ -529,6 +808,18 @@ def edit_story_character(story_uuid, name):
             existing_char['first_chapter'] = data.get('first_chapter')
         if 'appearance_context' in data:
             existing_char['appearance_context'] = data.get('appearance_context')
+        if 'current_cultivation' in data:
+            existing_char['current_cultivation'] = data.get('current_cultivation')
+        if 'active_weapon' in data:
+            existing_char['active_weapon'] = data.get('active_weapon')
+        if 'weapons_owned' in data:
+            existing_char['weapons_owned'] = [w.strip() for w in data.get('weapons_owned', []) if w.strip()] if isinstance(data.get('weapons_owned'), list) else ([w.strip() for w in data.get('weapons_owned', '').split(',') if w.strip()] if isinstance(data.get('weapons_owned'), str) else [])
+        if 'active_technique' in data:
+            existing_char['active_technique'] = data.get('active_technique')
+        if 'techniques_owned' in data:
+            existing_char['techniques_owned'] = [t.strip() for t in data.get('techniques_owned', []) if t.strip()] if isinstance(data.get('techniques_owned'), list) else ([t.strip() for t in data.get('techniques_owned', '').split(',') if t.strip()] if isinstance(data.get('techniques_owned'), str) else [])
+        if 'visited_locations' in data:
+            existing_char['visited_locations'] = [l.strip() for l in data.get('visited_locations', []) if l.strip()] if isinstance(data.get('visited_locations'), list) else ([l.strip() for l in data.get('visited_locations', '').split(',') if l.strip()] if isinstance(data.get('visited_locations'), str) else [])
 
         characters[char_index] = existing_char
         meta['characters'] = characters

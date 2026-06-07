@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 
 import src.core.config as config
-from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread
+from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string
 from src.utils.llm import invoke_with_retry, check_cancellation
@@ -95,6 +95,33 @@ class ExtractedCharacter(BaseModel):
 
 class NewCharactersExtraction(BaseModel):
     new_characters: List[ExtractedCharacter] = Field(default_factory=list, description="Danh sách các nhân vật mới xuất hiện lần đầu trong chương này. Để trống nếu không có nhân vật mới nào.")
+
+class CharacterUpdate(BaseModel):
+    name: str = Field(description="Tên nhân vật cần cập nhật thông tin")
+    current_cultivation: Optional[str] = Field(default=None, description="Cấp độ tu vi mới của nhân vật nếu có thay đổi hoặc đột phá trong chương này. Để None nếu không thay đổi.")
+    active_weapon: Optional[str] = Field(default=None, description="Binh khí nhân vật đang sử dụng/cầm trong chương này. Để None nếu không đổi/không có.")
+    new_weapons_owned: List[str] = Field(default_factory=list, description="Các binh khí nhân vật mới sở hữu/nhặt được trong chương này.")
+    active_technique: Optional[str] = Field(default=None, description="Công pháp nhân vật đang thi triển/sử dụng trong chương này. Để None nếu không đổi/không có.")
+    new_techniques_owned: List[str] = Field(default_factory=list, description="Các công pháp nhân vật mới sở hữu/học được trong chương này.")
+    new_visited_locations: List[str] = Field(default_factory=list, description="Các địa điểm nhân vật mới đi qua trong chương này.")
+
+class ExtractedLocation(BaseModel):
+    name: str = Field(description="Tên địa điểm xuất hiện trong chương")
+    description: str = Field(description="Mô tả ngắn gọn về địa điểm này dựa trên chương")
+
+class ExtractedWeapon(BaseModel):
+    name: str = Field(description="Tên binh khí / pháp khí xuất hiện trong chương")
+    description: str = Field(description="Mô tả ngắn gọn về binh khí / pháp khí này dựa trên chương")
+
+class ExtractedTechnique(BaseModel):
+    name: str = Field(description="Tên công pháp xuất hiện trong chương")
+    description: str = Field(description="Mô tả ngắn gọn về công pháp này dựa trên chương")
+
+class WorldEntityExtraction(BaseModel):
+    locations: List[ExtractedLocation] = Field(default_factory=list, description="Danh sách các địa điểm mới xuất hiện hoặc được nhắc đến trong chương.")
+    weapons: List[ExtractedWeapon] = Field(default_factory=list, description="Danh sách các binh khí / pháp khí mới xuất hiện trong chương.")
+    techniques: List[ExtractedTechnique] = Field(default_factory=list, description="Danh sách các công pháp mới xuất hiện trong chương.")
+    character_updates: List[CharacterUpdate] = Field(default_factory=list, description="Cập nhật trạng thái cụ thể cho từng nhân vật tham gia chương này.")
 
 
 # --- LangGraph Node Functions ---
@@ -716,6 +743,182 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
                 updated_threads.append(UnresolvedThread(thread=ti, chapter=chapter_num))
         ledger_model.unresolved_threads = updated_threads
                 
+    # 3.4 Tự động trích xuất thực thể thế giới (Địa điểm, Binh khí, Công pháp) và cập nhật nhân vật
+    meta_data = state["meta"]
+    existing_characters = meta_data.get("characters", [])
+    cult_stages_str = ", ".join(meta_data.get("cultivation_stages", []))
+    char_list_str = ", ".join([c.get("name", "") for c in existing_characters])
+
+    console.print("\n[bold cyan]Đang phân tích sổ cái thế giới và cập nhật trạng thái nhân vật...[/bold cyan]")
+    emit_agent_log(story_uuid, "Đang trích xuất thông tin Địa điểm, Binh khí, Công pháp và cập nhật trạng thái nhân vật từ chương...")
+
+    world_prompt = f"""
+Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và trích xuất thông tin về thế giới tiên hiệp bao gồm: các địa điểm mới, các binh khí/pháp khí mới, các công pháp mới, và cập nhật trạng thái tu vi, địa điểm đi qua, binh khí và công pháp của các nhân vật tham gia chương này.
+
+HỆ THỐNG TU VI THẾ GIỚI:
+[{cult_stages_str}]
+
+DANH SÁCH NHÂN VẬT HIỆN CÓ:
+[{char_list_str}]
+
+NỘI DUNG CHƯƠNG {chapter_num}:
+---
+{draft_content}
+---
+
+YÊU CẦU TRÍCH XUẤT:
+1. Địa điểm mới: Trích xuất các địa điểm cụ thể xuất hiện hoặc được nhắc đến trong chương (ví dụ: Vạn Tượng Sơn, Độc Cô Cốc...).
+2. Binh khí mới: Trích xuất các binh khí, pháp khí hoặc thần binh xuất hiện trong chương (ví dụ: Hỏa Diễm Đao, Tru Tiên Kiếm...).
+3. Công pháp mới: Trích xuất các công pháp, chiêu thức, bí tịch xuất hiện trong chương (ví dụ: Hỏa Diễm Đao Pháp, Thái Cực Kiếm...).
+4. Cập nhật nhân vật: 
+   - Với mỗi nhân vật tham gia hoặc được nhắc tới trong chương:
+     - Xác định xem họ có đột phá tu vi hay thay đổi tu vi trong chương này không. Nếu có, ghi lại tu vi mới (nên khớp hoặc nằm trong hệ thống tu vi thế giới nếu có thể).
+     - Xác định binh khí họ đang sử dụng/cầm trong chương này.
+     - Xác định binh khí mới họ nhặt được, chế tạo hoặc sở hữu thêm trong chương này.
+     - Xác định công pháp họ đang sử dụng hoặc thi triển trong chương này.
+     - Xác định công pháp mới họ học được hoặc sở hữu thêm trong chương này.
+     - Xác định địa điểm họ đã đi qua/ghé thăm trong chương này.
+"""
+    try:
+        world_extraction = invoke_with_retry(state, world_prompt, temperature=0.2, output_schema=WorldEntityExtraction)
+        
+        # Cập nhật địa điểm
+        if not hasattr(ledger_model, "locations") or ledger_model.locations is None:
+            ledger_model.locations = []
+        existing_locs_lower = [loc.name.strip().lower() for loc in ledger_model.locations]
+        for extracted_loc in world_extraction.locations:
+            loc_name = extracted_loc.name.strip()
+            if loc_name and loc_name.lower() not in existing_locs_lower:
+                ledger_model.locations.append(LocationInfo(
+                    name=loc_name,
+                    chapter=chapter_num,
+                    description=extracted_loc.description.strip()
+                ))
+                console.print(f"  + Phát hiện địa điểm mới: [bold green]{loc_name}[/bold green]")
+                emit_agent_log(story_uuid, f"Phát hiện địa điểm mới: {loc_name}")
+                existing_locs_lower.append(loc_name.lower())
+                
+        # Cập nhật binh khí
+        if not hasattr(ledger_model, "weapons") or ledger_model.weapons is None:
+            ledger_model.weapons = []
+        existing_weapons_lower = [w.name.strip().lower() for w in ledger_model.weapons]
+        for extracted_w in world_extraction.weapons:
+            w_name = extracted_w.name.strip()
+            if w_name and w_name.lower() not in existing_weapons_lower:
+                ledger_model.weapons.append(WeaponInfo(
+                    name=w_name,
+                    chapter=chapter_num,
+                    description=extracted_w.description.strip()
+                ))
+                console.print(f"  + Phát hiện binh khí mới: [bold green]{w_name}[/bold green]")
+                emit_agent_log(story_uuid, f"Phát hiện binh khí mới: {w_name}")
+                existing_weapons_lower.append(w_name.lower())
+                
+        # Cập nhật công pháp
+        if not hasattr(ledger_model, "techniques") or ledger_model.techniques is None:
+            ledger_model.techniques = []
+        existing_techs_lower = [t.name.strip().lower() for t in ledger_model.techniques]
+        for extracted_t in world_extraction.techniques:
+            t_name = extracted_t.name.strip()
+            if t_name and t_name.lower() not in existing_techs_lower:
+                ledger_model.techniques.append(TechniqueInfo(
+                    name=t_name,
+                    chapter=chapter_num,
+                    description=extracted_t.description.strip()
+                ))
+                console.print(f"  + Phát hiện công pháp mới: [bold green]{t_name}[/bold green]")
+                emit_agent_log(story_uuid, f"Phát hiện công pháp mới: {t_name}")
+                existing_techs_lower.append(t_name.lower())
+                
+        # Cập nhật nhân vật
+        for update in world_extraction.character_updates:
+            update_name = update.name.strip()
+            if not update_name:
+                continue
+            update_name_lower = update_name.lower()
+            
+            matched_char = None
+            for c in meta_data.get("characters", []):
+                c_name_lower = c.get("name", "").strip().lower()
+                if update_name_lower == c_name_lower or update_name_lower in c_name_lower or c_name_lower in update_name_lower:
+                    matched_char = c
+                    break
+                    
+            if matched_char:
+                # Tu vi
+                if update.current_cultivation and update.current_cultivation.strip():
+                    matched_char["current_cultivation"] = update.current_cultivation.strip()
+                    console.print(f"  * Cập nhật tu vi của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{update.current_cultivation.strip()}[/bold cyan]")
+                    emit_agent_log(story_uuid, f"Cập nhật tu vi {matched_char['name']}: {update.current_cultivation.strip()}")
+                
+                # Binh khí đang dùng
+                if update.active_weapon and update.active_weapon.strip():
+                    matched_char["active_weapon"] = update.active_weapon.strip()
+                    console.print(f"  * Cập nhật binh khí đang dùng của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{update.active_weapon.strip()}[/bold cyan]")
+                    active_w_lower = update.active_weapon.strip().lower()
+                    owned_weapons = matched_char.get("weapons_owned", [])
+                    if not owned_weapons:
+                        owned_weapons = []
+                    owned_weapons_lower = [w.lower() for w in owned_weapons]
+                    if active_w_lower not in owned_weapons_lower:
+                        owned_weapons.append(update.active_weapon.strip())
+                        matched_char["weapons_owned"] = owned_weapons
+                
+                # Binh khí sở hữu thêm
+                for nw in update.new_weapons_owned:
+                    nw = nw.strip()
+                    if nw:
+                        owned_weapons = matched_char.get("weapons_owned", [])
+                        if not owned_weapons:
+                            owned_weapons = []
+                        owned_weapons_lower = [w.lower() for w in owned_weapons]
+                        if nw.lower() not in owned_weapons_lower:
+                            owned_weapons.append(nw)
+                            matched_char["weapons_owned"] = owned_weapons
+                            console.print(f"  * Thêm binh khí sở hữu của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{nw}[/bold cyan]")
+                            
+                # Công pháp đang dùng
+                if update.active_technique and update.active_technique.strip():
+                    matched_char["active_technique"] = update.active_technique.strip()
+                    console.print(f"  * Cập nhật công pháp đang dùng của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{update.active_technique.strip()}[/bold cyan]")
+                    active_t_lower = update.active_technique.strip().lower()
+                    owned_techs = matched_char.get("techniques_owned", [])
+                    if not owned_techs:
+                        owned_techs = []
+                    owned_techs_lower = [t.lower() for t in owned_techs]
+                    if active_t_lower not in owned_techs_lower:
+                        owned_techs.append(update.active_technique.strip())
+                        matched_char["techniques_owned"] = owned_techs
+                        
+                # Công pháp sở hữu thêm
+                for nt in update.new_techniques_owned:
+                    nt = nt.strip()
+                    if nt:
+                        owned_techs = matched_char.get("techniques_owned", [])
+                        if not owned_techs:
+                            owned_techs = []
+                        owned_techs_lower = [t.lower() for t in owned_techs]
+                        if nt.lower() not in owned_techs_lower:
+                            owned_techs.append(nt)
+                            matched_char["techniques_owned"] = owned_techs
+                            console.print(f"  * Thêm công pháp sở hữu của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{nt}[/bold cyan]")
+                            
+                # Địa điểm đi qua
+                for nl in update.new_visited_locations:
+                    nl = nl.strip()
+                    if nl:
+                        visited_locs = matched_char.get("visited_locations", [])
+                        if not visited_locs:
+                            visited_locs = []
+                        visited_locs_lower = [l.lower() for l in visited_locs]
+                        if nl.lower() not in visited_locs_lower:
+                            visited_locs.append(nl)
+                            matched_char["visited_locations"] = visited_locs
+                            console.print(f"  * Thêm địa điểm đã qua của [bold yellow]{matched_char['name']}[/bold yellow] -> [bold cyan]{nl}[/bold cyan]")
+    except Exception as e:
+        console.print(f"[bold red]Lỗi khi trích xuất sổ cái thế giới và nhân vật: {e}[/bold red]")
+        emit_agent_log(story_uuid, f"Lỗi trích xuất sổ cái thế giới: {e}", level="warning")
+
     # Ghi lại ledger.json
     ledger_path = config.get_ledger_path(story_uuid)
     try:
@@ -727,7 +930,6 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
         emit_agent_log(story_uuid, f"Lỗi cập nhật Sổ cái Toàn cục: {e}", level="error")
 
     # 3.5 Tự động phát hiện và trích xuất nhân vật mới
-    meta_data = state["meta"]
     existing_characters = meta_data.get("characters", [])
     existing_names = [c.get("name", "").strip() for c in existing_characters if c.get("name")]
     
@@ -769,7 +971,6 @@ YÊU CẦU:
             continue
         ext_name_lower = ext_name.lower()
         
-        # Lọc trùng substring / exact match với các nhân vật hiện tại
         is_duplicate = False
         for ex_name in existing_names_lower:
             if ext_name_lower == ex_name or ext_name_lower in ex_name or ex_name in ext_name_lower:
@@ -777,7 +978,6 @@ YÊU CẦU:
                 break
                 
         if not is_duplicate:
-            # Tránh trùng lặp ngay trong danh sách mới trích xuất
             if any(c["name"].lower() == ext_name_lower for c in new_chars_to_add):
                 continue
                 
@@ -786,7 +986,13 @@ YÊU CẦU:
                 "role": ext_char.role,
                 "description": ext_char.description,
                 "first_chapter": chapter_num,
-                "appearance_context": ext_char.appearance_context
+                "appearance_context": ext_char.appearance_context,
+                "visited_locations": [],
+                "active_weapon": None,
+                "weapons_owned": [],
+                "active_technique": None,
+                "techniques_owned": [],
+                "current_cultivation": None
             }
             new_chars_to_add.append(new_char)
             
@@ -802,14 +1008,15 @@ YÊU CẦU:
             meta_data["characters"] = []
         meta_data["characters"].extend(new_chars_to_add)
         
-        meta_path = config.get_meta_path(story_uuid)
-        try:
-            story_meta = StoryMeta(**meta_data)
-            meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
-            console.print(f"✓ Đã tự động cập nhật thông tin nhân vật mới vào file cấu hình: [bold green]{meta_path}[/bold green]")
-            emit_agent_log(story_uuid, "✓ Đã tự động cập nhật thông tin nhân vật mới vào file cấu hình.")
-        except Exception as e:
-            console.print(f"[bold red]Lỗi ghi file cấu hình truyện (meta.json): {e}[/bold red]")
+    # Ghi lại meta.json để lưu cập nhật của cả nhân vật mới lẫn cũ
+    meta_path = config.get_meta_path(story_uuid)
+    try:
+        story_meta = StoryMeta(**meta_data)
+        meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
+        console.print(f"✓ Đã cập nhật file cấu hình nhân vật: [bold green]{meta_path}[/bold green]")
+        emit_agent_log(story_uuid, "✓ Đã cập nhật file cấu hình nhân vật.")
+    except Exception as e:
+        console.print(f"[bold red]Lỗi ghi file cấu hình truyện (meta.json): {e}[/bold red]")
 
     # 4. Xóa temp_draft.md
     temp_draft_path = config.get_temp_draft_path(story_uuid)
