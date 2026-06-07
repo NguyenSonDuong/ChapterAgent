@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
-import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin } from 'lucide-react';
+import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin, Settings } from 'lucide-react';
 
 export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRefreshDetails }) {
   const [isEditingModel, setIsEditingModel] = useState(false);
   const [selectedModel, setSelectedModel] = useState('');
+
+  // Story Edit States
+  const [isEditingStory, setIsEditingStory] = useState(false);
+  const [editedStory, setEditedStory] = useState({
+    name: '',
+    context: '',
+    style: '',
+    tags: '',
+    model: '',
+    max_chapters: 10,
+    max_words_per_chapter: 2000,
+    cultivation_stages: ''
+  });
 
   // Character States
   const [isAddingCharacter, setIsAddingCharacter] = useState(false);
@@ -512,10 +525,65 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     }
   };
 
+  const handleStartEditStory = () => {
+    setEditedStory({
+      name: storyMeta.name,
+      context: storyMeta.context,
+      style: storyMeta.style,
+      tags: storyMeta.tags ? storyMeta.tags.join(', ') : '',
+      model: storyMeta.model || 'gemini-2.5-flash',
+      max_chapters: storyMeta.max_chapters || 10,
+      max_words_per_chapter: storyMeta.max_words_per_chapter || 2000,
+      cultivation_stages: storyMeta.cultivation_stages ? storyMeta.cultivation_stages.join(', ') : ''
+    });
+    setIsEditingStory(true);
+  };
+
+  const handleSaveStory = async () => {
+    if (!editedStory.name.trim() || !editedStory.context.trim() || !editedStory.style.trim()) {
+      alert('Vui lòng điền đầy đủ: Tên truyện, Bối cảnh và Phong cách.');
+      return;
+    }
+    try {
+      const res = await fetch(`${backendUrl}/api/stories/${storyMeta.uuid}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editedStory.name.trim(),
+          context: editedStory.context.trim(),
+          style: editedStory.style.trim(),
+          tags: editedStory.tags ? editedStory.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          model: editedStory.model,
+          max_chapters: parseInt(editedStory.max_chapters) || 10,
+          max_words_per_chapter: parseInt(editedStory.max_words_per_chapter) || 2000,
+          cultivation_stages: editedStory.cultivation_stages ? editedStory.cultivation_stages.split(',').map(s => s.trim()).filter(Boolean) : []
+        })
+      });
+      if (res.ok) {
+        setIsEditingStory(false);
+        if (onRefreshDetails) onRefreshDetails();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Lỗi khi cập nhật cấu hình truyện.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Không thể kết nối đến backend server.');
+    }
+  };
+
   return (
     <div className="story-overview fade-in">
-      <div className="overview-header glass">
-        <h1 className="story-title">{storyMeta.name}</h1>
+      <div className="overview-header glass" style={{ position: 'relative' }}>
+        <button 
+          onClick={handleStartEditStory}
+          className="btn-icon" 
+          style={{ position: 'absolute', top: '20px', right: '20px', width: '36px', height: '36px' }}
+          title="Chỉnh sửa cấu hình truyện"
+        >
+          <Settings className="icon-sm text-cyan" />
+        </button>
+        <h1 className="story-title" style={{ paddingRight: '40px' }}>{storyMeta.name}</h1>
         <div className="story-meta-tags" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {isEditingModel ? (
             <div className="model-edit-inline" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1588,5 +1656,125 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
         )}
       </div>
     </div>
-  );
+    
+    {/* Edit Story Config Modal */}
+    {isEditingStory && (
+      <div className="modal-overlay" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, alignItems: 'center', justifyContent: 'center' }}>
+        <div className="modal-card glass-light" style={{ width: '90%', maxWidth: '600px', background: 'rgba(18, 22, 33, 0.95)', border: '1px solid var(--border-glass)', borderRadius: '16px', boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)' }}>
+          <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-glass)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Settings className="icon-sm text-cyan" />
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#fff' }}>Chỉnh Sửa Cấu HÌnh Truyện</h3>
+            </div>
+            <button onClick={() => setIsEditingStory(false)} className="btn-close" style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+              <X className="icon-sm" />
+            </button>
+          </div>
+          
+          <div className="modal-body" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '70vh', overflowY: 'auto' }}>
+            <div>
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Tên tác phẩm</label>
+              <input 
+                type="text" 
+                value={editedStory.name}
+                onChange={e => setEditedStory({ ...editedStory, name: e.target.value })}
+                style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Phong cách</label>
+                <input 
+                  type="text" 
+                  value={editedStory.style}
+                  onChange={e => setEditedStory({ ...editedStory, style: e.target.value })}
+                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Thẻ phân loại (tags)</label>
+                <input 
+                  type="text" 
+                  value={editedStory.tags}
+                  onChange={e => setEditedStory({ ...editedStory, tags: e.target.value })}
+                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Bối cảnh thế giới / Cốt truyện chung</label>
+              <textarea 
+                value={editedStory.context}
+                onChange={e => setEditedStory({ ...editedStory, context: e.target.value })}
+                rows={3}
+                style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', fontFamily: 'var(--font-sans)', resize: 'vertical' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Hệ thống cấp bậc tu vi (ngăn cách bằng dấu phẩy)</label>
+              <input 
+                type="text" 
+                value={editedStory.cultivation_stages}
+                onChange={e => setEditedStory({ ...editedStory, cultivation_stages: e.target.value })}
+                style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                placeholder="Ví dụ: Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh, Hóa Thần"
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 2 }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Model AI</label>
+                <select 
+                  value={editedStory.model}
+                  onChange={e => setEditedStory({ ...editedStory, model: e.target.value })}
+                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                >
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                  <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
+                  <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
+                  <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                  <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+                  <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+                  <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                  <option value="gemini-3.0-flash">Gemini 3 Flash</option>
+                  <option value="gemma-4-26b">Gemma 4 26B</option>
+                  <option value="gemma-4-31b">Gemma 4 31B</option>
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                  <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Số chương</label>
+                <input 
+                  type="number" 
+                  value={editedStory.max_chapters}
+                  onChange={e => setEditedStory({ ...editedStory, max_chapters: parseInt(e.target.value) || 10 })}
+                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: '600' }}>Từ/Chương</label>
+                <input 
+                  type="number" 
+                  value={editedStory.max_words_per_chapter}
+                  onChange={e => setEditedStory({ ...editedStory, max_words_per_chapter: parseInt(e.target.value) || 2000 })}
+                  style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer" style={{ padding: '16px 20px', borderTop: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <button type="button" onClick={() => setIsEditingStory(false)} className="btn-secondary-sm" style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>Hủy</button>
+            <button type="button" onClick={handleSaveStory} className="btn-primary-sm" style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600' }}>Lưu</button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
 }

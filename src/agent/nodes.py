@@ -772,7 +772,7 @@ YÊU CẦU TRÍCH XUẤT:
 3. Công pháp mới: Trích xuất các công pháp, chiêu thức, bí tịch xuất hiện trong chương (ví dụ: Hỏa Diễm Đao Pháp, Thái Cực Kiếm...).
 4. Cập nhật nhân vật: 
    - Với mỗi nhân vật tham gia hoặc được nhắc tới trong chương:
-     - Xác định xem họ có đột phá tu vi hay thay đổi tu vi trong chương này không. Nếu có, ghi lại tu vi mới (nên khớp hoặc nằm trong hệ thống tu vi thế giới nếu có thể).
+     - Xác định xem họ có đột phá tu vi hay thăng tiến tu vi trong chương này không. Hệ thống tu vi được sắp xếp từ thấp đến cao theo đúng thứ tự trong danh sách HỆ THỐNG TU VI THẾ GIỚI. Chỉ ghi nhận tu vi mới nếu nó mạnh hơn/cao hơn so với tu vi hiện tại của nhân vật (ví dụ: Trúc Cơ kỳ cao hơn Luyện Khí kỳ, Trúc Cơ tầng 5 cao hơn Trúc Cơ tầng 2). Không hạ cấp tu vi của nhân vật. Để trống (None) nếu không thăng cấp.
      - Xác định binh khí họ đang sử dụng/cầm trong chương này.
      - Xác định binh khí mới họ nhặt được, chế tạo hoặc sở hữu thêm trong chương này.
      - Xác định công pháp họ đang sử dụng hoặc thi triển trong chương này.

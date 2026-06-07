@@ -207,6 +207,13 @@ def update_story(story_uuid):
     existing_meta['max_words_per_chapter'] = data.get('max_words_per_chapter', existing_meta.get('max_words_per_chapter', 2000))
     existing_meta['model'] = data.get('model', existing_meta.get('model', 'gemini-2.5-flash'))
     
+    if 'cultivation_stages' in data:
+        stages = data.get('cultivation_stages', [])
+        if isinstance(stages, list):
+            existing_meta['cultivation_stages'] = [s.strip() for s in stages if s.strip()]
+        elif isinstance(stages, str):
+            existing_meta['cultivation_stages'] = [s.strip() for s in stages.split(',') if s.strip()]
+    
     # Handle characters update
     if 'characters' in data:
         existing_meta['characters'] = data['characters']
