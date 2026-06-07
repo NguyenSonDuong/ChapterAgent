@@ -1,0 +1,171 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780845433121",
+      "title": "Phục sinh và Dời bước",
+      "description": "Dược lực của chén trà sinh cơ phát huy tác dụng thần kỳ, các vết thương ngoài da của Sở Mặc dần khép miệng và lành lại. Thể lực được hồi phục, hai người không dám nán lại bãi chiến trường mà quyết định tiếp tục di chuyển về hướng Tây của Táng Cốt Lâm. Đi được một chặng đường dài thì trời sập tối. Rừng thiêng nước độc, yêu thú rình rập, họ cố gắng tìm một hang động để an tọa nghỉ chân nhưng vô vọng.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 5,
+          "nodes": [
+            "node-1780838378764"
+          ]
+        }
+      ],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "x": 10,
+      "y": 10
+    },
+    {
+      "id": "node-1780846515089",
+      "title": "Điểm tựa trên ngọn cây",
+      "description": "Bất đắc dĩ, để tránh dã thú ban đêm, hai người đành tìm một cây cổ thụ to lớn, tán lá rậm rạp làm nơi trú ẩn. Sở Mặc thoăn thoắt bám vào vỏ cây xù xì trèo lên một chạc cây vững chãi trước. Từ trên cao, hắn nhoài người, vươn cánh tay rắn rỏi xuống phía dưới. Khoảng cách vừa đủ để Mộc Tuyết vươn tay lên, Sở Mặc nắm chặt lấy tay nàng, dùng sức mạnh mẽ kéo bổng nàng lên vị trí an toàn.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 280.91941326139056,
+      "y": 19.10016300965333
+    },
+    {
+      "id": "node-1780846560667",
+      "title": "Chỗ ngả lưng tạm bợ",
+      "description": "Ở trên chạc cây cách mặt đất một khoảng an toàn, Sở Mặc dùng thanh đao cùn chặt gãy vài nhánh cây rậm lá xung quanh. Hắn khéo léo đan chéo các cành cây vào giữa khe của hai nhánh lớn, tạo thành một chỗ ngả lưng tạm thời, che chắn bớt sương lạnh. Sau một ngày dài chạy trốn và đối mặt sinh tử, khi ngồi xuống tổ ấm tạm bợ này, cơn đói khát bắt đầu ập đến cồn cào với cả hai.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 513.0432726502984,
+      "y": 37.13405786938279
+    },
+    {
+      "id": "node-1780846605031",
+      "title": "Vị ngọt của miếng bánh",
+      "description": "Sở Mặc mở tay nải, lấy ra chút đồ ăn vụn vặt gom góp được từ đống đổ nát ở làng của Mộc Tuyết. Hắn im lặng đưa chiếc bánh khô duy nhất cho nàng, còn bản thân thì bốc một nắm quả dại nhăn nheo, lẳng lặng nhai. Vị quả dại chua chát và đắng nghét, nhưng hắn tuyệt nhiên không để lộ biểu cảm khó chịu. Mộc Tuyết cắn miếng bánh, ngước nhìn hắn, nội tâm dâng lên cỗ xót xa ấm áp. Cả hai không ai nói một lời, nhưng sự thấu hiểu và quan tâm thầm lặng đã tự đan xen trong bóng tối.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 749.0104964702181,
+      "y": 70.12996576324929
+    },
+    {
+      "id": "node-1780846667679",
+      "title": "Lời lỡ miệng trong đêm",
+      "description": "Ăn xong, hai người bắt đầu trò chuyện nhỏ tiếng về Vô Trần Tử và hai bộ công pháp vừa nhận được. Giữa câu chuyện, Sở Mặc trầm ngâm nhìn vào màn đêm, đột nhiên hỏi dò với giọng xa xăm: \"Nếu như có một ngày... ta thực sự bỏ mạng, muội định sẽ đi về đâu?\". Câu hỏi nghẹn ngào khiến Mộc Tuyết hoảng hốt. Bỏ qua mọi sự e dè của thiếu nữ, nàng bột miệng thốt lên rành rọt và gay gắt: \"Huynh không được chết! Muội không cho phép huynh chết!\". Lời vừa dứt, không gian trên ngọn cây đột ngột chìm vào một sự im lặng tĩnh mịch đến ngượng ngùng. - đoạn này hãy bổ sung thêm nhiều lời thoại về các chuyện đã xảy ra",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 2,
+          "nodes": [
+            "node-1780764297815",
+            "node-1780763425746"
+          ]
+        }
+      ],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 954.6428008329381,
+      "y": 226.56936936337195
+    },
+    {
+      "id": "node-1780846744944",
+      "title": "Nụ cười dưới tán lá mục",
+      "description": "Sự im lặng kéo dài khiến bầu không khí trở nên bối rối. Mộc Tuyết đỏ bừng mặt, vội vã phá vỡ sự tĩnh lặng bằng cách ấp úng nói mình đã mệt rồi quay lưng nằm cuộn tròn trên chiếc giường cành cây Sở Mặc vừa đan. Phía sau nàng, Sở Mặc vẫn ngồi bó gối thẫn thờ một lúc lâu. Tiêu hóa câu nói mang đậm sự nương tựa và sợ hãi mất mát của nàng, khóe môi hắn từ từ cong lên một nụ cười ấm áp hiếm hoi. Hắn khẽ gác thanh đao bên cạnh, rồi cũng nằm xuống nhắm mắt nghỉ ngơi. Đêm ở Táng Cốt Lâm rất lạnh, nhưng trên ngọn cây cổ thụ lại vô cùng ấm áp.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "x": 702.626839179531,
+      "y": 389.8266794870939
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780845433121",
+      "to": "node-1780846515089"
+    },
+    {
+      "from": "node-1780846515089",
+      "to": "node-1780846560667"
+    },
+    {
+      "from": "node-1780846560667",
+      "to": "node-1780846605031"
+    },
+    {
+      "from": "node-1780846605031",
+      "to": "node-1780846667679"
+    },
+    {
+      "from": "node-1780846667679",
+      "to": "node-1780846744944"
+    }
+  ]
+}

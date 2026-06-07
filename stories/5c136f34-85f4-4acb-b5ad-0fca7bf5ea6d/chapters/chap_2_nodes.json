@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780763425746",
+      "title": "Hơi thở dưới gạch vụn",
+      "description": "Từ tiếng động lạ phát ra trong bóng tối, Sở Mặc tay lăm lăm thanh đao cùn mẻ, tay kia cầm cành củi đang cháy dở rón rén đi kiểm tra. Dưới một đống đổ nát của ngôi nhà rách nát, hắn vô tình phát hiện một cô gái đang nằm bất động. Chậm rãi tiến lại gần thăm dò, Sở Mặc thở phào khi nhận ra cô gái vẫn còn hơi thở dẫu rất mong manh. Không chút chần chừ, hắn dùng tay trần gạt bỏ gạch đá, rỡ hết đồ đạc đang đè nặng lên người cô gái, rồi cẩn thận bế cô quay trở lại chỗ đống lửa.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "Tiếng động xuất hiện",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 1,
+          "nodes": []
+        }
+      ],
+      "x": 164.92629508471848,
+      "y": 236.08746972591769
+    },
+    {
+      "id": "node-1780764297815",
+      "title": "Chút ấm áp giữa đêm tàn",
+      "description": "Đặt cô gái nằm cạnh đống lửa, Sở Mặc nhíu mày khi thấy trên người cô chi chít vết thương do gạch đá cứa và va đập. Tình thế cấp bách, hắn đành mạn phép tự ý kiểm tra và dùng số thảo dược vặt vãnh tìm được ban nãy cẩn thận băng bó cho cô gái để ngăn máu chảy. Xong xuôi, trời đêm ngày càng lạnh gắt, Sở Mặc quyết định cởi phăng chiếc áo khoác ngoài duy nhất của mình, nhẹ nhàng đắp lên người cô gái. Phần mình, hắn chỉ mặc lớp áo trong mỏng manh, nằm co ro ôm lấy thanh đao cùn bên kia đống lửa, nhắm hờ mắt thiếp đi trong cái lạnh thấu xương.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": "ĐI đến và phát hie"
+      },
+      "links": [],
+      "x": 523.7217258637637,
+      "y": 224.12169911212766
+    },
+    {
+      "id": "node-1780764349416",
+      "title": "Tương phùng",
+      "description": "Sáng hôm sau, cô gái lờ mờ tỉnh giấc. Nhìn thấy các vết thương đã được băng bó cẩn thận, trên người đắp một chiếc áo nam sờn cũ, và cách đó không xa là một chàng trai đang nằm co ro ôm đao ngủ, cô gái lập tức hiểu rõ ân tình cứu mạng đêm qua. Nghe tiếng cựa mình, Sở Mặc bừng tỉnh, vội vã bật dậy hỏi thăm tình hình của cô. Hai người bắt đầu mở lòng trao đổi. Cô gái giới thiệu mình tên là Mộc Tuyết, bằng tuổi Sở Mặc. Mộc Tuyết trầm buồn kể lại lý do mình xuất hiện ở phế tích này và vì sao bị thương nặng đến vậy là do phải chạy trốn sự truy sát của một đám yêu thú cấp thấp. Sự đồng cảm giữa hai kẻ cùng khổ bắt đầu nảy mầm.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "x": 784.825285971214,
+      "y": 143.4499567791301
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780763425746",
+      "to": "node-1780764297815"
+    },
+    {
+      "from": "node-1780764297815",
+      "to": "node-1780764349416"
+    }
+  ]
+}

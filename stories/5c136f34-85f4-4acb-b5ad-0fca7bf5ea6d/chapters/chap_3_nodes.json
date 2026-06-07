@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780824945308",
+      "title": "Dừng chân ở Táng Cốt Lâm",
+      "description": "Quyết định không thể nán lại bãi chiến trường, Sở Mặc và Mộc Tuyết dìu nhau tiến về phía Tây, bước vào khu rừng già u ám mang tên Táng Cốt Lâm. Tán cây nơi đây rậm rạp che khuất ánh mặt trời, không khí lạnh lẽo xộc lên mùi bùn lầy và huyết tủy thối rữa. Do vết thương từ trận huyết chiến trước nứt toác, Sở Mặc mất máu nhiều, bước chân lảo đảo. Cố lết được nửa ngày, hắn rốt cuộc quỵ xuống bên một gốc cổ thụ.\n\"Tuyết... nghỉ một lát... huynh không đi nổi nữa rồi,\" Sở Mặc thở dốc, đôi môi tái nhợt, mồ hôi lạnh túa ra ướt sũng trán.\nMộc Tuyết cắn chặt môi, cởi chiếc áo khoác cũ đắp lại cho hắn, xót xa nói: \"Huynh cứ nhắm mắt dưỡng thần. Muội sẽ đi tìm chút nước, chúng ta nhất định không thể bỏ mạng ở đây!\". Sở Mặc yếu ớt gật đầu rồi thiếp đi vì kiệt sức. Mộc Tuyết nhìn quanh đánh giá địa hình, rồi cẩn thận lách mình vào bụi rậm.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 2,
+          "nodes": [
+            "node-1780764349416"
+          ]
+        }
+      ],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 183.70850444978294,
+      "y": 254.88052528153116
+    },
+    {
+      "id": "node-1780825413495",
+      "title": "Dấu chân Dã Lang",
+      "description": "Mộc Tuyết dò dẫm men theo một khe suối cạn, cố gắng bẻ vài nhánh cây để đánh dấu đường về. Giữa lúc đang dùng lá cây hứng từng giọt nước vẩn đục rỉ ra từ vách đá, ánh mắt nàng chợt khựng lại. Trên nền đất bùn lầy ngay sát mép nước là một dấu chân thú khổng lồ, in hằn những vết vuốt sắc nhọn. Đất bùn ở viền dấu chân vẫn còn đang rịn nước — chứng tỏ con thú chỉ vừa mới đi ngang qua. Ký ức kinh hoàng về lũ yêu ma ùa về khiến da đầu Mộc Tuyết tê rần, sắc mặt trắng bệch. \"Sở Mặc đang bất tỉnh!\". Không màng đến số nước vừa hứng được, Mộc Tuyết hoảng hốt quay đầu, vứt bỏ mọi sự cẩn trọng mà thục mạng chạy thẳng về phía gốc cổ thụ, trong đầu chỉ có một suy nghĩ duy nhất: Phải xốc Sở Mặc dậy và rời khỏi đây ngay lập tức.",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 442.1413183145355,
+      "y": 245.12388663198226
+    },
+    {
+      "id": "node-1780825436211",
+      "title": "Cặp mắt trong bụi rậm",
+      "description": "Điều Mộc Tuyết không ngờ tới là ngay khoảnh khắc nàng hoảng loạn bỏ chạy, một đôi mắt xám ngoét đã lạnh lẽo nhìn chằm chằm nàng từ trong bụi cỏ tranh. Con Dã Lang đó không vồ lấy nàng ngay mà điếm nhiên thu lại sát khí, âm thầm đạp lên thảm lá mục bám theo sát gót con mồi. Mộc Tuyết chạy ùa về đến nơi, vội vã quỳ xuống lay mạnh Sở Mặc: \"Sở Mặc, tỉnh lại đi! Dã Lang... có dấu chân Dã Lang quanh đây, mau, để muội cõng huynh!\". Sở Mặc mơ màng mở bừng mắt, bản năng sinh tồn khiến hắn lập tức vồ lấy thanh đao cùn, dùng sức tàn chống người đứng dậy. Nhưng ngay khi hai người vừa quay lưng chuẩn bị tháo chạy, một tiếng gầm gừ trầm đục, ồ ồ vang lên ngay sát sau gáy. Từ trong bóng tối của rễ cây cổ thụ, thân ảnh hôi hám và gầy guộc của con Dã Lang từ từ bước ra, há cái mõm đầy nước dãi chặn đứng hoàn toàn đường lui của cả hai.",
+      "characters": [
+        "Mộc Tuyết",
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 738.3093133892156,
+      "y": 272.08077885323974
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780824945308",
+      "to": "node-1780825413495"
+    },
+    {
+      "from": "node-1780825413495",
+      "to": "node-1780825436211"
+    }
+  ]
+}

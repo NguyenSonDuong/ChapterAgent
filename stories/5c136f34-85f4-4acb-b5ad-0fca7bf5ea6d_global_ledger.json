@@ -1,0 +1,862 @@
+{
+  "timeline": [
+    {
+      "chapter": 1,
+      "title": "Bản Án Tạp Linh Căn",
+      "summary": "Trong bối cảnh Cửu Châu đại lục chìm trong hỗn loạn vì yêu ma tràn ra từ Vực Sâu, Sở Mặc, một phàm nhân gầy gò, bị các tông môn tu tiên từ chối vì sở hữu Tạp Linh Căn ngũ hành, bị coi là phế vật. Bị bỏ mặc giữa vùng đất đầy hiểm nguy, hắn nhặt một thanh phàm đao nứt mẻ và một mình bước vào khu rừng u ám. Tại đây, hắn đối mặt với một con Lục Nhãn Lang hung dữ. Bằng ý chí sinh tồn mãnh liệt và chiến thuật liều lĩnh \"lấy mạng đổi mạng\", Sở Mặc đã tiêu diệt được yêu thú, dù phải chịu vết thương chí mạng ở vai. Sau đó, hắn tiếp tục lê bước trong vô định và phát hiện một ngôi làng hoang tàn, nơi một tiếng động lạ lùng vang lên trong đêm tối."
+    },
+    {
+      "chapter": 2,
+      "title": "Tro Tàn Và Ánh Sáng Mong Manh",
+      "summary": "Sở Mặc, một kẻ bị tông môn ruồng bỏ, đang bị thương nặng thì tình cờ phát hiện Mộc Tuyết bị kẹt dưới đống đổ nát sau một cuộc tập kích của yêu ma. Dù bản thân đang kiệt quệ, Sở Mặc vẫn quyết định cứu giúp và chăm sóc nàng qua đêm lạnh giá. Sáng hôm sau, cả hai nhận ra sự đồng điệu trong nỗi đau bị thế đạo ruồng bỏ, Mộc Tuyết quyết định đồng hành cùng Sở Mặc để cùng nhau sinh tồn và chống lại nghịch cảnh.",
+      "nodes": [
+        {
+          "id": "node-1780763425746",
+          "title": "Hơi thở dưới gạch vụn",
+          "description": "Từ tiếng động lạ phát ra trong bóng tối, Sở Mặc tay lăm lăm thanh đao cùn mẻ, tay kia cầm cành củi đang cháy dở rón rén đi kiểm tra. Dưới một đống đổ nát của ngôi nhà rách nát, hắn vô tình phát hiện một cô gái đang nằm bất động. Chậm rãi tiến lại gần thăm dò, Sở Mặc thở phào khi nhận ra cô gái vẫn còn hơi thở dẫu rất mong manh. Không chút chần chừ, hắn dùng tay trần gạt bỏ gạch đá, rỡ hết đồ đạc đang đè nặng lên người cô gái, rồi cẩn thận bế cô quay trở lại chỗ đống lửa.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "Tiếng động xuất hiện",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 1,
+              "nodes": []
+            }
+          ],
+          "x": 164.92629508471848,
+          "y": 236.08746972591769
+        },
+        {
+          "id": "node-1780764297815",
+          "title": "Chút ấm áp giữa đêm tàn",
+          "description": "Đặt cô gái nằm cạnh đống lửa, Sở Mặc nhíu mày khi thấy trên người cô chi chít vết thương do gạch đá cứa và va đập. Tình thế cấp bách, hắn đành mạn phép tự ý kiểm tra và dùng số thảo dược vặt vãnh tìm được ban nãy cẩn thận băng bó cho cô gái để ngăn máu chảy. Xong xuôi, trời đêm ngày càng lạnh gắt, Sở Mặc quyết định cởi phăng chiếc áo khoác ngoài duy nhất của mình, nhẹ nhàng đắp lên người cô gái. Phần mình, hắn chỉ mặc lớp áo trong mỏng manh, nằm co ro ôm lấy thanh đao cùn bên kia đống lửa, nhắm hờ mắt thiếp đi trong cái lạnh thấu xương.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": "ĐI đến và phát hie"
+          },
+          "links": [],
+          "x": 523.7217258637637,
+          "y": 224.12169911212766
+        },
+        {
+          "id": "node-1780764349416",
+          "title": "Tương phùng",
+          "description": "Sáng hôm sau, cô gái lờ mờ tỉnh giấc. Nhìn thấy các vết thương đã được băng bó cẩn thận, trên người đắp một chiếc áo nam sờn cũ, và cách đó không xa là một chàng trai đang nằm co ro ôm đao ngủ, cô gái lập tức hiểu rõ ân tình cứu mạng đêm qua. Nghe tiếng cựa mình, Sở Mặc bừng tỉnh, vội vã bật dậy hỏi thăm tình hình của cô. Hai người bắt đầu mở lòng trao đổi. Cô gái giới thiệu mình tên là Mộc Tuyết, bằng tuổi Sở Mặc. Mộc Tuyết trầm buồn kể lại lý do mình xuất hiện ở phế tích này và vì sao bị thương nặng đến vậy là do phải chạy trốn sự truy sát của một đám yêu thú cấp thấp. Sự đồng cảm giữa hai kẻ cùng khổ bắt đầu nảy mầm.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "x": 784.825285971214,
+          "y": 143.4499567791301
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780763425746",
+          "to": "node-1780764297815"
+        },
+        {
+          "from": "node-1780764297815",
+          "to": "node-1780764349416"
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "title": "Táng Cốt Lâm Và Ánh Mắt Tử Thần",
+      "summary": "Sở Mặc và Mộc Tuyết đang kiệt sức khi băng qua khu rừng nguy hiểm Táng Cốt Lâm. Trong khi Sở Mặc ngất đi vì vết thương nặng, Mộc Tuyết đi tìm nước và phát hiện dấu vết của yêu vật. Khi nàng quay lại đánh thức Sở Mặc, cả hai bị một con Dã Lang phục kích. Chương truyện kết thúc trong khoảnh khắc căng thẳng khi Sở Mặc dùng chút sức tàn cuối cùng để bảo vệ Mộc Tuyết trước sự tấn công của con quái vật.",
+      "nodes": [
+        {
+          "id": "node-1780824945308",
+          "title": "Dừng chân ở Táng Cốt Lâm",
+          "description": "Quyết định không thể nán lại bãi chiến trường, Sở Mặc và Mộc Tuyết dìu nhau tiến về phía Tây, bước vào khu rừng già u ám mang tên Táng Cốt Lâm. Tán cây nơi đây rậm rạp che khuất ánh mặt trời, không khí lạnh lẽo xộc lên mùi bùn lầy và huyết tủy thối rữa. Do vết thương từ trận huyết chiến trước nứt toác, Sở Mặc mất máu nhiều, bước chân lảo đảo. Cố lết được nửa ngày, hắn rốt cuộc quỵ xuống bên một gốc cổ thụ.\n\"Tuyết... nghỉ một lát... huynh không đi nổi nữa rồi,\" Sở Mặc thở dốc, đôi môi tái nhợt, mồ hôi lạnh túa ra ướt sũng trán.\nMộc Tuyết cắn chặt môi, cởi chiếc áo khoác cũ đắp lại cho hắn, xót xa nói: \"Huynh cứ nhắm mắt dưỡng thần. Muội sẽ đi tìm chút nước, chúng ta nhất định không thể bỏ mạng ở đây!\". Sở Mặc yếu ớt gật đầu rồi thiếp đi vì kiệt sức. Mộc Tuyết nhìn quanh đánh giá địa hình, rồi cẩn thận lách mình vào bụi rậm.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 2,
+              "nodes": [
+                "node-1780764349416"
+              ]
+            }
+          ],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 183.70850444978294,
+          "y": 254.88052528153116
+        },
+        {
+          "id": "node-1780825413495",
+          "title": "Dấu chân Dã Lang",
+          "description": "Mộc Tuyết dò dẫm men theo một khe suối cạn, cố gắng bẻ vài nhánh cây để đánh dấu đường về. Giữa lúc đang dùng lá cây hứng từng giọt nước vẩn đục rỉ ra từ vách đá, ánh mắt nàng chợt khựng lại. Trên nền đất bùn lầy ngay sát mép nước là một dấu chân thú khổng lồ, in hằn những vết vuốt sắc nhọn. Đất bùn ở viền dấu chân vẫn còn đang rịn nước — chứng tỏ con thú chỉ vừa mới đi ngang qua. Ký ức kinh hoàng về lũ yêu ma ùa về khiến da đầu Mộc Tuyết tê rần, sắc mặt trắng bệch. \"Sở Mặc đang bất tỉnh!\". Không màng đến số nước vừa hứng được, Mộc Tuyết hoảng hốt quay đầu, vứt bỏ mọi sự cẩn trọng mà thục mạng chạy thẳng về phía gốc cổ thụ, trong đầu chỉ có một suy nghĩ duy nhất: Phải xốc Sở Mặc dậy và rời khỏi đây ngay lập tức.",
+          "characters": [
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 442.1413183145355,
+          "y": 245.12388663198226
+        },
+        {
+          "id": "node-1780825436211",
+          "title": "Cặp mắt trong bụi rậm",
+          "description": "Điều Mộc Tuyết không ngờ tới là ngay khoảnh khắc nàng hoảng loạn bỏ chạy, một đôi mắt xám ngoét đã lạnh lẽo nhìn chằm chằm nàng từ trong bụi cỏ tranh. Con Dã Lang đó không vồ lấy nàng ngay mà điếm nhiên thu lại sát khí, âm thầm đạp lên thảm lá mục bám theo sát gót con mồi. Mộc Tuyết chạy ùa về đến nơi, vội vã quỳ xuống lay mạnh Sở Mặc: \"Sở Mặc, tỉnh lại đi! Dã Lang... có dấu chân Dã Lang quanh đây, mau, để muội cõng huynh!\". Sở Mặc mơ màng mở bừng mắt, bản năng sinh tồn khiến hắn lập tức vồ lấy thanh đao cùn, dùng sức tàn chống người đứng dậy. Nhưng ngay khi hai người vừa quay lưng chuẩn bị tháo chạy, một tiếng gầm gừ trầm đục, ồ ồ vang lên ngay sát sau gáy. Từ trong bóng tối của rễ cây cổ thụ, thân ảnh hôi hám và gầy guộc của con Dã Lang từ từ bước ra, há cái mõm đầy nước dãi chặn đứng hoàn toàn đường lui của cả hai.",
+          "characters": [
+            "Mộc Tuyết",
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 738.3093133892156,
+          "y": 272.08077885323974
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780824945308",
+          "to": "node-1780825413495"
+        },
+        {
+          "from": "node-1780825413495",
+          "to": "node-1780825436211"
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "title": "Ngọn Núi Giữa Vòng Vây Tử Thần",
+      "summary": "Sở Mặc và Mộc Tuyết bị dồn vào đường cùng bởi một con Dã Lang hung dữ tại Táng Cốt Lâm. Trong khoảnh khắc cận kề cái chết, một vị lão giả bí ẩn xuất hiện và tiêu diệt con quái vật chỉ bằng một cái phẩy tay. Sau khi hỏi đường đến Huyền Thiên Tông, vị lão giả chứng kiến Sở Mặc ngất đi vì kiệt sức và vết thương nặng. Mộc Tuyết cầu xin lão giả cứu mạng Sở Mặc, khiến ông lão nảy sinh sự ngưỡng mộ đối với ý chí và tình cảm của hai người dù họ chỉ có tư chất Tạp Linh Căn kém cỏi.",
+      "nodes": [
+        {
+          "id": "node-1780826702210",
+          "title": "Ngọn núi che chắn",
+          "description": "Từng bước tiến ép sát đầy áp lực của Dã Lang khiến Sở Mặc và Mộc Tuyết phải liên tục lùi lại đến khi lưng chạm vách đá tảng. Dù thể lực đã cạn kiệt, máu từ vai chảy ròng ròng ướt đẫm tay áo, Sở Mặc vẫn nghiến răng đứng thẳng tắp, sừng sững như một ngọn núi nhỏ che chắn toàn bộ phía trước Mộc Tuyết. Nhìn bóng lưng vững chãi nhuốm máu ấy, hốc mắt Mộc Tuyết đỏ hoe. Kể từ khi gia đình bị yêu ma tàn sát, đây là lần đầu tiên nàng cảm nhận được một tia sáng ấm áp, một cảm giác được bảo vệ và an toàn tuyệt đối ngay giữa vòng vây của tử thần.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 3,
+              "nodes": [
+                "node-1780825436211"
+              ]
+            }
+          ],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 26.80033410390979,
+          "y": 17.043197485588507
+        },
+        {
+          "id": "node-1780827623967",
+          "title": "Đồng sinh cộng tử",
+          "description": "Biết khó bề trốn thoát, Sở Mặc gằn giọng, thanh âm khàn đặc nhưng kiên quyết: \"Tuyết... lát nữa ta lao lên ôm chặt con súc sinh này, muội dùng hết sức mà chạy đi! Tuyệt đối không được ngoái đầu lại!\". Mộc Tuyết nắm chặt lấy vạt áo sờn rách của hắn, nước mắt lã chã rơi nhưng ánh mắt lại quật cường chưa từng thấy, dứt khoát đáp: \"Không! Muội không đi! Nếu thế đạo này muốn dồn chúng ta vào chỗ chết, thì cùng chết ở đây đi. Muội thà bị dã thú cắn xé cùng huynh, còn hơn sống cô độc một mình trên cõi đời này!\". Cả hai rơi vào sự bất lực tột cùng trước thực tại tàn khốc, nhưng giữa ranh giới sinh tử, sự quan tâm và tình yêu của họ lại càng rực sáng.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 10,
+          "y": 239.66026729270425
+        },
+        {
+          "id": "node-1780827659180",
+          "title": "Vị cứu tinh bí ẩn",
+          "description": "Con Dã Lang rống lên một tiếng đinh tai rồi tung người vồ thẳng tới, nhe nanh sắc nhọn nhắm vào cổ họng Sở Mặc. Cả hai trừng lớn mắt, nội tâm gào thét không cam lòng chết khuất phục trước cái thế đạo bất công này. Ngay khoảnh khắc ngàn cân treo sợi tóc, không gian đột nhiên tĩnh lặng. Một thân ảnh mặc trường bào tro xám xuất hiện lơ lửng ngay phía trên. Ông lão bí ẩn đó chỉ khẽ hừ lạnh một tiếng, tùy ý vung nhẹ ống tay áo. Không có bất kỳ tiếng động lớn nào, con Dã Lang khổng lồ bỗng chốc vỡ vụn, hóa thành một đám tro bụi bay lả tả trong gió, tan biến không còn dấu vết.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "Liệu Sở Mặc với cơ thể đang trọng thương có thể đánh bại được Dã Lang hay không?",
+            "resolution_note": "Một ông lão bí ẩn đã ra tay giúp đỡ"
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 278.42930134621884,
+          "y": 10
+        },
+        {
+          "id": "node-1780827711965",
+          "title": "Nụ cười hiền từ",
+          "description": "Cảnh tượng thần thông siêu phàm diễn ra trong chớp mắt khiến cả Sở Mặc và Mộc Tuyết đều sững sờ, hóa đá tại chỗ. Sức mạnh này hoàn toàn vượt quá nhận thức của những phàm nhân nhỏ bé như họ. Giữa lúc cả hai còn đang bàng hoàng chưa hiểu chuyện gì vừa xảy ra, vị lão giả chắp tay sau lưng, khuôn mặt vô cùng hiền từ nở một nụ cười nhạt. Ông khẽ gật gù rồi chậm rãi đạp hư không bước xuống mặt đất, thong thả tiến về phía hai người. -",
+          "characters": [
+            "Mộc Tuyết",
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "Liệu Sở Mặc với cơ thể đang trọng thương có thể đánh bại được Dã Lang hay không?",
+            "resolution_note": "Ông ão bí ẩn đã cứu 2 ngườii"
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 301.0224740914772,
+          "y": 222.15219763932015
+        },
+        {
+          "id": "node-1780827769845",
+          "title": "Bản năng bảo vệ",
+          "description": "Bất chấp thái độ ôn hòa của đối phương, khi thấy ông lão tiến lại gần, Sở Mặc bừng tỉnh khỏi cơn chấn động. Bản năng sinh tồn ở nơi ma loạn nhắc nhở hắn: không có ai là đáng tin tuyệt đối. Hắn lảo đảo lùi lại nửa bước nhưng vẫn kiên nghị đẩy Mộc Tuyết ra sau lưng mình. Cánh tay phải rỉ máu nắm chặt thanh đao cùn đang run lên bần bật vì áp lực từ sức mạnh vô hình kia, nhưng ánh mắt Sở Mặc vẫn sắc lạnh như sói hoang, gườm gườm nhìn thẳng vào ông lão không chút lùi bước.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 567.3520699818828,
+          "y": 10
+        },
+        {
+          "id": "node-1780827794444",
+          "title": "Khách qua đường vấn đạo",
+          "description": "Lão giả dừng bước cách họ vài trượng, vuốt râu cười nói: \"Tiểu tử, đừng căng thẳng. Lão phu nếu muốn hại các ngươi, cần gì phải phí sức vung tay cứu mạng? Ta chỉ là kẻ lạc đường, tiện tay làm việc thiện thôi.\"\nThấy Sở Mặc vẫn im lặng phòng thủ, ông lão thở dài hỏi tiếp: \"Lão phu bế quan nhiều năm mới xuất sơn, vạn dặm quanh đây sơn hà biến đổi lớn. Hai tiểu bối các ngươi ở vùng này, có biết đường tới Huyền Thiên Tông đi hướng nào không?\".",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 561.8616026210638,
+          "y": 238.65274085256488
+        },
+        {
+          "id": "node-1780827829839",
+          "title": "Chạm ngưỡng cực hạn",
+          "description": "Cảm nhận được sự chân thành và không có sát khí từ ông lão, Sở Mặc dần buông lỏng cơ bắp đang gồng cứng. Tuy nhiên, trước câu hỏi của cường giả, một phàm nhân lang bạt trốn chạy như hắn làm sao biết được tiên môn đại phái nằm ở đâu, Sở Mặc chỉ đành cắn răng lắc đầu nhẹ. Dường như khoảnh khắc sợi dây thần kinh căng thẳng vừa được buông lỏng, cơn đau từ vết thương rách nát cùng sự suy kiệt thể lực lập tức ập đến như thủy triều. Mắt hắn tối sầm lại, thân hình đổ gục xuống mặt đất bùn lầy, ngất lịm đi.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 824.8929559565779,
+          "y": 14.073779858508033
+        },
+        {
+          "id": "node-1780827853989",
+          "title": "Lời van xin trong nước mắt",
+          "description": "Sở Mặc vừa ngã xuống, Mộc Tuyết hoảng hốt kêu lên một tiếng thất thanh, vội vàng lao tới ôm lấy đầu hắn đặt lên đùi mình. Thấy hơi thở Sở Mặc mỏng manh như tơ, máu lại rỉ ra, Mộc Tuyết hoảng loạn rơi nước mắt. Bỏ qua mọi sự dè dặt với cường giả bí ẩn, nàng ngẩng mặt lên nhìn thẳng vào ông lão, ánh mắt van lơn đầy bi thương: \"Tiền bối... xin ngài! Xin ngài mở lòng từ bi cứu lấy huynh ấy. Ngài bắt vãn bối làm trâu làm ngựa thế nào cũng được, chỉ xin ngài đừng để huynh ấy bỏ mạng!\".",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 833.2726118000778,
+          "y": 234.61100348657988
+        },
+        {
+          "id": "node-1780827905559",
+          "title": "Lời thở dài (Kết chương)",
+          "description": "Lão giả đứng lặng im, trầm ngâm nhìn xuống. Cặp mắt tang thương chứa đựng vô tận tuế nguyệt của ông xoáy sâu vào đôi mắt quật cường đẫm lệ của Mộc Tuyết, rồi lại nhìn sang thân thể đầy thương tích của Sở Mặc. Ông dường như nhìn thấu được tư chất Tạp Linh Căn vô cùng kém cỏi của hai người, nhưng lại thấy được một thứ gì đó rực rỡ và kiên định hơn cả linh căn quý giá nhất. Trong không gian tĩnh lặng giữa rừng già, lão giả khẽ chắp tay sau lưng, ngước nhìn lên bầu trời rồi thở dài một hơi đầy cảm xúc, thấp giọng thốt lên:\n\"Thật là ngưỡng mộ các ngươi.\"\n(Kết thúc chương)",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 1048.3712832923352,
+          "y": 16.77590812707308
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780826702210",
+          "to": "node-1780827623967"
+        },
+        {
+          "from": "node-1780827623967",
+          "to": "node-1780827659180"
+        },
+        {
+          "from": "node-1780827659180",
+          "to": "node-1780827711965"
+        },
+        {
+          "from": "node-1780827711965",
+          "to": "node-1780827769845"
+        },
+        {
+          "from": "node-1780827769845",
+          "to": "node-1780827794444"
+        },
+        {
+          "from": "node-1780827794444",
+          "to": "node-1780827829839"
+        },
+        {
+          "from": "node-1780827829839",
+          "to": "node-1780827853989"
+        },
+        {
+          "from": "node-1780827853989",
+          "to": "node-1780827905559"
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "title": "Thử Thách Nhân Tâm, Ngã Rẽ Nghịch Thiên",
+      "summary": "Vô Trần Tử đưa Mộc Tuyết và Sở Mặc vào một huyễn cảnh để thử thách nhân tâm thông qua việc lựa chọn giữa sức mạnh vô thượng và sinh cơ cứu người. Mộc Tuyết đã vượt qua cám dỗ, chọn cứu Sở Mặc thay vì theo đuổi quyền năng, qua đó nhận được sự công nhận của Vô Trần Tử. Sau thử thách, cả hai được truyền thụ công pháp bí truyền là Thiên Diễn Tàn Trận và Bá Huyết Cuồng Đao Quyết, đồng thời Sở Mặc được chữa lành vết thương, chính thức bắt đầu hành trình nghịch thiên cải mệnh.",
+      "nodes": [
+        {
+          "id": "node-1780838208121",
+          "title": "Tiến vào Huyễn Cảnh",
+          "description": "Lão giả phất tay, Mộc Tuyết đột ngột bị kéo vào một không gian tiên khí mờ ảo, tách biệt hoàn toàn với hiện thực u ám. Cùng lúc đó, ý thức của Sở Mặc cũng thức tỉnh tại đây dưới dạng một linh thể vô hình. Hắn có thể nhìn thấy vạn vật và quan sát Mộc Tuyết rõ ràng, nhưng Mộc Tuyết tuyệt đối không thể nhìn thấy hay cảm nhận được sự tồn tại của hắn.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 4,
+              "nodes": [
+                "node-1780827905559"
+              ]
+            }
+          ],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 20.605891239461016,
+          "y": 29.26534208108251
+        },
+        {
+          "id": "node-1780838244295",
+          "title": "Hai chén trà định mệnh",
+          "description": "Giữa không gian xuất hiện một bàn ngọc đặt hai chén trà mang khí tức hoàn toàn đối lập. Một chén rực rỡ kim quang, cuộn trào sức mạnh cải thiên hoán mệnh, tẩy tủy đắp nặn Tiên Cốt vô thượng. Chén còn lại chỉ tỏa ra dải sương mù sinh cơ ôn hòa, tẻ nhạt nhưng lại mang dược lực duy nhất đủ khả năng kéo sự sống của Sở Mặc về từ cõi chết ở thế giới thực. Ý niệm của không gian ép buộc Mộc Tuyết chỉ được chọn một.",
+          "characters": [
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 44.3917210545294,
+          "y": 274.7869776796832
+        },
+        {
+          "id": "node-1780838294897",
+          "title": "Sự cám dỗ tột cùng",
+          "description": "Đứng trước cơ hội thoát khỏi kiếp Tạp Linh Căn hèn mọn, tâm trí Mộc Tuyết bị chấn động dữ dội. Những ký ức đau thương bị yêu ma săn đuổi, sự bất lực khi làm kẻ yếu thế trỗi dậy cắn nuốt lấy lý trí. Cám dỗ sức mạnh và bản năng sinh tồn ích kỷ thôi thúc nàng. Khát vọng hóa tiên lấn át tất cả, bàn tay Mộc Tuyết bắt đầu run rẩy, từ từ vươn về phía chén trà kim quang hoán mệnh.",
+          "characters": [
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 274.7154957568945,
+          "y": 120.78039727543648
+        },
+        {
+          "id": "node-1780838314249",
+          "title": "Ánh nhìn tĩnh lặng của Sở Mặc",
+          "description": "Từ trong góc khuất vô hình, Sở Mặc thu trọn vẹn sự dao động và quyết định của Mộc Tuyết vào mắt. Đối diện với việc bị bỏ rơi, nội tâm hắn không hề có phẫn nộ hay oán hận, chỉ nổi lên một sự chua xót và cam chịu tột cùng. Sống giữa thế đạo ma loạn tàn khốc, hắn hoàn toàn thấu hiểu và chấp nhận việc một cô gái vứt bỏ kẻ xa lạ vừa quen để nắm lấy bến bờ sinh mệnh của chính mình.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 536.0563979825349,
+          "y": 111.58976032520093
+        },
+        {
+          "id": "node-1780838338158",
+          "title": "Vết rạn trong tham niệm",
+          "description": "Đầu ngón tay Mộc Tuyết chỉ còn cách chén kim quang đúng một tấc thì đột ngột khựng lại. Gương mặt nàng biến sắc liên tục, mồ hôi lạnh toát ra phản chiếu sự giằng xé kịch liệt. Ngay khoảnh khắc chạm tay vào tương lai huy hoàng, hình ảnh tấm lưng nhuốm máu sừng sững chắn trước hàm răng Dã Lang của Sở Mặc bất ngờ hiện lên rõ nét. Lương tri nhân tính và tham vọng ích kỷ quyết liệt cắn xé lẫn nhau trong tâm trí nàng.",
+          "characters": [
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 462.93291403270587,
+          "y": 343.8287285735544
+        },
+        {
+          "id": "node-1780838353167",
+          "title": "Quyết định cuối cùng",
+          "description": "Sau một khoảnh khắc nghẹt thở, ánh mắt Mộc Tuyết từ hoảng loạn, điên cuồng dần lắng xuống thành sự tĩnh lặng và kiên định tuyệt đối. Nàng nghiến răng, đột ngột rụt tay lại từ bỏ chén kim quang, dứt khoát nắm chặt lấy chén trà sinh cơ mờ nhạt. Hành động này đánh dấu việc nàng tự tay bóp nát con đường tu tiên rực rỡ của bản thân, chấp nhận làm phàm nhân hạ đẳng chỉ để đổi lấy mạng sống cho người đã vì nàng mà đổ máu.",
+          "characters": [
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 762.5441591072829,
+          "y": 181.84529644071534
+        },
+        {
+          "id": "node-1780838378764",
+          "title": "Chân tâm thấu tỏ và Truyền thừa",
+          "description": "Ảo cảnh vỡ nát. Sở Mặc tỉnh lại, nhìn Mộc Tuyết với ánh mắt tín nhiệm tuyệt đối. Lão giả mỉm cười xưng danh Vô Trần Tử. Ông trao Mộc Tuyết cuốn trận đồ \"Thiên Diễn Tàn Trận\", đồng thời ném cho Sở Mặc cuốn \"Bá Huyết Cuồng Đao Quyết\" cực kỳ phù hợp với lối chiến đấu bạt mạng của hắn. Lão chỉ vào chén trà sinh cơ hiện ra ở đời thực, bảo nó sẽ cứu mạng Sở Mặc. Vô Trần Tử hóa thành vô số đốm sáng tan biến, để lại âm vang: \"Đường nghịch thiên muôn vàn hung hiểm, mong các ngươi giữ mãi nhân tính và quan trọng nhất... hãy luôn nắm chặt tay nhau mà đi.\" Lời dặn khiến Mộc Tuyết chấn động, đôi má ửng hồng thẹn thùng khi vô tình chạm ánh mắt Sở Mặc.",
+          "characters": [
+            "Mộc Tuyết",
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 892.8197436235282,
+          "y": 356.4301806482231
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780838208121",
+          "to": "node-1780838244295"
+        },
+        {
+          "from": "node-1780838244295",
+          "to": "node-1780838294897"
+        },
+        {
+          "from": "node-1780838294897",
+          "to": "node-1780838314249"
+        },
+        {
+          "from": "node-1780838314249",
+          "to": "node-1780838338158"
+        },
+        {
+          "from": "node-1780838338158",
+          "to": "node-1780838353167"
+        },
+        {
+          "from": "node-1780838353167",
+          "to": "node-1780838378764"
+        }
+      ]
+    },
+    {
+      "chapter": 6,
+      "title": "Điểm Tựa Giữa Rừng Già",
+      "summary": "Sau khi được chữa trị bằng trà sinh cơ của Vô Trần Tử, Sở Mặc và Mộc Tuyết di chuyển về hướng Tây của Táng Cốt Lâm để tìm nơi trú ẩn. Họ dừng chân trên một cây cổ thụ nghìn năm, nơi Sở Mặc tạo ra một chỗ ngả lưng tạm thời. Trong lúc nghỉ ngơi và chia sẻ lương thực ít ỏi, cả hai cùng tâm sự về thân phận 'Tạp linh căn' bị hắt hủi và quyết tâm luyện thành các công pháp mới nhận được. Một khoảnh khắc cảm xúc bùng nổ khi Mộc Tuyết khẳng định không cho phép Sở Mặc chết, khiến mối quan hệ giữa họ trở thành điểm tựa tinh thần quan trọng giữa môi trường khắc nghiệt.",
+      "nodes": [
+        {
+          "id": "node-1780845433121",
+          "title": "Phục sinh và Dời bước",
+          "description": "Dược lực của chén trà sinh cơ phát huy tác dụng thần kỳ, các vết thương ngoài da của Sở Mặc dần khép miệng và lành lại. Thể lực được hồi phục, hai người không dám nán lại bãi chiến trường mà quyết định tiếp tục di chuyển về hướng Tây của Táng Cốt Lâm. Đi được một chặng đường dài thì trời sập tối. Rừng thiêng nước độc, yêu thú rình rập, họ cố gắng tìm một hang động để an tọa nghỉ chân nhưng vô vọng.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 5,
+              "nodes": [
+                "node-1780838378764"
+              ]
+            }
+          ],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 10,
+          "y": 10
+        },
+        {
+          "id": "node-1780846515089",
+          "title": "Điểm tựa trên ngọn cây",
+          "description": "Bất đắc dĩ, để tránh dã thú ban đêm, hai người đành tìm một cây cổ thụ to lớn, tán lá rậm rạp làm nơi trú ẩn. Sở Mặc thoăn thoắt bám vào vỏ cây xù xì trèo lên một chạc cây vững chãi trước. Từ trên cao, hắn nhoài người, vươn cánh tay rắn rỏi xuống phía dưới. Khoảng cách vừa đủ để Mộc Tuyết vươn tay lên, Sở Mặc nắm chặt lấy tay nàng, dùng sức mạnh mẽ kéo bổng nàng lên vị trí an toàn.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 280.91941326139056,
+          "y": 19.10016300965333
+        },
+        {
+          "id": "node-1780846560667",
+          "title": "Chỗ ngả lưng tạm bợ",
+          "description": "Ở trên chạc cây cách mặt đất một khoảng an toàn, Sở Mặc dùng thanh đao cùn chặt gãy vài nhánh cây rậm lá xung quanh. Hắn khéo léo đan chéo các cành cây vào giữa khe của hai nhánh lớn, tạo thành một chỗ ngả lưng tạm thời, che chắn bớt sương lạnh. Sau một ngày dài chạy trốn và đối mặt sinh tử, khi ngồi xuống tổ ấm tạm bợ này, cơn đói khát bắt đầu ập đến cồn cào với cả hai.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 513.0432726502984,
+          "y": 37.13405786938279
+        },
+        {
+          "id": "node-1780846605031",
+          "title": "Vị ngọt của miếng bánh",
+          "description": "Sở Mặc mở tay nải, lấy ra chút đồ ăn vụn vặt gom góp được từ đống đổ nát ở làng của Mộc Tuyết. Hắn im lặng đưa chiếc bánh khô duy nhất cho nàng, còn bản thân thì bốc một nắm quả dại nhăn nheo, lẳng lặng nhai. Vị quả dại chua chát và đắng nghét, nhưng hắn tuyệt nhiên không để lộ biểu cảm khó chịu. Mộc Tuyết cắn miếng bánh, ngước nhìn hắn, nội tâm dâng lên cỗ xót xa ấm áp. Cả hai không ai nói một lời, nhưng sự thấu hiểu và quan tâm thầm lặng đã tự đan xen trong bóng tối.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 749.0104964702181,
+          "y": 70.12996576324929
+        },
+        {
+          "id": "node-1780846667679",
+          "title": "Lời lỡ miệng trong đêm",
+          "description": "Ăn xong, hai người bắt đầu trò chuyện nhỏ tiếng về Vô Trần Tử và hai bộ công pháp vừa nhận được. Giữa câu chuyện, Sở Mặc trầm ngâm nhìn vào màn đêm, đột nhiên hỏi dò với giọng xa xăm: \"Nếu như có một ngày... ta thực sự bỏ mạng, muội định sẽ đi về đâu?\". Câu hỏi nghẹn ngào khiến Mộc Tuyết hoảng hốt. Bỏ qua mọi sự e dè của thiếu nữ, nàng bột miệng thốt lên rành rọt và gay gắt: \"Huynh không được chết! Muội không cho phép huynh chết!\". Lời vừa dứt, không gian trên ngọn cây đột ngột chìm vào một sự im lặng tĩnh mịch đến ngượng ngùng. - đoạn này hãy bổ sung thêm nhiều lời thoại về các chuyện đã xảy ra",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [
+            {
+              "chapter": 2,
+              "nodes": [
+                "node-1780764297815",
+                "node-1780763425746"
+              ]
+            }
+          ],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 954.6428008329381,
+          "y": 226.56936936337195
+        },
+        {
+          "id": "node-1780846744944",
+          "title": "Nụ cười dưới tán lá mục",
+          "description": "Sự im lặng kéo dài khiến bầu không khí trở nên bối rối. Mộc Tuyết đỏ bừng mặt, vội vã phá vỡ sự tĩnh lặng bằng cách ấp úng nói mình đã mệt rồi quay lưng nằm cuộn tròn trên chiếc giường cành cây Sở Mặc vừa đan. Phía sau nàng, Sở Mặc vẫn ngồi bó gối thẫn thờ một lúc lâu. Tiêu hóa câu nói mang đậm sự nương tựa và sợ hãi mất mát của nàng, khóe môi hắn từ từ cong lên một nụ cười ấm áp hiếm hoi. Hắn khẽ gác thanh đao bên cạnh, rồi cũng nằm xuống nhắm mắt nghỉ ngơi. Đêm ở Táng Cốt Lâm rất lạnh, nhưng trên ngọn cây cổ thụ lại vô cùng ấm áp.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 702.626839179531,
+          "y": 389.8266794870939
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780845433121",
+          "to": "node-1780846515089"
+        },
+        {
+          "from": "node-1780846515089",
+          "to": "node-1780846560667"
+        },
+        {
+          "from": "node-1780846560667",
+          "to": "node-1780846605031"
+        },
+        {
+          "from": "node-1780846605031",
+          "to": "node-1780846667679"
+        },
+        {
+          "from": "node-1780846667679",
+          "to": "node-1780846744944"
+        }
+      ]
+    }
+  ],
+  "unresolved_threads": [
+    {
+      "thread": "Triết lý sinh tồn mới của Sở Mặc: 'Muốn sống, phải ác hơn cả yêu ma'.",
+      "chapter": 1
+    },
+    {
+      "thread": "Mục tiêu nghịch thiên mà sống của hai nhân vật chính trong một thế giới đầy rẫy yêu ma.",
+      "chapter": 2
+    },
+    {
+      "thread": "Sự tồn tại của thế lực yêu ma đã tàn sát ngôi làng của Mộc Tuyết.",
+      "chapter": 2
+    },
+    {
+      "thread": "Khả năng phát triển sức mạnh của hai nhân vật vốn bị coi là phế vật trong mắt tiên môn.",
+      "chapter": 2
+    },
+    {
+      "thread": "Liệu hai người có thể thoát khỏi Táng Cốt Lâm hay sẽ trở thành con mồi tiếp theo của yêu vật?",
+      "chapter": 3
+    },
+    {
+      "thread": "Tại sao lão giả lại muốn tìm đường đến Huyền Thiên Tông?",
+      "chapter": 4
+    },
+    {
+      "thread": "Tại sao lão giả lại bày tỏ sự ngưỡng mộ đối với hai người có tư chất kém cỏi?",
+      "chapter": 4
+    },
+    {
+      "thread": "Tiềm năng thực sự của Thiên Diễn Tàn Trận và Bá Huyết Cuồng Đao Quyết.",
+      "chapter": 5
+    },
+    {
+      "thread": "Hành trình nghịch thiên cải mệnh phía trước với đầy rẫy yêu ma.",
+      "chapter": 5
+    },
+    {
+      "thread": "Lời dặn dò ẩn ý của Vô Trần Tử về việc giữ vững nhân tính và sự gắn kết giữa hai người.",
+      "chapter": 5
+    },
+    {
+      "thread": "Yêu cầu về sự đánh đổi và ý chí sắt đá khi luyện tập Bá Huyết Cuồng Đao Quyết.",
+      "chapter": 6
+    },
+    {
+      "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây.",
+      "chapter": 6
+    }
+  ],
+  "resolved_threads": [
+    {
+      "thread": "Liệu Sở Mặc với cơ thể đang trọng thương có thể đánh bại được Dã Lang hay không?",
+      "chapter_introduced": 3,
+      "chapter_resolved": 4,
+      "resolution_note": "Một ông lão bí ẩn đã ra tay giúp đỡ"
+    },
+    {
+      "thread": "Liệu lão giả có quyết định cứu sống Sở Mặc hay không?",
+      "chapter_introduced": 4,
+      "chapter_resolved": 4,
+      "resolution_note": "Vô Trần Tử đã cho Sở Mặc 1 chén trà sinh cơ"
+    },
+    {
+      "thread": "Danh tính và mục đích thực sự của vị lão giả bí ẩn là gì?",
+      "chapter_introduced": 4,
+      "chapter_resolved": 4,
+      "resolution_note": "Vô Trần Tử"
+    }
+  ],
+  "locations": [
+    {
+      "name": "Táng Cốt Lâm",
+      "chapter": 3,
+      "description": "Khu rừng nằm về phía Tây, nơi ánh mặt trời bị che khuất, không khí đặc quánh mùi bùn lầy và huyết tủy thối rữa."
+    },
+    {
+      "name": "Huyền Thiên Tông",
+      "chapter": 4,
+      "description": "Một tông môn được ông lão bí ẩn nhắc đến và đang tìm đường tới."
+    },
+    {
+      "name": "Cõi hư vô",
+      "chapter": 5,
+      "description": "Không gian tĩnh mịch, thanh khiết nơi Mộc Tuyết trải qua thử thách nhân tâm."
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Thanh đao cùn",
+      "chapter": 3,
+      "description": "Vật bất ly thân của Sở Mặc, được hắn sử dụng làm điểm tựa và vũ khí phòng thân."
+    }
+  ],
+  "techniques": [
+    {
+      "name": "Thiên Diễn Tàn Trận",
+      "chapter": 5,
+      "description": "Công pháp hoặc trận pháp được Vô Trần Tử truyền thụ cho Mộc Tuyết."
+    },
+    {
+      "name": "Bá Huyết Cuồng Đao Quyết",
+      "chapter": 5,
+      "description": "Công pháp võ học được Vô Trần Tử truyền thụ cho Sở Mặc."
+    }
+  ]
+}
