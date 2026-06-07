@@ -715,6 +715,100 @@ def delete_chapter(story_uuid, chapter_num):
         'deleted_files': deleted_files
     })
 
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/edit-paragraph', methods=['POST'])
+def edit_chapter_paragraph(story_uuid, chapter_num):
+    """AI-assisted editing of a single paragraph in a chapter."""
+    data = request.json or {}
+    original_paragraph = data.get('paragraph', '').strip()
+    instruction = data.get('instruction', '').strip()
+    
+    if not original_paragraph:
+        return jsonify({'error': 'Original paragraph text is required.'}), 400
+    if not instruction:
+        return jsonify({'error': 'Instruction description is required.'}), 400
+
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found.'}), 404
+        
+    try:
+        meta_data = json.loads(meta_path.read_text(encoding="utf-8"))
+        model_name = meta_data.get('model', 'gemini-2.5-flash')
+    except Exception as e:
+        return jsonify({'error': f'Failed to read metadata: {str(e)}'}), 500
+
+    # Try to load chapter content for context
+    chapter_content = ""
+    content_path = config.get_chapter_content_path(story_uuid, chapter_num)
+    if content_path.exists():
+        try:
+            chapter_content = content_path.read_text(encoding="utf-8")
+        except Exception:
+            pass
+
+    # Build prompt and call Gemini LLM
+    try:
+        from src.utils.llm import get_llm
+        llm = get_llm(model_name=model_name, temperature=0.7)
+        
+        # Format characters list
+        characters_list = meta_data.get('characters', [])
+        characters_str = ", ".join([f"{c.get('name')} ({c.get('role')}): {c.get('description')}" for c in characters_list])
+        
+        # Extract context
+        context_str = "..."
+        if chapter_content:
+            context_str = chapter_content[:3000] # Limit to 3000 chars
+
+        prompt = f"""
+Bạn là một biên tập viên văn học chuyên nghiệp. Hãy hỗ trợ tác giả chỉnh sửa một đoạn văn cụ thể trong chương truyện theo yêu cầu chi tiết của họ, đảm bảo giữ vững văn phong và nhất quán logic của toàn bộ tác phẩm.
+
+THÔNG TIN TÁC PHẨM:
+- Tên truyện: {meta_data.get('name')}
+- Phong cách hành văn: {meta_data.get('style')}
+- Bối cảnh chung: {meta_data.get('context')}
+- Nhân vật đã biết: {characters_str}
+
+NỘI DUNG CHƯƠNG {chapter_num} ĐỂ THAM KHẢO BỐI CẢNH:
+---
+{context_str}
+---
+
+ĐOẠN VĂN GỐC CẦN CHỈNH SỬA:
+---
+{original_paragraph}
+---
+
+YÊU CẦU CHỈNH SỬA CỦA TÁC GIẢ:
+"{instruction}"
+
+HƯỚNG DẪN VIẾT:
+1. Chỉnh sửa và viết lại đoạn văn gốc sao cho đáp ứng hoàn hảo yêu cầu của tác giả.
+2. Giữ nguyên bối cảnh, ngôi kể và các thông tin logic đã có của tác phẩm trừ khi tác giả có yêu cầu thay đổi chúng cụ thể.
+3. Chỉ trả về nội dung đoạn văn mới đã được chỉnh sửa. Tuyệt đối không thêm bất kỳ lời bình luận, lời giới thiệu hay định dạng markdown rườm rà nào khác ngoài đoạn văn chính.
+"""
+        response = llm.invoke(prompt)
+        revised_paragraph = response.content.strip()
+        
+        # Clean up any potential markdown wraps if the model returned them
+        if revised_paragraph.startswith("```"):
+            lines = revised_paragraph.splitlines()
+            if len(lines) >= 2:
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                revised_paragraph = "\n".join(lines).strip()
+
+        return jsonify({
+            'original_paragraph': original_paragraph,
+            'revised_paragraph': revised_paragraph
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to call LLM: {str(e)}'}), 500
+
+
 
 # ----------------------------------------------------
 # Real-time Chapter Generation API (LangGraph trigger)

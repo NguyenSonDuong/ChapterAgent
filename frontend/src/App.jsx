@@ -233,6 +233,7 @@ export default function App() {
                   setActiveChapterNum={setActiveChapterNum}
                   onUpdateChapterContent={handleUpdateChapterContent}
                   onDeleteChapter={handleDeleteChapter}
+                  backendUrl={BACKEND_URL}
                 />
               )}
               {activeTab === 'generator' && (
