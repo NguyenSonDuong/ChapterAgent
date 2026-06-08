@@ -964,8 +964,8 @@
             "Mộc Tuyết"
           ],
           "resolved_thread": {
-            "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây.",
-            "resolution_note": "Cả hai lên kế hoạch di chuyển thận trọng, tận dụng địa hình để tránh né các vùng có yêu khí đậm đặc."
+            "resolution_note": "Cả hai lên kế hoạch di chuyển thận trọng, tận dụng địa hình để tránh né các vùng có yêu khí đậm đặc.",
+            "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây."
           },
           "links": [
             {
@@ -1016,8 +1016,8 @@
             "Sở Mặc"
           ],
           "resolved_thread": {
-            "thread": "",
-            "resolution_note": ""
+            "resolution_note": "",
+            "thread": ""
           },
           "links": [],
           "locations": [
@@ -1041,8 +1041,8 @@
             "Mộc Tuyết"
           ],
           "resolved_thread": {
-            "thread": "",
-            "resolution_note": ""
+            "resolution_note": "",
+            "thread": ""
           },
           "links": [],
           "locations": [
@@ -1079,13 +1079,31 @@
           "techniques": [
             "Bá Huyết Cuồng Đao Quyết"
           ],
-          "x": 1230,
-          "y": 189
+          "x": 1169,
+          "y": 187
         },
         {
-          "id": "node-1780896427326",
-          "title": "Bước đầu đột phá",
-          "description": "Dưới áp lực của trận chiến và sự tôi luyện của 'Bá Huyết Cuồng Đao Quyết', cơ thể Sở Mặc được tẩy rửa, xương cốt cứng cáp lạ thường. Hắn chính thức đột phá Thối thể cảnh nhất trọng, cảm nhận được sức mạnh phàm nhân đang chuyển hóa thành nội lực sơ khai, sẵn sàng cho con đường nghịch thiên sắp tới. - Tại đây hãy đặt 1 nghi vấn là vốn dĩ Tạp Linh căn không thể tu luyện vậy tại sao Sở mặc có thể đột phá được - điều này chính là bí ẩn ẩn sâu của công pháp mà Sở mặc đang sử dụng - sẽ được hé lộ sau không cần thắc mắc chỉ cần tạo nội dung nghi phần rồi lắc đầu bỏ qua không nghĩ nữa",
+          "id": "node-1780899937763",
+          "title": "Không gian huyền ảo",
+          "description": "Sở mặc bị kéo vòa 1 không gian huyển ảo vô định",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 1527.3828333831793,
+          "y": 268.5769917507797
+        },
+        {
+          "id": "node-1780900039711",
+          "title": "Nguy hiểm cận kề",
+          "description": "Trong lúc Sở Mặc hôn mê và Mục tuyết đang lo lắng ôm hắt trong lòng thì con Ma vật bị đâm vào mắt đã tỉnh lại và dùng con mắt còn lại phẫn nộ tiến đến tấn công 2 người",
           "characters": [
             "Sở Mặc",
             "Mộc Tuyết"
@@ -1096,16 +1114,13 @@
           },
           "links": [],
           "locations": [
+            "Con suối cạn",
             "Táng Cốt Lâm"
           ],
-          "weapons": [
-            "Thanh đao cùn"
-          ],
-          "techniques": [
-            "Bá Huyết Cuồng Đao Quyết"
-          ],
-          "x": 1406,
-          "y": 426
+          "weapons": [],
+          "techniques": [],
+          "x": 1636.1952854375972,
+          "y": 464.5270969197468
         }
       ],
       "connections": [
@@ -1127,7 +1142,11 @@
         },
         {
           "from": "node-1780896427325",
-          "to": "node-1780896427326"
+          "to": "node-1780899937763"
+        },
+        {
+          "from": "node-1780899937763",
+          "to": "node-1780900039711"
         }
       ]
     }
