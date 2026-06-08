@@ -120,3 +120,32 @@ class ChapterState(BaseModel):
         default_factory=list, 
         description="Các nút thắt, bí ẩn hoặc mối lo mới được mở ra trong chương này"
     )
+
+
+class SuggestedNodeResolvedThread(BaseModel):
+    thread: str = Field(description="Nội dung nút thắt giải quyết, để trống nếu không giải quyết nút thắt")
+    resolution_note: str = Field(description="Phương án giải quyết nút thắt")
+
+class SuggestedNodeLink(BaseModel):
+    chapter: int = Field(description="Số chương cũ muốn liên kết")
+    nodes: List[str] = Field(description="Danh sách các ID node của chương cũ đó muốn liên kết tới")
+
+class SuggestedNode(BaseModel):
+    id: str = Field(description="ID tạm thời của node, ví dụ node-1, node-2")
+    title: str = Field(description="Tiêu đề / Tiến trình sự kiện (bắt buộc, không để trống)")
+    description: str = Field(description="Mô tả kịch bản / Hướng giải quyết chi tiết diễn biến")
+    characters: List[str] = Field(description="Danh sách các nhân vật tham gia trong sự kiện này (chọn từ danh sách nhân vật đầu vào)")
+    locations: List[str] = Field(description="Danh sách các địa điểm xuất hiện trong sự kiện này (chọn từ danh sách địa điểm đầu vào)")
+    weapons: List[str] = Field(description="Danh sách các binh khí / pháp khí sử dụng trong sự kiện này (chọn từ danh sách binh khí đầu vào)")
+    techniques: List[str] = Field(description="Danh sách các công pháp thi triển trong sự kiện này (chọn từ danh sách công pháp đầu vào)")
+    resolved_thread: SuggestedNodeResolvedThread = Field(description="Giải quyết nút thắt nếu có")
+    links: List[SuggestedNodeLink] = Field(description="Liên kết với các node của chương cũ nếu có")
+
+class SuggestedConnection(BaseModel):
+    from_node: str = Field(description="ID tạm thời của node bắt đầu, ví dụ node-1")
+    to_node: str = Field(description="ID tạm thời của node đích, ví dụ node-2")
+
+class SuggestedChapterNodes(BaseModel):
+    nodes: List[SuggestedNode] = Field(description="Danh sách các node sự kiện theo trình tự")
+    connections: List[SuggestedConnection] = Field(description="Danh sách các kết nối giữa các node để tạo luồng kịch bản")
+

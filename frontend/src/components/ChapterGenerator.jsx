@@ -177,6 +177,22 @@ export default function ChapterGenerator({
 
   const [chapterNodesCache, setChapterNodesCache] = useState({});
 
+  // --- AI Suggest Nodes States ---
+  const [showSuggestModal, setShowSuggestModal] = useState(false);
+  const [suggestForm, setSuggestForm] = useState({
+    numNodes: 3,
+    linkedChapters: [],
+    characters: [],
+    resolvedThreads: [],
+    techniques: [],
+    locations: [],
+    weapons: [],
+    notes: ''
+  });
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestError, setSuggestError] = useState(null);
+
+
   const chatEndRef = useRef(null);
 
   // Auto-scroll chat to bottom
@@ -414,6 +430,77 @@ export default function ChapterGenerator({
   const handleDeleteConnection = (index) => {
     setConnections(prev => prev.filter((_, idx) => idx !== index));
   };
+
+  // --- AI Suggest Nodes Handlers ---
+  const handleOpenSuggestModal = () => {
+    setSuggestForm({
+      numNodes: 3,
+      linkedChapters: [],
+      characters: [],
+      resolvedThreads: [],
+      techniques: [],
+      locations: [],
+      weapons: [],
+      notes: ''
+    });
+    setSuggestError(null);
+    setShowSuggestModal(true);
+  };
+
+  const handleSuggestToggle = (field, item) => {
+    setSuggestForm(prev => {
+      const exists = prev[field].includes(item);
+      return {
+        ...prev,
+        [field]: exists ? prev[field].filter(x => x !== item) : [...prev[field], item]
+      };
+    });
+  };
+
+  const handleAISuggestSubmit = async (e) => {
+    e.preventDefault();
+    setSuggesting(true);
+    setSuggestError(null);
+
+    const nextChapterNum = storyLedger?.timeline && storyLedger.timeline.length > 0
+      ? Math.max(...storyLedger.timeline.map(t => t.chapter)) + 1
+      : 1;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/stories/${storyUuid}/chapters/${nextChapterNum}/suggest-nodes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          num_nodes: suggestForm.numNodes,
+          linked_chapters: suggestForm.linkedChapters,
+          characters: suggestForm.characters,
+          resolved_threads: suggestForm.resolvedThreads,
+          techniques: suggestForm.techniques,
+          locations: suggestForm.locations,
+          weapons: suggestForm.weapons,
+          notes: suggestForm.notes
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi không xác định khi gợi ý sự kiện.');
+      }
+
+      setNodes(data.nodes || []);
+      setConnections(data.connections || []);
+
+      for (const chap of suggestForm.linkedChapters) {
+        await fetchChapterNodes(chap);
+      }
+
+      setShowSuggestModal(false);
+    } catch (err) {
+      setSuggestError(err.message);
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
 
   // --- Fetch Chapter Event Nodes Cache ---
   const fetchChapterNodes = async (chapNum) => {
@@ -1137,14 +1224,33 @@ export default function ChapterGenerator({
                       <span>💡 Nhấp giữ chuột để Kéo thả Node. Nhấp "Liên kết" để nối các sự kiện theo luồng kể chuyện.</span>
                     )}
                   </div>
-                  <button 
-                    type="button" 
-                    onClick={handleAddNewNode}
-                    className="btn-primary-sm btn-cyan"
-                    style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <Plus className="icon-xs" /> Thêm Sự Kiện (Node)
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      type="button" 
+                      onClick={handleOpenSuggestModal}
+                      className="btn-primary-sm btn-purple"
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        background: 'linear-gradient(135deg, #a855f7 0%, #06b6d4 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Sparkles className="icon-xs" /> Gợi Ý Sự Kiện (AI)
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={handleAddNewNode}
+                      className="btn-primary-sm btn-cyan"
+                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <Plus className="icon-xs" /> Thêm Sự Kiện (Node)
+                    </button>
+                  </div>
+
                 </div>
 
                 <div className="canvas-editor-layout">
@@ -1682,6 +1788,260 @@ export default function ChapterGenerator({
           </div>
         </div>
       )}
+
+
+
+      {showSuggestModal && (
+        <div className="modal-overlay">
+          <div className="modal-card glass" style={{ maxWidth: '650px', width: '90%' }}>
+            <div className="modal-header">
+              <div className="modal-title-container">
+                <Sparkles className="icon-sm text-cyan" style={{ animation: 'pulse 1.5s infinite' }} />
+                <h3>Gợi Ý Sơ Đồ Sự Kiện Bằng AI</h3>
+              </div>
+              <button 
+                onClick={() => !suggesting && setShowSuggestModal(false)} 
+                className="btn-close" 
+                type="button"
+                disabled={suggesting}
+              >
+                <X className="icon-sm" />
+              </button>
+            </div>
+
+            {suggesting ? (
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', gap: '20px' }}>
+                <div className="ai-glowing-spinner" style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  border: '3px solid rgba(6, 182, 212, 0.1)',
+                  borderTopColor: 'var(--color-cyan)',
+                  borderRightColor: '#a855f7',
+                  animation: 'spin 1s linear infinite, glow 2s ease-in-out infinite alternate'
+                }} />
+                <div style={{ textAlign: 'center' }}>
+                  <h4 style={{ color: '#fff', fontSize: '15px', fontWeight: '600', marginBottom: '8px' }}>AI Đang Xây Dựng Kịch Bản...</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Quá trình này có thể mất từ 10 - 25 giây để dệt nên kịch bản mượt mà nhất.</p>
+                </div>
+                <style>{`
+                  @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                  }
+                  @keyframes glow {
+                    0% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+                    100% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); }
+                  }
+                `}</style>
+              </div>
+            ) : (
+              <form onSubmit={handleAISuggestSubmit} className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '70vh', overflowY: 'auto', paddingRight: '4px' }}>
+                {suggestError && (
+                  <div className="chat-system-log level-error" style={{ padding: '8px 12px', borderRadius: '6px', margin: 0 }}>
+                    <span className="log-text">⚠️ {suggestError}</span>
+                  </div>
+                )}
+
+                <div className="form-row">
+                  <div className="form-group flex-1">
+                    <label className="form-label required">Số lượng sự kiện (Nodes) cần tạo</label>
+                    <select 
+                      className="form-select"
+                      value={suggestForm.numNodes}
+                      onChange={e => setSuggestForm(prev => ({ ...prev, numNodes: parseInt(e.target.value) }))}
+                      required
+                    >
+                      <option value="2">2 Nodes (Ngắn)</option>
+                      <option value="3">3 Nodes (Mặc định)</option>
+                      <option value="4">4 Nodes</option>
+                      <option value="5">5 Nodes (Trung bình)</option>
+                      <option value="6">6 Nodes</option>
+                      <option value="7">7 Nodes</option>
+                      <option value="8">8 Nodes (Chi tiết)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Chương sẽ liên kết</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyLedger?.timeline && storyLedger.timeline.length > 0 ? (
+                      storyLedger.timeline.map((item) => {
+                        const isChecked = suggestForm.linkedChapters.includes(item.chapter);
+                        return (
+                          <label key={item.chapter} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isChecked ? 'var(--color-cyan)' : 'var(--border-glass)'}`, borderRadius: '6px', padding: '6px 10px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('linkedChapters', item.chapter)}
+                              style={{ display: 'none' }}
+                            />
+                            <span>Chương {item.chapter}: {item.title}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có chương cũ để liên kết.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Nhân vật sẽ xuất hiện</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyMeta?.characters && storyMeta.characters.length > 0 ? (
+                      storyMeta.characters.map((char) => {
+                        const isChecked = suggestForm.characters.includes(char.name);
+                        return (
+                          <label key={char.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isChecked ? 'var(--color-cyan)' : 'var(--border-glass)'}`, borderRadius: '6px', padding: '6px 10px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('characters', char.name)}
+                              style={{ display: 'none' }}
+                            />
+                            <span>{char.name} ({char.role})</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có nhân vật nào trong tác phẩm.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Giải quyết nút thắt (nếu có)</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyLedger?.unresolved_threads && storyLedger.unresolved_threads.length > 0 ? (
+                      storyLedger.unresolved_threads.map((ut, utidx) => {
+                        const threadText = typeof ut === 'string' ? ut : ut.thread;
+                        const isChecked = suggestForm.resolvedThreads.includes(threadText);
+                        return (
+                          <label key={utidx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.05)' : 'transparent', border: `1px solid ${isChecked ? 'rgba(6, 182, 212, 0.3)' : 'transparent'}`, borderRadius: '6px', padding: '6px 8px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('resolvedThreads', threadText)}
+                              style={{ accentColor: 'var(--color-cyan)' }}
+                            />
+                            <span>{threadText}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có nút thắt nào cần giải quyết.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Địa điểm sẽ tới hoặc sẽ ở</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyLedger?.locations && storyLedger.locations.length > 0 ? (
+                      storyLedger.locations.map((loc, lidx) => {
+                        const isChecked = suggestForm.locations.includes(loc.name);
+                        return (
+                          <label key={lidx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isChecked ? 'var(--color-cyan)' : 'var(--border-glass)'}`, borderRadius: '6px', padding: '6px 10px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('locations', loc.name)}
+                              style={{ display: 'none' }}
+                            />
+                            <span>{loc.name}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có địa điểm nào trong Sổ cái.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Công pháp sẽ dùng</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyLedger?.techniques && storyLedger.techniques.length > 0 ? (
+                      storyLedger.techniques.map((tech, tidx) => {
+                        const isChecked = suggestForm.techniques.includes(tech.name);
+                        return (
+                          <label key={tidx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isChecked ? 'var(--color-cyan)' : 'var(--border-glass)'}`, borderRadius: '6px', padding: '6px 10px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('techniques', tech.name)}
+                              style={{ display: 'none' }}
+                            />
+                            <span>{tech.name}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có công pháp nào trong Sổ cái.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Binh khí sẽ dùng</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '10px' }}>
+                    {storyLedger?.weapons && storyLedger.weapons.length > 0 ? (
+                      storyLedger.weapons.map((weap, widx) => {
+                        const isChecked = suggestForm.weapons.includes(weap.name);
+                        return (
+                          <label key={widx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isChecked ? 'var(--color-cyan)' : 'var(--text-secondary)', cursor: 'pointer', background: isChecked ? 'rgba(6, 182, 212, 0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isChecked ? 'var(--color-cyan)' : 'var(--border-glass)'}`, borderRadius: '6px', padding: '6px 10px', transition: 'all 0.2s' }}>
+                            <input 
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleSuggestToggle('weapons', weap.name)}
+                              style={{ display: 'none' }}
+                            />
+                            <span>{weap.name}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa có binh khí nào trong Sổ cái.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Chú thích / Lưu ý khi tạo sự kiện (Directives)</label>
+                  <textarea 
+                    className="form-textarea"
+                    value={suggestForm.notes}
+                    onChange={e => setSuggestForm(prev => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Ví dụ: Kịch bản kịch tính, Sở Mặc đột phá ở cuối chương, hoặc các lưu ý về bối cảnh..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="modal-actions" style={{ marginTop: '8px' }}>
+                  <button type="button" onClick={() => setShowSuggestModal(false)} className="btn-secondary">Hủy</button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary" 
+                    style={{
+                      background: 'linear-gradient(135deg, #a855f7 0%, #06b6d4 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Sparkles className="icon-xs" /> Gợi Ý Sự Kiện (AI)
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -981,6 +981,184 @@ def get_chapter_nodes(story_uuid, chapter_num):
     except Exception as e:
         return jsonify({'error': f'Failed to read nodes: {str(e)}'}), 500
 
+
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/suggest-nodes', methods=['POST'])
+def suggest_chapter_nodes(story_uuid, chapter_num):
+    """Call Gemini to get suggestions for the next chapter's event nodes."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    try:
+        meta_data = json.loads(meta_path.read_text(encoding="utf-8") if meta_path.exists() else '{}')
+        model_name = meta_data.get('model', 'gemini-2.5-flash')
+    except Exception as e:
+        return jsonify({'error': f'Failed to read metadata: {str(e)}'}), 500
+
+    ledger_path = config.get_ledger_path(story_uuid)
+    ledger_data = {}
+    if ledger_path.exists():
+        try:
+            ledger_data = json.loads(ledger_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    req_data = request.json or {}
+    num_nodes = int(req_data.get('num_nodes', 3))
+    linked_chapters = req_data.get('linked_chapters', [])
+    characters = req_data.get('characters', [])
+    resolved_threads = req_data.get('resolved_threads', [])
+    techniques = req_data.get('techniques', [])
+    locations = req_data.get('locations', [])
+    weapons = req_data.get('weapons', [])
+    notes = req_data.get('notes', '').strip()
+
+    # Build context of previous nodes
+    prev_nodes_ctx = ""
+    # 1. Load immediate previous chapter N-1
+    if chapter_num > 1:
+        prev_nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num - 1)
+        if prev_nodes_path.exists():
+            try:
+                prev_nodes_data = json.loads(prev_nodes_path.read_text(encoding="utf-8"))
+                prev_nodes_ctx += f"\nSơ đồ sự kiện chương trước (Chương {chapter_num - 1}):\n"
+                for node in prev_nodes_data.get("nodes", []):
+                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+            except Exception:
+                pass
+
+    # 2. Load other linked chapters
+    for chap in linked_chapters:
+        try:
+            chap_num = int(chap)
+            if chap_num != chapter_num - 1:
+                nodes_path = config.get_chapter_nodes_path(story_uuid, chap_num)
+                if nodes_path.exists():
+                    nodes_data = json.loads(nodes_path.read_text(encoding="utf-8"))
+                    prev_nodes_ctx += f"\nSơ đồ sự kiện Chương {chap_num} (Chương liên kết):\n"
+                    for node in nodes_data.get("nodes", []):
+                        prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+        except Exception:
+            pass
+
+    # Build system prompt and user query
+    prompt = f"""
+Bạn là một chuyên gia xây dựng kịch bản và sơ đồ sự kiện cho tiểu thuyết dài kỳ. Nhiệm vụ của bạn là thiết lập danh sách {num_nodes} node sự kiện tuần tự nối tiếp nhau cho Chương {chapter_num} của câu chuyện dưới đây.
+
+THÔNG TIN TÁC PHẨM:
+- Tên truyện: {meta_data.get('name')}
+- Bối cảnh chính: {meta_data.get('context')}
+- Phong cách hành văn: {meta_data.get('style')}
+
+SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
+- Lịch sử cốt truyện: {json.dumps(ledger_data.get('timeline', []), ensure_ascii=False)}
+- Các nút thắt chưa giải quyết: {json.dumps(ledger_data.get('unresolved_threads', []), ensure_ascii=False)}
+
+BỐI CẢNH SỰ KIỆN CHƯƠNG TRƯỚC / CHƯƠNG LIÊN KẾT ĐỂ TẠO SỰ LIỀN MẠCH:
+{prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ."}
+
+YÊU CẦU CHO CHƯƠNG {chapter_num}:
+- Tạo chính xác {num_nodes} node sự kiện được nối kết tuần tự.
+- Các nhân vật sẽ xuất hiện trong chương này: {', '.join(characters) if characters else 'Không chỉ định'}
+- Các địa điểm nhân vật sẽ tới hoặc ở: {', '.join(locations) if locations else 'Không chỉ định'}
+- Các công pháp sẽ sử dụng: {', '.join(techniques) if techniques else 'Không chỉ định'}
+- Binh khí/Pháp khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
+- Nút thắt sẽ giải quyết (nếu có, hãy tự nghĩ phương án giải quyết và điền vào resolution_note): {', '.join(resolved_threads) if resolved_threads else 'Không chỉ định'}
+- Lưu ý/chú thích của tác giả: "{notes}"
+
+HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
+1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) với node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
+2. Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí vào các node sao cho tự nhiên nhất.
+3. Nếu có giải quyết nút thắt, hãy chọn đúng nút thắt đó và mô tả cách giải quyết chi tiết trong trường `resolved_thread.resolution_note`.
+4. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
+"""
+
+    try:
+        from src.utils.llm import invoke_with_retry
+        state = {
+            "story_uuid": story_uuid,
+            "model": model_name
+        }
+        
+        # Invoke LLM with structured output schema
+        suggested_data = invoke_with_retry(
+            state, 
+            prompt, 
+            temperature=0.7, 
+            output_schema=models.SuggestedChapterNodes
+        )
+        
+        # Transform temp IDs to unique IDs and add coordinate layouts
+        import time
+        timestamp = int(time.time() * 1000)
+        
+        node_id_map = {}
+        transformed_nodes = []
+        
+        for idx, node in enumerate(suggested_data.nodes):
+            new_id = f"node-{timestamp + idx}"
+            node_id_map[node.id] = new_id
+            
+            # Map resolved thread
+            res_thread = {
+                "thread": "",
+                "resolution_note": ""
+            }
+            if node.resolved_thread and node.resolved_thread.thread.strip():
+                res_thread = {
+                    "thread": node.resolved_thread.thread.strip(),
+                    "resolution_note": node.resolved_thread.resolution_note.strip()
+                }
+                
+            # Map old chapter links
+            links = []
+            if node.links:
+                for l in node.links:
+                    links.append({
+                        "chapter": l.chapter,
+                        "nodes": l.nodes or []
+                    })
+                    
+            transformed_nodes.append({
+                "id": new_id,
+                "title": node.title.strip(),
+                "description": node.description.strip(),
+                "characters": node.characters or [],
+                "locations": node.locations or [],
+                "weapons": node.weapons or [],
+                "techniques": node.techniques or [],
+                "resolved_thread": res_thread,
+                "links": links,
+                "x": 150 + idx * 300,
+                "y": 200 + (idx % 2) * 60
+            })
+            
+        transformed_connections = []
+        for conn in suggested_data.connections:
+            from_new = node_id_map.get(conn.from_node)
+            to_new = node_id_map.get(conn.to_node)
+            if from_new and to_new:
+                transformed_connections.append({
+                    "from": from_new,
+                    "to": to_new
+                })
+        # If there are no connections generated but multiple nodes, construct sequential ones
+        if not transformed_connections and len(transformed_nodes) > 1:
+            for idx in range(len(transformed_nodes) - 1):
+                transformed_connections.append({
+                    "from": transformed_nodes[idx]["id"],
+                    "to": transformed_nodes[idx + 1]["id"]
+                })
+                
+        return jsonify({
+            "nodes": transformed_nodes,
+            "connections": transformed_connections
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to generate suggested nodes: {str(e)}'}), 500
+
+
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>', methods=['PUT'])
 def update_chapter(story_uuid, chapter_num):
     """Edit the chapter content manually."""
