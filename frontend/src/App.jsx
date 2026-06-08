@@ -238,7 +238,10 @@ export default function App() {
                   onUpdateChapterContent={handleUpdateChapterContent}
                   onDeleteChapter={handleDeleteChapter}
                   backendUrl={BACKEND_URL}
+                  storyMeta={storyMeta}
+                  storyLedger={storyLedger}
                 />
+
               </div>
               <div style={{ display: activeTab === 'generator' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>
                 <ChapterGenerator

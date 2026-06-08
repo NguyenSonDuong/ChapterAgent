@@ -1157,9 +1157,121 @@ HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
         
     except Exception as e:
         return jsonify({'error': f'Failed to generate suggested nodes: {str(e)}'}), 500
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/nodes', methods=['PUT'])
+def update_chapter_nodes(story_uuid, chapter_num):
+    """Save/update the event nodes and connections for a specific chapter."""
+    nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
+    data = request.json or {}
+    
+    # Save the updated nodes and connections to chap_X_nodes.json
+    try:
+        nodes_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        return jsonify({'error': f'Failed to write nodes file: {str(e)}'}), 500
+
+    # Parse newly resolved threads from the updated nodes
+    new_resolved = []
+    for n in data.get('nodes', []):
+        res_thread = n.get('resolved_thread', {})
+        if isinstance(res_thread, dict):
+            t_text = res_thread.get('thread', '').strip()
+            if t_text:
+                new_resolved.append(t_text)
+
+    # Sync and update states/chap_X_state.md (Nút thắt đã giải quyết)
+    state_path = config.get_chapter_state_path(story_uuid, chapter_num)
+    if state_path.exists():
+        try:
+            state_content = state_path.read_text(encoding="utf-8")
+            lines = state_content.splitlines()
+            new_lines = []
+            in_resolved_section = False
+            for line in lines:
+                if line.strip() == "## Nút thắt đã giải quyết":
+                    new_lines.append(line)
+                    for tr in new_resolved:
+                        new_lines.append(f"- {tr}")
+                    in_resolved_section = True
+                elif line.strip() == "## Nút thắt mới mở ra" or line.strip().startswith("## "):
+                    if in_resolved_section:
+                        new_lines.append("")
+                        in_resolved_section = False
+                    new_lines.append(line)
+                else:
+                    if not in_resolved_section:
+                        new_lines.append(line)
+            
+            state_path.write_text("\n".join(new_lines), encoding="utf-8")
+        except Exception:
+            pass
+
+    # Update Ledger
+    ledger_path = config.get_ledger_path(story_uuid)
+    if ledger_path.exists():
+        try:
+            ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+            timeline = ledger.get('timeline', [])
+            
+            # Find the chapter entry in the timeline
+            updated = False
+            for item in timeline:
+                if item.get('chapter') == chapter_num:
+                    item['nodes'] = data.get('nodes', [])
+                    item['connections'] = data.get('connections', [])
+                    updated = True
+                    break
+            
+            if updated:
+                ledger['timeline'] = timeline
+                
+                # Align ledger unresolved vs resolved threads if nodes resolved them
+                ledger_model = models.GlobalLedger(**ledger)
+                
+                # Process explicit user-selected resolutions from the canvas nodes
+                for n in data.get("nodes", []):
+                    res_thread = n.get("resolved_thread", {})
+                    if isinstance(res_thread, dict):
+                        res_text = res_thread.get("thread", "").strip()
+                        res_note = res_thread.get("resolution_note", "").strip()
+                        if res_text:
+                            # Look up in unresolved_threads to remove it and put in resolved_threads
+                            matched_unresolved = None
+                            for ut in ledger_model.unresolved_threads:
+                                if ut.thread.strip().lower() == res_text.lower():
+                                    matched_unresolved = ut
+                                    break
+                            
+                            if matched_unresolved:
+                                ledger_model.unresolved_threads.remove(matched_unresolved)
+                                if not any(rt.thread.strip().lower() == res_text.lower() for rt in ledger_model.resolved_threads):
+                                    ledger_model.resolved_threads.append(models.ResolvedThread(
+                                        thread=matched_unresolved.thread,
+                                        chapter_introduced=matched_unresolved.chapter,
+                                        chapter_resolved=chapter_num,
+                                        resolution_note=res_note if res_note else "Giải quyết qua sơ đồ sự kiện (sửa đổi)."
+                                    ))
+                            else:
+                                if not any(rt.thread.strip().lower() == res_text.lower() for rt in ledger_model.resolved_threads):
+                                    ledger_model.resolved_threads.append(models.ResolvedThread(
+                                        thread=res_text,
+                                        chapter_introduced=None,
+                                        chapter_resolved=chapter_num,
+                                        resolution_note=res_note if res_note else "Giải quyết qua sơ đồ sự kiện (sửa đổi)."
+                                    ))
+                                    
+                # Write updated ledger back
+                ledger_path.write_text(ledger_model.model_dump_json(indent=2), encoding="utf-8")
+        except Exception as e:
+            return jsonify({
+                'warning': f'Nodes file updated, but ledger sync failed: {str(e)}',
+                'message': 'Nodes updated partially'
+            }), 200
+
+    return jsonify({'message': f'Chapter {chapter_num} nodes updated successfully'})
 
 
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>', methods=['PUT'])
+
 def update_chapter(story_uuid, chapter_num):
     """Edit the chapter content manually."""
     content_path = config.get_chapter_content_path(story_uuid, chapter_num)
