@@ -1,0 +1,126 @@
+{
+  "uuid": "5c136f34-85f4-4acb-b5ad-0fca7bf5ea6d",
+  "name": "Nghịch Mệnh Song Hành",
+  "characters": [
+    {
+      "name": "Sở Mặc",
+      "role": "Nam chính",
+      "description": "Ngoại hình cương nghị, nhiều vết sẹo do chiến đấu bảo vệ Mộc Tuyết. Tính cách trầm ổn, sát phạt quyết đoán với kẻ thù nhưng cực kỳ dịu dàng, ôn nhu với nữ chính. Sở hữu Tạp linh căn ngũ hành, tốc độ tu luyện cực chậm. Bù lại, hắn có ý chí sinh tồn đáng sợ, chủ tu thể thuật và đao pháp thực chiến, luôn lấy thân mình làm khiên chắn cho Mộc Tuyết.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Táng Cốt Lâm",
+        "Cõi hư vô"
+      ],
+      "active_weapon": "Thanh đao cùn",
+      "weapons_owned": [
+        "Thanh đao cùn"
+      ],
+      "active_technique": "",
+      "techniques_owned": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "current_cultivation": "",
+      "current_location": "Táng Cốt Lâm",
+      "status": "Đang an toàn"
+    },
+    {
+      "name": "Mộc Tuyết",
+      "role": "Nữ chính",
+      "description": "Ngoại hình thanh tú, ánh mắt quật cường. Bề ngoài có vẻ nhu thuận yếu đuối nhưng nội tâm vô cùng mạnh mẽ. Chỉ yêu duy nhất Sở Mặc, sẵn sàng đồng sinh cộng tử. Tư chất Tạp linh căn giống nam chính. Sức mạnh thiên về hỗ trợ: am hiểu sơ đồ trận pháp tàn khuyết và thuật trị thương cơ bản, là hậu phương vững chắc và là \"chấp niệm\" để Sở Mặc không bao giờ gục ngã.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Táng Cốt Lâm",
+        "Cõi hư vô"
+      ],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [
+        "Thiên Diễn Tàn Trận"
+      ],
+      "current_cultivation": "",
+      "current_location": "Táng Cốt Lâm",
+      "status": "Đang an toàn"
+    },
+    {
+      "name": "Vô Trần Tử",
+      "role": "Người thử thách, tiền bối",
+      "description": "Một ông lão có mái tóc bạc phơ, phong thái ung dung tự tại, ánh mắt thâm sâu khó dò, có khả năng tạo ra huyễn cảnh và truyền thụ công pháp.",
+      "first_chapter": 5,
+      "appearance_context": "Xuất hiện trong huyễn cảnh tại Táng Cốt Lâm để đưa ra thử thách nhân tâm cho Mộc Tuyết, sau đó xuất hiện ở thực tại để trao công pháp và dặn dò hai nhân vật chính.",
+      "visited_locations": [],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [],
+      "current_cultivation": "",
+      "current_location": "",
+      "status": "Đang an toàn"
+    }
+  ],
+  "context": "Cửu Châu đại lục đang trong thời kỳ tăm tối, phong ấn rạn nứt, yêu ma từ Vực Sâu tràn ra hoành hành khắp nơi. Các tông môn tu tiên lớn đều đóng cửa bế quan hoặc chỉ thu nhận những thiên tài tuyệt đỉnh để dồn tài nguyên chống đỡ. Đạo thống suy tàn, mạng phàm nhân như cỏ rác.\n\nNam chính và nữ chính vốn là thanh mai trúc mã, đều mang \"Tạp linh căn\" (tư chất thấp kém nhất), bị các tiên môn từ chối và ruồng bỏ giữa thế đạo loạn lạc. Thay vì chấp nhận số phận làm thức ăn cho yêu ma, hai người nương tựa vào nhau, lấy tình yêu sâu đậm làm động lực sinh tồn. Tình cờ phát hiện một tàn quyển công pháp thượng cổ yêu cầu sự đồng điệu tuyệt đối về linh hồn giữa hai người thi triển, họ quyết tâm bước lên con đường nghịch thiên cải mệnh. Không có tài nguyên, họ dùng máu và mồ hôi để tranh đoạt; không có thiên phú, họ lấy ý chí và tình yêu làm đạo tâm. Cùng nhau trảm yêu, sát ma, đạp phá thiên đạo bất công để bảo vệ người mình yêu.",
+  "style": "Phàm nhân lưu, Bi tráng, Nhiệt huyết, Trọng tình cảm (1v1 - tuyệt đối chung thủy).",
+  "tags": [
+    "phàm nhân lưu",
+    "nghịch thiên",
+    "yêu ma hoành hành",
+    "1v1",
+    "đồng sinh cộng tử",
+    "song tu."
+  ],
+  "max_chapters": 300,
+  "max_words_per_chapter": 1000,
+  "model": "gemini-3.1-flash-lite",
+  "cultivation_stages": [
+    {
+      "name": "Thối Thể Cảnh",
+      "description": "Bước đầu tiên của người tu đạo. Dùng linh khí thô sơ hoặc dược thảo để rèn luyện da thịt, cường hóa gân cốt. Người ở cảnh giới này có sức mạnh và tốc độ vượt trội phàm nhân, đao thương bất nhập ở mức cơ bản."
+    },
+    {
+      "name": "Tụ Khí Cảnh",
+      "description": "Bắt đầu biết dẫn khí vào đan điền. Linh lực lúc này còn mỏng manh, chủ yếu dùng để bọc ngoài vũ khí  để tăng lực sát thương khi chém yêu thú."
+    },
+    {
+      "name": "Ngưng Mạch Cảnh",
+      "description": "Linh khí đủ nhiều để chạy dọc các kinh mạch. Bắt đầu sử dụng được các thuật pháp sơ cấp hoặc kỹ năng di chuyển nhanh."
+    },
+    {
+      "name": "Trúc Cơ Cảnh",
+      "description": "Cột mốc quan trọng để thực sự \"thoát phàm\". Tuổi thọ tăng lên 200 năm. Đan điền hóa thành dạng lỏng."
+    },
+    {
+      "name": "Kết Đan Cảnh",
+      "description": "Linh lực hóa rắn thành Kim Đan trong đan điền. Thể chất trải qua một đợt tẩy tủy diện rộng. Có thể ngự khí phi hành (bay lượn) trong thời gian ngắn."
+    },
+    {
+      "name": "Nguyên Anh Cảnh",
+      "description": "Đan vỡ, Nguyên Anh (bản sao linh hồn thu nhỏ) xuất hiện. Dù thân xác bị hủy, chỉ cần Nguyên Anh trốn thoát thì vẫn có thể đoạt xá sống lại. Khả năng ngoại phóng thần thức để kiểm soát diện rộng."
+    },
+    {
+      "name": "Hóa Thần Cảnh",
+      "description": "Bắt đầu mượn được một phần sức mạnh của tự nhiên. Nguyên Anh có thể xuất khiếu chiến đấu độc lập. Cảnh giới này có thể dùng ý niệm để giết yêu ma cấp thấp."
+    },
+    {
+      "name": "Luyện Hư Cảnh",
+      "description": "ước đầu chạm đến sức mạnh của không gian. Có thể xé rách hư không để dịch chuyển, tự tạo ra các không gian phòng ngự hoặc nhốt kẻ thù."
+    },
+    {
+      "name": "Hợp Thể Cảnh",
+      "description": "Nguyên Anh và Thân xác hoàn toàn dung hợp. Hầu như bất tử bất diệt ở hạ giới. Một giọt máu hay một mảnh xương cũng có thể tái tạo lại cơ thể."
+    },
+    {
+      "name": "Đại Thừa Cảnh",
+      "description": "Đạt đến giới hạn sức mạnh mà không gian phàm giới có thể chứa đựng. Tu vi thâm hậu, giơ tay nhấc chân đều mang theo uy áp của đất trời. Đứng đầu Cửu Châu đại lục."
+    },
+    {
+      "name": "Độ Kiếp Cảnh",
+      "description": "Không hẳn là một cảnh giới để tu luyện, mà là khoảnh khắc phải đối mặt với Cửu Trọng Thiên Kiếp do Thiên Đạo giáng xuống để ngăn cản phàm nhân phi thăng. Thành thì thoát thai hoán cốt, bại thì hồn bay phách lạc."
+    },
+    {
+      "name": "Đạp Thiên Cảnh",
+      "description": "Cảnh giới vượt ngoài quy luật thông thường, do chính Sở Mặc và Mộc Tuyết mở ra. Ở cảnh giới này, họ không phi thăng làm tiên chịu sự quản thúc của Thiên Đạo, mà tự mình đạp nát trời xanh, thiết lập lại trật tự mới cho Cửu Châu đại lục."
+    }
+  ]
+}

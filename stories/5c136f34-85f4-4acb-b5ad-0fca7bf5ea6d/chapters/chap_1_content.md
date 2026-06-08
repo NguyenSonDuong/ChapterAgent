@@ -1,0 +1,27 @@
+# Chương 1: Bản Án Tạp Linh Căn
+
+Cửu Châu đại lục đang chìm trong đêm tối vô tận. Phong ấn viễn cổ rạn nứt, vô số yêu ma từ Vực Sâu cuồn cuộn tràn ra, nuốt chửng sơn hà. Các tông môn tu tiên, từng là trụ cột của nhân gian, giờ đây đóng cửa bế quan, chỉ thu nhận những thiên tài tuyệt đỉnh, dồn tài nguyên chống đỡ bức tường đổ nát. Đạo thống suy tàn, linh khí khô kiệt, mạng phàm nhân như cỏ rác, bị xé xác, bị nuốt chửng, bị biến thành những sinh vật gớm ghiếc, vô số thân ảnh vô hồn lang thang trong khói lửa và máu tanh.
+
+Tại một khe núi hẻo lánh, nơi một tiểu tông môn sắp rút chạy khỏi tiền tuyến, Trắc Linh Đài vẫn còn ráng sức hoạt động những tia sáng cuối cùng. Hàng trăm phàm nhân run rẩy xếp hàng, ánh mắt đầy sự cầu khẩn và tuyệt vọng, hy vọng tìm được một tia sống sót trong số ít ỏi những người được chọn. Sở Mặc đứng đó, thân hình gầy gò nhưng ánh mắt cương nghị không hề lay chuyển. Trên người hắn, những vết sẹo cũ mới chồng chéo, minh chứng cho những tháng ngày vật lộn sinh tồn nơi biên giới đầy hiểm nguy.
+
+Đến lượt hắn. Sở Mặc đặt bàn tay chai sạn lên Trắc Linh Đài. Ánh sáng ngũ sắc lập lòe, sau đó mờ nhạt dần, rồi vụt tắt. Một trưởng lão tông môn với khuôn mặt khắc khổ, ánh mắt đầy vẻ mệt mỏi và chán chường, lạnh lùng phán: "Tạp Linh Căn ngũ hành. Phế vật!"
+
+Chỉ vỏn vẹn ba chữ, như bản án tử hình, dập tắt mọi hy vọng. Hắn bị gạt sang một bên, hòa vào đám đông phàm nhân bị ruồng bỏ, số phận là tự sinh tự diệt giữa vùng đất sắp bị yêu ma càn quét. Tiếng khóc than, tiếng gào thét tuyệt vọng vang lên xung quanh, nhưng Sở Mặc không khóc. Hắn cắn chặt răng, cảm nhận vị máu tanh trong khoang miệng. Sự lạnh lùng của thế giới tu tiên, sự tàn nhẫn của thời đại này, hắn đã quá quen thuộc. Nhưng tuyệt vọng? Không, trong từ điển của Sở Mặc không có từ đó.
+
+Giữa đống đổ nát của tông môn, hắn thấy một thanh phàm đao nứt mẻ, lưỡi dao sứt mẻ đầy vết rỉ sét, bị vứt bỏ như rác rưởi. Hắn không nói một lời, cúi xuống nhặt lấy, nắm chặt cán đao, cảm nhận sự lạnh lẽo của kim loại truyền vào lòng bàn tay. Với ý chí sinh tồn đáng sợ, hắn không quay đầu nhìn lại đám đông đang gào khóc, hay những tu sĩ vội vã tháo chạy. Hắn xoay người, một mình bước vào khu rừng u ám, nơi tiếng gầm gừ của yêu thú đã bắt đầu vọng lại. Nơi đó, có thể là cái chết, nhưng cũng là con đường sống duy nhất của hắn.
+
+Rừng sâu âm u, ánh sáng le lói xuyên qua tán lá dày đặc. Sở Mặc lê bước, từng hơi thở nặng nề kéo theo vết thương cũ nhức nhối. Đói khát, mệt mỏi, hắn không có linh lực, chỉ có đôi chân trần trụi và ý chí sắt đá. Bỗng, một tiếng gầm gừ khàn đục xé tan sự tĩnh lặng. Một thân ảnh đen kịt, lùn tịt nhưng cơ bắp cuồn cuộn, lao ra từ bụi rậm. Đó là Lục Nhãn Lang, yêu thú cấp thấp nhưng đủ sức xé xác mười tên phàm nhân. Sáu con mắt đỏ rực như máu, hàm răng nanh dài nhọn hoắt nhỏ dãi thèm thuồng.
+
+Sở Mặc không né tránh. Hắn biết mình không thể chạy thoát. Hắn nắm chặt thanh phàm đao nứt mẻ, đôi mắt như chim ưng quan sát từng động thái của con quái vật. Con Lục Nhãn Lang lao tới, vuốt sắc như dao găm xé gió. Sở Mặc lăn mình tránh thoát, nhưng một vết cào sượt qua bắp đùi, máu tươi nhuộm đỏ ống quần. Hắn không ngừng lại, lợi dụng địa hình, nhảy vọt lên một gốc cây đổ, chờ đợi.
+
+Con sói gầm gừ, vồ tới. Sở Mặc vung đao, nhưng sức mạnh của phàm nhân không đủ để xuyên thủng lớp da cứng rắn của yêu thú. Thanh đao chỉ để lại một vết xước nông. Con Lục Nhãn Lang tức giận hơn, nó vồ tới, thân hình nặng trịch đè nghiến Sở Mặc xuống đất. Vuốt sắc bén của nó nhắm thẳng vào cổ họng hắn.
+
+Trong khoảnh khắc sinh tử, một tia sáng lóe lên trong đầu Sở Mặc. Hắn không tuyệt vọng, mà là sự lạnh lùng đến tột độ. Hắn nghiêng đầu, cố tình để vuốt sói xuyên qua vai trái. Máu tuôn xối xả, đau đớn kịch liệt khiến hắn đổ mồ hôi lạnh, nhưng bù lại, vuốt của con sói cắm sâu vào vai hắn, khóa chặt chuyển động của nó. Toàn thân Lục Nhãn Lang bị giữ lại.
+
+"Chết đi!" Sở Mặc gầm lên, sức lực cuối cùng dồn vào tay phải. Thanh đao nứt mẻ, không chút linh lực, nhưng lại mang theo tất cả ý chí sinh tồn của hắn, cứa mạnh vào yết hầu con sói. Máu đen bắn tung tóe, Lục Nhãn Lang rên rỉ một tiếng cuối cùng, rồi đổ gục.
+
+Hắn thở hổn hển, nằm vật ra đất, vai trái đau nhói đến tận xương tủy. Cả người hắn ướt đẫm mồ hôi và máu, không biết là của mình hay của yêu thú. Nhưng hắn sống sót. Sống sót bằng mưu trí, bằng sự liều lĩnh và bằng chiến thuật "lấy mạng đổi mạng" tàn khốc. Từ trong sâu thẳm tâm can, một quy luật sinh tồn khắc nghiệt đã bén rễ: "Muốn sống, phải ác hơn cả yêu ma."
+
+Với vết thương chí mạng, Sở Mặc vẫn cố gắng đứng dậy. Hắn không biết mình đang đi đâu, chỉ biết phải tiếp tục. Hắn lê bước, băng qua những thân cây khô cằn, những bụi gai rậm rạp. Cứ thế, hắn đi mãi, đi mãi trong vô định, cho đến khi ánh trăng mờ nhạt soi rọi một con đường mòn nhỏ. Cuối con đường là một ngôi làng, những mái nhà tranh xiêu vẹo hiện ra trong màn đêm.
+
+Hắn lại gần, trong lòng dấy lên một tia hy vọng mong manh. Ngôi làng có vẻ hoang tàn, nhưng không có mùi yêu ma. Có lẽ đây là một nơi trú ẩn an toàn tạm thời. Khi hắn vừa đặt chân đến cổng làng mục nát, một tiếng động yếu ớt, như tiếng bước chân nặng nề, như tiếng vật nặng đổ xuống, vang lên từ sâu bên trong. Một tiếng động lạ lùng, giữa sự tĩnh mịch đáng sợ của đêm tối.

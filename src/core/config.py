@@ -23,6 +23,12 @@ def get_story_dir(story_uuid: str) -> Path:
     """Get the subdirectory for a specific story's chapters and states."""
     return STORIES_DIR / story_uuid
 
+def get_temp_draft_path(story_uuid: str) -> Path:
+    """Get the path to the temp draft file for a specific story."""
+    d = get_story_dir(story_uuid)
+    d.mkdir(parents=True, exist_ok=True)
+    return d / "temp_draft.md"
+
 def get_chapters_dir(story_uuid: str) -> Path:
     """Get chapters directory for a story."""
     d = get_story_dir(story_uuid) / "chapters"
@@ -50,6 +56,10 @@ def get_chapter_content_path(story_uuid: str, chapter_num: int) -> Path:
 def get_chapter_state_path(story_uuid: str, chapter_num: int) -> Path:
     """Get path to a specific chapter state file."""
     return get_states_dir(story_uuid) / f"chap_{chapter_num}_state.md"
+
+def get_chapter_nodes_path(story_uuid: str, chapter_num: int) -> Path:
+    """Get path to a specific chapter's nodes JSON file."""
+    return get_chapters_dir(story_uuid) / f"chap_{chapter_num}_nodes.json"
 
 def check_api_key() -> bool:
     """Verify that GOOGLE_API_KEY is configured."""

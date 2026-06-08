@@ -47,7 +47,7 @@ ChapterAgent/
 │       ├── __init__.py
 │       ├── llm.py        # Quản lý gọi LLM, xử lý lỗi API và tự động thử lại (retry)
 │       ├── helpers.py    # Các hàm trợ giúp chuyển đổi kiểu dữ liệu
-│       ├── session_manager.py # Quản lý các phiên chạy ngầm LangGraph bất đồng bộ
+│       ├── session_manager.py # Quản lý các phiên sáng tác ngầm LangGraph bất đồng bộ
 │       └── socket_emitter.py  # Helper phát Socket.IO events tránh import vòng
 └── stories/              # Thư mục chứa dữ liệu các bộ truyện đang sáng tác
     └── <story_uuid>/     # Thư mục cụ thể của từng bộ truyện (định danh bằng UUID)
@@ -147,7 +147,7 @@ GOOGLE_API_KEY=your_gemini_api_key_here
 
 * **Khởi chạy Flask Web API & Socket.IO server (Dành cho giao diện ReactJS):**
   ```powershell
-  .\.venv\Scripts\python.exe main.exe serve --port 5000
+  .\.venv\Scripts\python.exe main.py serve --port 5000
   # Hoặc:
   .\.venv\Scripts\python.exe main.py serve --port 5000 --host 127.0.0.1
   ```

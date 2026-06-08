@@ -1,0 +1,167 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780838208121",
+      "title": "Tiến vào Huyễn Cảnh",
+      "description": "Lão giả phất tay, Mộc Tuyết đột ngột bị kéo vào một không gian tiên khí mờ ảo, tách biệt hoàn toàn với hiện thực u ám. Cùng lúc đó, ý thức của Sở Mặc cũng thức tỉnh tại đây dưới dạng một linh thể vô hình. Hắn có thể nhìn thấy vạn vật và quan sát Mộc Tuyết rõ ràng, nhưng Mộc Tuyết tuyệt đối không thể nhìn thấy hay cảm nhận được sự tồn tại của hắn.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 4,
+          "nodes": [
+            "node-1780827905559"
+          ]
+        }
+      ],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 20.605891239461016,
+      "y": 29.26534208108251
+    },
+    {
+      "id": "node-1780838244295",
+      "title": "Hai chén trà định mệnh",
+      "description": "Giữa không gian xuất hiện một bàn ngọc đặt hai chén trà mang khí tức hoàn toàn đối lập. Một chén rực rỡ kim quang, cuộn trào sức mạnh cải thiên hoán mệnh, tẩy tủy đắp nặn Tiên Cốt vô thượng. Chén còn lại chỉ tỏa ra dải sương mù sinh cơ ôn hòa, tẻ nhạt nhưng lại mang dược lực duy nhất đủ khả năng kéo sự sống của Sở Mặc về từ cõi chết ở thế giới thực. Ý niệm của không gian ép buộc Mộc Tuyết chỉ được chọn một.",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 44.3917210545294,
+      "y": 274.7869776796832
+    },
+    {
+      "id": "node-1780838294897",
+      "title": "Sự cám dỗ tột cùng",
+      "description": "Đứng trước cơ hội thoát khỏi kiếp Tạp Linh Căn hèn mọn, tâm trí Mộc Tuyết bị chấn động dữ dội. Những ký ức đau thương bị yêu ma săn đuổi, sự bất lực khi làm kẻ yếu thế trỗi dậy cắn nuốt lấy lý trí. Cám dỗ sức mạnh và bản năng sinh tồn ích kỷ thôi thúc nàng. Khát vọng hóa tiên lấn át tất cả, bàn tay Mộc Tuyết bắt đầu run rẩy, từ từ vươn về phía chén trà kim quang hoán mệnh.",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 274.7154957568945,
+      "y": 120.78039727543648
+    },
+    {
+      "id": "node-1780838314249",
+      "title": "Ánh nhìn tĩnh lặng của Sở Mặc",
+      "description": "Từ trong góc khuất vô hình, Sở Mặc thu trọn vẹn sự dao động và quyết định của Mộc Tuyết vào mắt. Đối diện với việc bị bỏ rơi, nội tâm hắn không hề có phẫn nộ hay oán hận, chỉ nổi lên một sự chua xót và cam chịu tột cùng. Sống giữa thế đạo ma loạn tàn khốc, hắn hoàn toàn thấu hiểu và chấp nhận việc một cô gái vứt bỏ kẻ xa lạ vừa quen để nắm lấy bến bờ sinh mệnh của chính mình.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 536.0563979825349,
+      "y": 111.58976032520093
+    },
+    {
+      "id": "node-1780838338158",
+      "title": "Vết rạn trong tham niệm",
+      "description": "Đầu ngón tay Mộc Tuyết chỉ còn cách chén kim quang đúng một tấc thì đột ngột khựng lại. Gương mặt nàng biến sắc liên tục, mồ hôi lạnh toát ra phản chiếu sự giằng xé kịch liệt. Ngay khoảnh khắc chạm tay vào tương lai huy hoàng, hình ảnh tấm lưng nhuốm máu sừng sững chắn trước hàm răng Dã Lang của Sở Mặc bất ngờ hiện lên rõ nét. Lương tri nhân tính và tham vọng ích kỷ quyết liệt cắn xé lẫn nhau trong tâm trí nàng.",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 462.93291403270587,
+      "y": 343.8287285735544
+    },
+    {
+      "id": "node-1780838353167",
+      "title": "Quyết định cuối cùng",
+      "description": "Sau một khoảnh khắc nghẹt thở, ánh mắt Mộc Tuyết từ hoảng loạn, điên cuồng dần lắng xuống thành sự tĩnh lặng và kiên định tuyệt đối. Nàng nghiến răng, đột ngột rụt tay lại từ bỏ chén kim quang, dứt khoát nắm chặt lấy chén trà sinh cơ mờ nhạt. Hành động này đánh dấu việc nàng tự tay bóp nát con đường tu tiên rực rỡ của bản thân, chấp nhận làm phàm nhân hạ đẳng chỉ để đổi lấy mạng sống cho người đã vì nàng mà đổ máu.",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 762.5441591072829,
+      "y": 181.84529644071534
+    },
+    {
+      "id": "node-1780838378764",
+      "title": "Chân tâm thấu tỏ và Truyền thừa",
+      "description": "Ảo cảnh vỡ nát. Sở Mặc tỉnh lại, nhìn Mộc Tuyết với ánh mắt tín nhiệm tuyệt đối. Lão giả mỉm cười xưng danh Vô Trần Tử. Ông trao Mộc Tuyết cuốn trận đồ \"Thiên Diễn Tàn Trận\", đồng thời ném cho Sở Mặc cuốn \"Bá Huyết Cuồng Đao Quyết\" cực kỳ phù hợp với lối chiến đấu bạt mạng của hắn. Lão chỉ vào chén trà sinh cơ hiện ra ở đời thực, bảo nó sẽ cứu mạng Sở Mặc. Vô Trần Tử hóa thành vô số đốm sáng tan biến, để lại âm vang: \"Đường nghịch thiên muôn vàn hung hiểm, mong các ngươi giữ mãi nhân tính và quan trọng nhất... hãy luôn nắm chặt tay nhau mà đi.\" Lời dặn khiến Mộc Tuyết chấn động, đôi má ửng hồng thẹn thùng khi vô tình chạm ánh mắt Sở Mặc.",
+      "characters": [
+        "Mộc Tuyết",
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 892.8197436235282,
+      "y": 356.4301806482231
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780838208121",
+      "to": "node-1780838244295"
+    },
+    {
+      "from": "node-1780838244295",
+      "to": "node-1780838294897"
+    },
+    {
+      "from": "node-1780838294897",
+      "to": "node-1780838314249"
+    },
+    {
+      "from": "node-1780838314249",
+      "to": "node-1780838338158"
+    },
+    {
+      "from": "node-1780838338158",
+      "to": "node-1780838353167"
+    },
+    {
+      "from": "node-1780838353167",
+      "to": "node-1780838378764"
+    }
+  ]
+}

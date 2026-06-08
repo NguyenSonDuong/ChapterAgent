@@ -4,6 +4,7 @@ class AgentState(TypedDict):
     story_uuid: str
     chapter_num: int
     user_idea: str
+    original_user_idea: Any
     model: str
     meta: Dict[str, Any]
     ledger: Dict[str, Any]

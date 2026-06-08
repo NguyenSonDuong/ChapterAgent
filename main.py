@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import sys
 import io
 
@@ -59,28 +62,28 @@ def handle_init(args):
     
     # Model selection
     console.print("\n[bold yellow]7. Lựa chọn Model AI sử dụng cho truyện:[/bold yellow]")
-    console.print("   1. [bold cyan]gemini-1.5-flash[/bold cyan] (Mặc định - Nhanh, rẻ, phù hợp viết nháp)")
-    console.print("   2. [bold cyan]gemini-1.5-pro[/bold cyan] (Thông minh - Phù hợp lập luận phức tạp và biên tập)")
-    console.print("   3. [bold cyan]gemini-2.0-flash[/bold cyan] (Thế hệ mới - Nhanh và cải tiến)")
-    console.print("   4. [bold cyan]gemini-2.5-flash[/bold cyan] (Thế hệ mới nhất - Tối ưu hiệu suất và tốc độ)")
+    console.print("   1. [bold cyan]gemini-2.5-flash[/bold cyan] (Mặc định - Thế hệ mới nhất - Tối ưu hiệu suất và tốc độ)")
+    console.print("   2. [bold cyan]gemini-1.5-flash[/bold cyan] (Cũ - Nhanh, rẻ, phù hợp viết nháp)")
+    console.print("   3. [bold cyan]gemini-1.5-pro[/bold cyan] (Thông minh - Phù hợp lập luận phức tạp và biên tập)")
+    console.print("   4. [bold cyan]gemini-2.0-flash[/bold cyan] (Thế hệ mới - Nhanh và cải tiến)")
     console.print("   5. [bold cyan]gemini-2.5-pro[/bold cyan] (Thế hệ mới nhất - Chất lượng cao nhất)")
     console.print("   6. [bold cyan]Khác[/bold cyan] (Nhập tên model thủ công)")
     
     model_choice = Prompt.ask("   Chọn số thứ tự model hoặc nhấn Enter để dùng mặc định", choices=["1", "2", "3", "4", "5", "6", ""], default="1")
     if model_choice == "1" or model_choice == "":
-        model_name = "gemini-1.5-flash"
-    elif model_choice == "2":
-        model_name = "gemini-1.5-pro"
-    elif model_choice == "3":
-        model_name = "gemini-2.0-flash"
-    elif model_choice == "4":
         model_name = "gemini-2.5-flash"
+    elif model_choice == "2":
+        model_name = "gemini-1.5-flash"
+    elif model_choice == "3":
+        model_name = "gemini-1.5-pro"
+    elif model_choice == "4":
+        model_name = "gemini-2.0-flash"
     elif model_choice == "5":
         model_name = "gemini-2.5-pro"
     else:
-        model_name = Prompt.ask("   Nhập tên model AI mong muốn (ví dụ: gemini-1.5-flash)")
+        model_name = Prompt.ask("   Nhập tên model AI mong muốn (ví dụ: gemini-2.5-flash)")
         if not model_name.strip():
-            model_name = "gemini-1.5-flash"
+            model_name = "gemini-2.5-flash"
             
     # Character setup
     characters = []
@@ -239,7 +242,7 @@ def handle_write(args):
             return
             
     # Resolve model to use
-    selected_model = getattr(args, "model", None) or meta_data.get("model") or os.getenv("GEMINI_MODEL") or "gemini-1.5-flash"
+    selected_model = getattr(args, "model", None) or meta_data.get("model") or os.getenv("GEMINI_MODEL") or "gemini-2.5-flash"
     
     console.print(f"Bắt đầu quy trình sáng tác [bold green]Chương {next_chap_num}[/bold green] của bộ truyện '[bold cyan]{meta_data.get('name')}[/bold cyan]'.")
     console.print(f"Model AI sử dụng: [bold yellow]{selected_model}[/bold yellow]")
@@ -301,7 +304,14 @@ def handle_ledger(args):
     # Unresolved threads panel
     threads_text = ""
     for idx, t in enumerate(ledger.get("unresolved_threads", [])):
-        threads_text += f"[bold yellow]{idx+1}.[/bold yellow] {t}\n"
+        if isinstance(t, dict):
+            thread_text_item = t.get("thread", "")
+            chap = t.get("chapter")
+            if chap is not None:
+                thread_text_item += f" [dim](Chương {chap})[/dim]"
+        else:
+            thread_text_item = str(t)
+        threads_text += f"[bold yellow]{idx+1}.[/bold yellow] {thread_text_item}\n"
     if not threads_text:
         threads_text = "[green]Tất cả các nút thắt đã được giải quyết![/green]"
     console.print(Panel(threads_text.strip(), title="Nút thắt chưa giải quyết", border_style="yellow"))
@@ -343,7 +353,7 @@ def handle_meta(args):
     show_banner()
     console.print(f"[bold green]=== Thông tin cấu hình: {meta.get('name')} ===[/bold green]\n")
     console.print(f"  [bold cyan]UUID:[/bold cyan] {meta.get('uuid')}")
-    console.print(f"  [bold cyan]Model AI:[/bold cyan] [bold yellow]{meta.get('model', 'gemini-1.5-flash')}[/bold yellow]")
+    console.print(f"  [bold cyan]Model AI:[/bold cyan] [bold yellow]{meta.get('model', 'gemini-2.5-flash')}[/bold yellow]")
     console.print(f"  [bold cyan]Bối cảnh:[/bold cyan] {meta.get('context')}")
     console.print(f"  [bold cyan]Phong cách kể chuyện:[/bold cyan] {meta.get('style')}")
     console.print(f"  [bold cyan]Nhãn (Tags):[/bold cyan] {', '.join(meta.get('tags', []))}")
@@ -376,29 +386,29 @@ def handle_set_model(args):
         console.print(f"[bold red]Lỗi đọc file cấu hình: {e}[/bold red]")
         return
         
-    current_model = meta_data.get("model", "gemini-1.5-flash")
+    current_model = meta_data.get("model", "gemini-2.5-flash")
     console.print(f"Truyện hiện tại: [bold cyan]{meta_data.get('name')}[/bold cyan]")
     console.print(f"Model hiện tại: [bold yellow]{current_model}[/bold yellow]\n")
     
     model_name = args.model
     if not model_name:
         console.print("[bold yellow]Chọn model AI mới:[/bold yellow]")
-        console.print(" 1. [bold cyan]gemini-1.5-flash[/bold cyan]")
-        console.print(" 2. [bold cyan]gemini-1.5-pro[/bold cyan]")
-        console.print(" 3. [bold cyan]gemini-2.0-flash[/bold cyan]")
-        console.print(" 4. [bold cyan]gemini-2.5-flash[/bold cyan]")
+        console.print(" 1. [bold cyan]gemini-2.5-flash[/bold cyan]")
+        console.print(" 2. [bold cyan]gemini-1.5-flash[/bold cyan]")
+        console.print(" 3. [bold cyan]gemini-1.5-pro[/bold cyan]")
+        console.print(" 4. [bold cyan]gemini-2.0-flash[/bold cyan]")
         console.print(" 5. [bold cyan]gemini-2.5-pro[/bold cyan]")
         console.print(" 6. [bold cyan]Khác[/bold cyan] (Nhập thủ công)")
         
         model_choice = Prompt.ask("Chọn số thứ tự model", choices=["1", "2", "3", "4", "5", "6"], default="1")
         if model_choice == "1":
-            model_name = "gemini-1.5-flash"
-        elif model_choice == "2":
-            model_name = "gemini-1.5-pro"
-        elif model_choice == "3":
-            model_name = "gemini-2.0-flash"
-        elif model_choice == "4":
             model_name = "gemini-2.5-flash"
+        elif model_choice == "2":
+            model_name = "gemini-1.5-flash"
+        elif model_choice == "3":
+            model_name = "gemini-1.5-pro"
+        elif model_choice == "4":
+            model_name = "gemini-2.0-flash"
         elif model_choice == "5":
             model_name = "gemini-2.5-pro"
         else:
@@ -419,6 +429,14 @@ def handle_set_model(args):
         console.print(f"Model mới cho truyện là: [bold yellow]{story_meta.model}[/bold yellow]")
     except Exception as e:
         console.print(f"[bold red]Lỗi khi ghi file cấu hình mới: {e}[/bold red]")
+
+def handle_serve(args):
+    """Command to run the Flask API & Socket.IO server."""
+    from src.api.app import app as flask_app, socketio
+    console.print(f"[bold green]=== Khởi chạy Flask & Socket.IO server ===[/bold green]")
+    console.print(f"Địa chỉ: [bold yellow]http://{args.host}:{args.port}[/bold yellow]")
+    console.print(f"Phục vụ APIs và kết nối Socket.IO thời gian thực...")
+    socketio.run(flask_app, host=args.host, port=args.port, debug=False, allow_unsafe_werkzeug=True)
 
 def main():
     check_env()
@@ -449,6 +467,11 @@ def main():
     set_model_parser = subparsers.add_parser("set-model", help="Thay đổi model AI của truyện")
     set_model_parser.add_argument("--uuid", type=str, help="UUID của truyện")
     set_model_parser.add_argument("--model", type=str, help="Tên model AI mới")
+
+    # serve
+    serve_parser = subparsers.add_parser("serve", help="Khởi chạy Flask API & Socket.IO server")
+    serve_parser.add_argument("--port", type=int, default=5000, help="Cổng chạy server (mặc định: 5000)")
+    serve_parser.add_argument("--host", type=str, default="127.0.0.1", help="Địa chỉ host (mặc định: 127.0.0.1)")
     
     args = parser.parse_args()
     
@@ -464,6 +487,8 @@ def main():
         handle_meta(args)
     elif args.command == "set-model":
         handle_set_model(args)
+    elif args.command == "serve":
+        handle_serve(args)
     else:
         # Default behavior: list and write
         show_banner()
