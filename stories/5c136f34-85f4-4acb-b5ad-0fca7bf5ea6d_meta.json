@@ -11,9 +11,10 @@
       "visited_locations": [
         "Táng Cốt Lâm",
         "Cõi hư vô",
-        "Con suối cạn"
+        "Con suối cạn",
+        "bãi cỏ mềm mại bên rìa rừng"
       ],
-      "active_weapon": "Thanh đao cùn",
+      "active_weapon": "thanh đao cùn",
       "weapons_owned": [
         "Thanh đao cùn"
       ],
@@ -22,7 +23,7 @@
         "Bá Huyết Cuồng Đao Quyết"
       ],
       "current_cultivation": "Thối Thể Cảnh",
-      "current_location": "Táng Cốt Lâm",
+      "current_location": "bãi cỏ mềm mại bên rìa rừng",
       "status": "Đang an toàn"
     },
     {
@@ -34,16 +35,18 @@
       "visited_locations": [
         "Táng Cốt Lâm",
         "Cõi hư vô",
-        "Con suối cạn"
+        "Con suối cạn",
+        "bãi cỏ mềm mại bên rìa rừng"
       ],
       "active_weapon": "",
       "weapons_owned": [],
-      "active_technique": "",
+      "active_technique": "Huyết Dẫn Bạo Ngũ Trấn Hồn Trận",
       "techniques_owned": [
-        "Thiên Diễn Tàn Trận"
+        "Thiên Diễn Tàn Trận",
+        "Huyết Dẫn Bạo Ngũ Trấn Hồn Trận"
       ],
       "current_cultivation": "",
-      "current_location": "Táng Cốt Lâm",
+      "current_location": "bãi cỏ mềm mại bên rìa rừng",
       "status": "Đang an toàn"
     },
     {

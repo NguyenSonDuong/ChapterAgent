@@ -1,0 +1,155 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780932992638",
+      "title": "Ánh sáng cuối đường",
+      "description": "Sau hai ngày đêm không ngừng nghỉ, Sở Mặc và Mộc Tuyết kiệt sức băng qua lớp sương mù độc hại cuối cùng của Táng Cốt Lâm. Khi những tia nắng đầu tiên xuyên qua kẽ lá, họ nhận ra mình đã thoát khỏi vùng đất tử thần. Cả hai ngã gục xuống bãi cỏ ngoài bìa rừng, hít thở bầu không khí trong lành hiếm hoi sau những ngày dài sống trong mùi máu tanh.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "Nhờ sự kiên trì và kỹ năng chiến đấu được cải thiện, họ đã vượt qua các lớp bẫy của yêu vật và thoát khỏi Táng Cốt Lâm an toàn.",
+        "thread": "Liệu hai người có thể thoát khỏi Táng Cốt Lâm hay sẽ trở thành con mồi tiếp theo của yêu vật?"
+      },
+      "links": [
+        {
+          "chapter": 9,
+          "nodes": [
+            "node-1780905980533"
+          ]
+        }
+      ],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 150,
+      "y": 200
+    },
+    {
+      "id": "node-1780932992639",
+      "title": "Sự đồng điệu của linh hồn",
+      "description": "Trong lúc nghỉ ngơi, Mộc Tuyết  nhớ lại lời dặn của Vô Trần Tử, bắt đầu thử nghiệm những gì được viết trong tàn quyển , ban đầu nàng thử với các trận pháp đươn giản nhưng đều không được và Nàng phát hiển ra các trận pháp này đều phải dùng linh khí để thúc ép và duy trì trận pháp, sau 1 lúc tìm tòi nàng phát hiện ra một trận pháp co tên khá kỳ lạ \"Huyết Dẫn Bạo Ngũ Trấn Hồn Trận\", ở trong đây không ghi rõ nó làm gì chỉ biết trận này dùng máu làm dẫn dùng Linh hồn làm tâm quan trọng hơn trận pháp này không cần đến linh khí. Nàng thử bày trận thử nàng đứng trong trung tâm trận pháp lấy màu của mình làm vật dẫn tuy nhiên thất bại",
+      "characters": [
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [
+        "Thiên Diễn Tàn Trận"
+      ],
+      "x": 450,
+      "y": 260
+    },
+    {
+      "id": "node-1780932992640",
+      "title": "Bá Huyết Cuồng Đao: Huyết mạch thức tỉnh",
+      "description": "Trong khoảnh khắc Mộc Tuyết thất bại khi bày trận, Sở Mặc ngăn cản Mộc tuyết không muốn cô ấy bị thương. Mộc tuyết không muốn vậy cô ấy muốn có ích hơn cho Sở mặc - điều này khiến sở mặc vừa cảm động vừa sót xa. Sở Mặc quyết định can thiệp bằng cách kết hợp chính máu của mình vào huyết dẫn của trận pháp. Cậu rút thanh đao cũ, vận chuyển Bá Huyết Cuồng Đao Quyết, ép dòng máu cuồng bạo chạy dọc theo lưỡi đao, tạo thành một vòng cung huyết sắc bao bọc lấy cả hai. Sự đau đớn như bị thiêu đốt lan tỏa khắp cơ thể, nhưng chính sự hy sinh và ý chí kiên định của Sở Mặc đã làm rung chuyển trận pháp, kích hoạt được trận phápi. Lòng tin tuyệt đối vào đối phương trở thành chất xúc tác, khiến Bá Huyết Cuồng Đao Quyết không còn là chiêu thức sát thương đơn thuần mà trở thành chìa khóa mở ra một cách tu luyện mới - Ở đây xin lưu ý. Trận pháp này sẽ lấy Hồn làm tâm trận vì thế nếu trận pháp bị phá vỡ. người làm tâm trận sẽ hồi siêu phách tán.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [
+        "Thiên Diễn Tàn Trận",
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 748,
+      "y": 200
+    },
+    {
+      "id": "node-1780932992641",
+      "title": "Hồn Tâm Giao Hòa: Đột Phá Cấm Kỵ",
+      "description": "Dưới áp lực khủng khiếp của trận pháp, Sở Mặc và Mộc Tuyết buộc phải thực hiện bước cuối cùng: hòa quyện linh hồn làm tâm trận. Mộc Tuyết nhắm mắt, thả lỏng toàn bộ ý thức để Sở Mặc dẫn dắt luồng linh lực cuồng bạo từ Bá Huyết Cuồng Đao Quyết chảy vào tâm khảm. Sự đau đớn xé toạc linh hồn khiến cả hai gục ngã trong vũng máu, nhưng đúng lúc ranh giới sinh tử mong manh nhất Mộc tuyết với sức lực và tỉnh táo cuối cùng cưỡng ép dừng trận pháp. điều này khiến Nàng ấy bị bất tỉnh còn Sở mặc cx ngất đi",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 1050,
+      "y": 260
+    },
+    {
+      "id": "node-1780932992642",
+      "title": "Tâm Ý Tương Thông: Hồi Sinh Trong Nghịch Cảnh",
+      "description": "Trong cơn mê man sau khi cưỡng ép dừng trận pháp, linh hồn Sở Mặc và Mộc Tuyết vô tình chạm đến một vùng ký ức chung sâu thẳm. Sự kích phát \"Huyết Dẫn Bạo Ngũ Trấn Hồn Trận\" đã vô hình trung khai mở ra một điều bí ẩn ở sau trong linh hồn của 2 người khiến cho 2 linh hồn đó gắn kết với nhau chặt chẽ. Sở Mặc bừng tỉnh, cảm nhận được nhịp đập trái tim Mộc Tuyết đang hòa cùng hơi thở của chính mình. Anh ôm chặt lấy cô, dùng chiếc áo tả tơi của mình đắp lên người cô ấy để sưởi ấm cơ thể đang lạnh dần của nàng. Giữa sự tĩnh lặng của màn đêm, một luồng sức mạnh lạ lẫm bắt đầu luân chuyển.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 1350,
+      "y": 200
+    },
+    {
+      "id": "node-1780932992643",
+      "title": "Huyết Mạch Thức Tỉnh: Giao Thoa Linh Hồn",
+      "description": "Trong màn đêm tĩnh mịch, luồng sức mạnh lạ lẫm từ sự gắn kết linh hồn bắt đầu cuộn chảy trong kinh mạch Sở Mặc và Mộc Tuyết. Thay vì xung đột, dòng linh lực hỗn tạp vốn bị coi là phế vật giờ đây cộng hưởng mãnh liệt, tạo thành một vòng tuần hoàn âm dương hoàn hảo. Sở Mặc kinh ngạc Dưới sự dẫn dắt của \"Huyết Dẫn Bạo Ngũ Trấn Hồn Trận\", họ vô tình chạm đến một điều gì đó bí ẩn cũng như đã mở ra cho cả 2 1 con đường tu tiên khác. Sự thức tỉnh này không chỉ mang lại sức mạnh mà còn là minh chứng cho con đường nghịch thiên mà họ đang theo đuổi, đánh dấu bước ngoặt đầu tiên trong hành trình sinh tử.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 1650,
+      "y": 260
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780932992638",
+      "to": "node-1780932992639"
+    },
+    {
+      "from": "node-1780932992639",
+      "to": "node-1780932992640"
+    },
+    {
+      "from": "node-1780932992640",
+      "to": "node-1780932992641"
+    },
+    {
+      "from": "node-1780932992641",
+      "to": "node-1780932992642"
+    },
+    {
+      "from": "node-1780932992642",
+      "to": "node-1780932992643"
+    }
+  ]
+}
