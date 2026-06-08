@@ -33,6 +33,7 @@ export default function ChapterReader({
   const [editingNodeId, setEditingNodeId] = useState(null);
   const [linkingSourceNodeId, setLinkingSourceNodeId] = useState(null);
   const [savingNodes, setSavingNodes] = useState(false);
+  const [suggestingNodeId, setSuggestingNodeId] = useState(null);
   const [chapterNodesCache, setChapterNodesCache] = useState({});
   const [nodeForm, setNodeForm] = useState({
     title: '',
@@ -461,15 +462,105 @@ export default function ChapterReader({
     setEditingNodeId(null);
   };
 
+  const handleSuggestSingleNode = async (nodeId) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    setSuggestingNodeId(nodeId);
+
+    // Identify linked nodes in the same chapter
+    const linkedNodes = [];
+    connections.forEach(conn => {
+      if (conn.from === nodeId) {
+        const otherNode = nodes.find(n => n.id === conn.to);
+        if (otherNode) {
+          linkedNodes.push({
+            id: otherNode.id,
+            title: otherNode.title,
+            description: otherNode.description,
+            relationship: 'after'
+          });
+        }
+      } else if (conn.to === nodeId) {
+        const otherNode = nodes.find(n => n.id === conn.from);
+        if (otherNode) {
+          linkedNodes.push({
+            id: otherNode.id,
+            title: otherNode.title,
+            description: otherNode.description,
+            relationship: 'before'
+          });
+        }
+      }
+    });
+
+    const isNodeEditing = editingNodeId === nodeId;
+    const charList = isNodeEditing ? nodeForm.characters : (node.characters || []);
+    const locList = isNodeEditing ? nodeForm.locations : (node.locations || []);
+    const weapList = isNodeEditing ? nodeForm.weapons : (node.weapons || []);
+    const techList = isNodeEditing ? nodeForm.techniques : (node.techniques || []);
+    const resThread = isNodeEditing ? {
+      thread: nodeForm.resolvedThreadText,
+      resolution_note: nodeForm.resolutionNote
+    } : (node.resolved_thread || {});
+    const lnkList = isNodeEditing ? nodeForm.links : (node.links || []);
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/stories/${storyUuid}/chapters/${selectedNum}/suggest-node-details`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          characters: charList,
+          locations: locList,
+          weapons: weapList,
+          techniques: techList,
+          resolved_thread: resThread,
+          links: lnkList,
+          notes: '',
+          linked_nodes: linkedNodes
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi không xác định khi gợi ý nội dung sự kiện.');
+      }
+
+      setNodes(prev => prev.map(n => {
+        if (n.id === nodeId) {
+          return {
+            ...n,
+            title: data.title,
+            description: data.description
+          };
+        }
+        return n;
+      }));
+
+      if (isNodeEditing) {
+        setNodeForm(prev => ({
+          ...prev,
+          title: data.title,
+          description: data.description
+        }));
+      }
+    } catch (err) {
+      alert(`Không thể gợi ý nội dung node: ${err.message}`);
+    } finally {
+      setSuggestingNodeId(null);
+    }
+  };
+
   const renderConnections = () => {
     return connections.map((conn, idx) => {
       const fromNode = nodes.find(n => n.id === conn.from);
       const toNode = nodes.find(n => n.id === conn.to);
       if (!fromNode || !toNode) return null;
 
-      const x1 = fromNode.x + 90;
+      // Node size: width = 200, height = 90
+      const x1 = fromNode.x + 100;
       const y1 = fromNode.y + 45;
-      const x2 = toNode.x + 90;
+      const x2 = toNode.x + 100;
       const y2 = toNode.y + 45;
 
       const dx = x2 - x1;
@@ -480,7 +571,7 @@ export default function ChapterReader({
       let targetY = y2;
 
       if (dist > 0) {
-        const ratio = Math.max(0, (dist - 100) / dist);
+        const ratio = Math.max(0, (dist - 110) / dist);
         targetX = x1 + dx * ratio;
         targetY = y1 + dy * ratio;
       }
@@ -866,7 +957,7 @@ export default function ChapterReader({
                             left: `${n.x}px`,
                             top: `${n.y}px`,
                             position: 'absolute',
-                            width: '180px',
+                            width: '200px',
                             minHeight: '90px',
                             padding: '12px',
                             borderRadius: '10px',
@@ -901,7 +992,7 @@ export default function ChapterReader({
                             </p>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '4px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>👤 {charText}</span>
+                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '105px' }}>👤 {charText}</span>
                               <div style={{ display: 'flex', gap: '4px' }}>
                                 <button
                                   type="button"
@@ -911,6 +1002,16 @@ export default function ChapterReader({
                                   title={isSource ? "Nhấp node khác để liên kết" : "Liên kết sự kiện"}
                                 >
                                   <Link size={9} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); handleSuggestSingleNode(n.id); }}
+                                  className="node-action-btn"
+                                  style={{ border: 'none', background: suggestingNodeId === n.id ? 'var(--color-purple)' : 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px 4px', fontSize: '9px', color: '#c084fc', cursor: 'pointer' }}
+                                  title="Gợi ý nội dung bằng AI"
+                                  disabled={suggestingNodeId === n.id}
+                                >
+                                  <Sparkles size={9} />
                                 </button>
                                 <button
                                   type="button"

@@ -191,7 +191,7 @@ export default function ChapterGenerator({
   });
   const [suggesting, setSuggesting] = useState(false);
   const [suggestError, setSuggestError] = useState(null);
-
+  const [suggestingNodeId, setSuggestingNodeId] = useState(null);
 
   const chatEndRef = useRef(null);
 
@@ -498,6 +498,100 @@ export default function ChapterGenerator({
       setSuggestError(err.message);
     } finally {
       setSuggesting(false);
+    }
+  };
+
+  const handleSuggestSingleNode = async (nodeId) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+
+    setSuggestingNodeId(nodeId);
+
+    const nextChapterNum = storyLedger?.timeline && storyLedger.timeline.length > 0
+      ? Math.max(...storyLedger.timeline.map(t => t.chapter)) + 1
+      : 1;
+
+    // Use current form values if editing this node, otherwise use saved node values
+    const isNodeEditing = editingNodeId === nodeId;
+    const charList = isNodeEditing ? nodeForm.characters : (node.characters || []);
+    const locList = isNodeEditing ? nodeForm.locations : (node.locations || []);
+    const weapList = isNodeEditing ? nodeForm.weapons : (node.weapons || []);
+    const techList = isNodeEditing ? nodeForm.techniques : (node.techniques || []);
+    const resThread = isNodeEditing ? {
+      thread: nodeForm.resolvedThreadText,
+      resolution_note: nodeForm.resolutionNote
+    } : (node.resolved_thread || {});
+    const lnkList = isNodeEditing ? nodeForm.links : (node.links || []);
+
+    // Identify linked nodes in the same chapter
+    const linkedNodes = [];
+    connections.forEach(conn => {
+      if (conn.from === nodeId) {
+        const otherNode = nodes.find(n => n.id === conn.to);
+        if (otherNode) {
+          linkedNodes.push({
+            id: otherNode.id,
+            title: otherNode.title,
+            description: otherNode.description,
+            relationship: 'after'
+          });
+        }
+      } else if (conn.to === nodeId) {
+        const otherNode = nodes.find(n => n.id === conn.from);
+        if (otherNode) {
+          linkedNodes.push({
+            id: otherNode.id,
+            title: otherNode.title,
+            description: otherNode.description,
+            relationship: 'before'
+          });
+        }
+      }
+    });
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/stories/${storyUuid}/chapters/${nextChapterNum}/suggest-node-details`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          characters: charList,
+          locations: locList,
+          weapons: weapList,
+          techniques: techList,
+          resolved_thread: resThread,
+          links: lnkList,
+          notes: '',
+          linked_nodes: linkedNodes
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi không xác định khi gợi ý nội dung sự kiện.');
+      }
+
+      setNodes(prev => prev.map(n => {
+        if (n.id === nodeId) {
+          return {
+            ...n,
+            title: data.title,
+            description: data.description
+          };
+        }
+        return n;
+      }));
+
+      if (isNodeEditing) {
+        setNodeForm(prev => ({
+          ...prev,
+          title: data.title,
+          description: data.description
+        }));
+      }
+    } catch (err) {
+      alert(`Không thể gợi ý nội dung node: ${err.message}`);
+    } finally {
+      setSuggestingNodeId(null);
     }
   };
 
@@ -937,10 +1031,10 @@ export default function ChapterGenerator({
       const toNode = nodes.find(n => n.id === conn.to);
       if (!fromNode || !toNode) return null;
 
-      // Node size: width = 180, height = 90
-      const x1 = fromNode.x + 90;
+      // Node size: width = 200, height = 90
+      const x1 = fromNode.x + 100;
       const y1 = fromNode.y + 45;
-      const x2 = toNode.x + 90;
+      const x2 = toNode.x + 100;
       const y2 = toNode.y + 45;
 
       const dx = x2 - x1;
@@ -951,8 +1045,8 @@ export default function ChapterGenerator({
       let targetY = y2;
 
       if (dist > 0) {
-        // Stop exactly at the border of target node (approx 95px from center)
-        const ratio = Math.max(0, (dist - 100) / dist);
+        // Stop exactly at the border of target node (approx 110px from center)
+        const ratio = Math.max(0, (dist - 110) / dist);
         targetX = x1 + dx * ratio;
         targetY = y1 + dy * ratio;
       }
@@ -1025,7 +1119,7 @@ export default function ChapterGenerator({
         }
         .canvas-node {
           position: absolute;
-          width: 180px;
+          width: 200px;
           min-height: 90px;
           padding: 12px;
           border-radius: 10px;
@@ -1306,8 +1400,18 @@ export default function ChapterGenerator({
                                 className={`canvas-node-btn ${isSource ? 'text-yellow' : ''}`}
                                 title="Tạo liên kết luồng đến node khác"
                               >
-                                <Link className="icon-xs" style={{ width: '10px', height: '10px' }} /> 
-                                {isSource ? 'Nối...' : 'Liên kết'}
+                                <Link className="icon-xs" style={{ width: '9px', height: '9px' }} /> 
+                                {isSource ? 'Nối...' : 'Nối'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSuggestSingleNode(n.id)}
+                                className="canvas-node-btn text-purple"
+                                title="Gợi ý nội dung bằng AI"
+                                disabled={suggestingNodeId === n.id}
+                              >
+                                <Sparkles className="icon-xs" style={{ width: '9px', height: '9px' }} />
+                                {suggestingNodeId === n.id ? '...' : 'AI'}
                               </button>
                               <button
                                 type="button"
@@ -1315,7 +1419,7 @@ export default function ChapterGenerator({
                                 className="canvas-node-btn text-cyan"
                                 title="Sửa chi tiết sự kiện"
                               >
-                                <Edit className="icon-xs" style={{ width: '10px', height: '10px' }} /> Sửa
+                                <Edit className="icon-xs" style={{ width: '9px', height: '9px' }} /> Sửa
                               </button>
                               <button
                                 type="button"
@@ -1323,7 +1427,7 @@ export default function ChapterGenerator({
                                 className="canvas-node-btn text-red"
                                 title="Xóa sự kiện"
                               >
-                                <Trash2 className="icon-xs" style={{ width: '10px', height: '10px' }} /> Xóa
+                                <Trash2 className="icon-xs" style={{ width: '9px', height: '9px' }} /> Xóa
                               </button>
                             </div>
                           </div>

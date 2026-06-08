@@ -1157,6 +1157,105 @@ HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
         
     except Exception as e:
         return jsonify({'error': f'Failed to generate suggested nodes: {str(e)}'}), 500
+
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/suggest-node-details', methods=['POST'])
+def suggest_node_details(story_uuid, chapter_num):
+    """Call Gemini to get suggestions (title & description) for a single event node."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    try:
+        meta_data = json.loads(meta_path.read_text(encoding="utf-8") if meta_path.exists() else '{}')
+        model_name = meta_data.get('model', 'gemini-2.5-flash')
+    except Exception as e:
+        return jsonify({'error': f'Failed to read metadata: {str(e)}'}), 500
+
+    ledger_path = config.get_ledger_path(story_uuid)
+    ledger_data = {}
+    if ledger_path.exists():
+        try:
+            ledger_data = json.loads(ledger_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    req_data = request.json or {}
+    characters = req_data.get('characters', [])
+    locations = req_data.get('locations', [])
+    weapons = req_data.get('weapons', [])
+    techniques = req_data.get('techniques', [])
+    resolved_thread = req_data.get('resolved_thread', {})
+    notes = req_data.get('notes', '').strip()
+    linked_nodes = req_data.get('linked_nodes', [])
+
+    # Build context of linked nodes in this chapter
+    linked_nodes_ctx = ""
+    if linked_nodes:
+        linked_nodes_ctx += "\nCác sự kiện liên kết trực tiếp trong chương này:\n"
+        for idx, ln in enumerate(linked_nodes):
+            rel = ln.get('relationship', 'liên kết')
+            rel_str = "Sự kiện diễn ra trước" if rel == 'before' else ("Sự kiện diễn ra sau" if rel == 'after' else "Sự kiện liên quan")
+            linked_nodes_ctx += f"- [{rel_str}] Tiêu đề: \"{ln.get('title')}\" | Mô tả kịch bản: {ln.get('description', '')}\n"
+
+    resolved_thread_str = ""
+    if resolved_thread and resolved_thread.get('thread'):
+        resolved_thread_str = f"- Nút thắt sẽ giải quyết: {resolved_thread.get('thread')}"
+        if resolved_thread.get('resolution_note'):
+            resolved_thread_str += f" (Gợi ý cách giải quyết: {resolved_thread.get('resolution_note')})"
+
+    # Build system prompt and user query
+    prompt = f"""
+Bạn là một chuyên gia xây dựng kịch bản tiểu thuyết dài kỳ. Hãy gợi ý Tiêu đề (title) ngắn gọn và Mô tả kịch bản (description) chi tiết diễn biến cho một sự kiện (node) cụ thể trong Chương {chapter_num} của câu chuyện dưới đây.
+
+THÔNG TIN TÁC PHẨM:
+- Tên truyện: {meta_data.get('name')}
+- Bối cảnh chính: {meta_data.get('context')}
+- Phong cách hành văn: {meta_data.get('style')}
+
+SỔ CÁI TOÀN CỤC (GLOBAL LEDGER) THAM KHẢO:
+- Các nút thắt chưa giải quyết: {json.dumps(ledger_data.get('unresolved_threads', []), ensure_ascii=False)}
+
+CÁC THÔNG SỐ ĐẦU VÀO CỦA SỰ KIỆN NÀY (BẮT BUỘC PHẢI DỰA VÀO ĐỂ TẠO NỘI DUNG):
+- Nhân vật tham gia: {', '.join(characters) if characters else 'Không chỉ định'}
+- Địa điểm diễn ra: {', '.join(locations) if locations else 'Không chỉ định'}
+- Công pháp thi triển: {', '.join(techniques) if techniques else 'Không chỉ định'}
+- Binh khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
+{resolved_thread_str}
+- Ghi chú thêm từ tác giả: "{notes if notes else 'Không có'}"
+
+BỐI CẢNH CỦA CÁC SỰ KIỆN LIÊN KẾT TRONG CÙNG CHƯƠNG (BẮT BUỘC PHẢI ĐẢM BẢO TÍNH LIỀN MẠCH):
+{linked_nodes_ctx or "Không có sự kiện liên kết trực tiếp trong chương."}
+
+YÊU CẦU:
+1. Tạo tiêu đề (title) ngắn gọn, súc tích (dưới 10 từ).
+2. Tạo mô tả kịch bản (description) chi tiết diễn biến (khoảng 50-150 từ), viết mạch lạc và hấp dẫn, kết nối hợp lý với bối cảnh sự kiện trước/sau (nếu có).
+3. Sử dụng đúng các nhân vật, địa điểm, công pháp, binh khí đầu vào đã được chỉ định.
+4. Trả về đúng định dạng có cấu trúc chứa title và description.
+"""
+
+    try:
+        from src.utils.llm import invoke_with_retry
+        state = {
+            "story_uuid": story_uuid,
+            "model": model_name
+        }
+        
+        # Invoke LLM with structured output schema
+        suggested_data = invoke_with_retry(
+            state, 
+            prompt, 
+            temperature=0.7, 
+            output_schema=models.SuggestedSingleNodeDetails
+        )
+        
+        return jsonify({
+            "title": suggested_data.title.strip(),
+            "description": suggested_data.description.strip()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to generate suggested node details: {str(e)}'}), 500
+
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/nodes', methods=['PUT'])
 def update_chapter_nodes(story_uuid, chapter_num):
     """Save/update the event nodes and connections for a specific chapter."""

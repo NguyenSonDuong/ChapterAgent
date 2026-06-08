@@ -149,3 +149,9 @@ class SuggestedChapterNodes(BaseModel):
     nodes: List[SuggestedNode] = Field(description="Danh sách các node sự kiện theo trình tự")
     connections: List[SuggestedConnection] = Field(description="Danh sách các kết nối giữa các node để tạo luồng kịch bản")
 
+
+class SuggestedSingleNodeDetails(BaseModel):
+    title: str = Field(description="Tiêu đề / Tiến trình sự kiện được gợi ý (bắt buộc, không để trống, ngắn gọn)")
+    description: str = Field(description="Mô tả kịch bản / Hướng giải quyết chi tiết diễn biến được gợi ý (bắt buộc, không để trống)")
+
+
