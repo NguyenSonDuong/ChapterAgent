@@ -751,13 +751,207 @@
           "to": "node-1780846744944"
         }
       ]
+    },
+    {
+      "chapter": 7,
+      "title": "Huyết Nhẫn Nghịch Thiên",
+      "summary": "Sở Mặc gặp ác mộng về cái chết của cha mẹ và sự xuất hiện của mảnh ngọc bội hình rồng, khơi dậy nghi vấn về thân thế thực sự. Để mạnh mẽ hơn, hắn bắt đầu luyện tập công pháp Bá Huyết Cuồng Đao Quyết đầy nguy hiểm, chịu đựng sự đau đớn và nguy cơ bị ma niệm xâm chiếm. Nhờ sự hỗ trợ tinh thần và hơi ấm từ Mộc Tuyết, Sở Mặc đã áp chế được sát khí, đồng thời hạ quyết tâm dùng sức mạnh mới để bảo vệ nàng và đối mặt với nghịch cảnh.",
+      "nodes": [
+        {
+          "id": "node-1780892110600",
+          "title": "Cơn ác mộng trong đêm",
+          "description": "Giữa đêm khuya tĩnh mịch trên ngọn cây, Sở Mặc đột ngột bừng tỉnh, hơi thở dồn dập, trán đẫm mồ hôi lạnh. Hắn vừa mơ thấy cảnh tượng ngôi nhà cũ bốc cháy ngùn ngụt, cha mẹ hắn gào thét trong biển lửa yêu ma, còn hắn chỉ là một đứa trẻ bất lực đứng nhìn. Hình ảnh người mẹ quay đầu lại, đôi mắt đẫm máu nhìn hắn đầy oán hận và đau đớn khiến tâm trí Sở Mặc chấn động mạnh, khơi gợi lại những ký ức đau thương bị chôn vùi về dòng máu và thân thế thực sự của mình.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [
+            {
+              "chapter": 6,
+              "nodes": [
+                "node-1780846744944"
+              ]
+            }
+          ],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1780892110601",
+          "title": "Nỗi hoài nghi về thân thế",
+          "description": "Sở Mặc nhìn đôi bàn tay run rẩy dưới ánh trăng, tự hỏi liệu tư chất Tạp linh căn của mình có phải là một sự che đậy của định mệnh. Trong giấc mơ, hắn thoáng thấy một mảnh ngọc bội vỡ vụn mang ký hiệu kỳ lạ trên cổ cha mình trước khi ông ngã xuống. Những câu hỏi về việc tại sao yêu ma lại nhắm vào gia đình hắn bắt đầu nảy sinh, biến nỗi đau thành một khối u uất nghẹn ngào trong lồng ngực.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1780892110602",
+          "title": "Quyết tâm luyện đao",
+          "description": "Không thể chợp mắt thêm, Sở Mặc cẩn thận ngồi dậy để không đánh thức Mộc Tuyết đang say ngủ bên cạnh. hắn sẽ thiền định nghiền ngẫm những gì của Bá huyết cuồng đao quết mà mình được Vô trần tử truyền vào trong đầu - tại đoạn này hãy mô tả chi tiết hơn về môn công pháp sẽ phải đánh đổi máu và sinh mệnh lực này để đổi lấy sức mạnh",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [
+            "Bá Huyết Cuồng Đao Quyết"
+          ],
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1780892110603",
+          "title": "Sự khắc nghiệt của Bá Huyết",
+          "description": "Sở Mặc bắt đầu tập những thế đao đầu tiên. Bá Huyết Cuồng Đao Quyết đòi hỏi người tập phải dùng chính máu mình làm dẫn để kích hoạt đao ý. Mỗi nhát chém đều khiến khí huyết trong người hắn sôi trào như bị thiêu đốt, cơn đau từ các kinh mạch bị ép buộc mở ra khiến hắn suýt chút nữa gục ngã.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Sở Mặc chấp nhận dùng máu làm dẫn, hy sinh một phần tuổi thọ và chịu đựng nỗi đau xé xác để đổi lấy sức mạnh bộc phát cực hạn.",
+            "thread": "Yêu cầu về sự đánh đổi và ý chí sắt đá khi luyện tập Bá Huyết Cuồng Đao Quyết."
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [
+            "Bá Huyết Cuồng Đao Quyết"
+          ],
+          "x": 830,
+          "y": 371
+        },
+        {
+          "id": "node-1780892110604",
+          "title": "Được và mất",
+          "description": "Cái được của công pháp là đao ý trở nên sắc bén, có thể chém đứt cả tảng đá cổ thụ chỉ bằng một nhát chém nhẹ. Cái mất chính là tâm ma ngày càng lớn, nếu không giữ vững đạo tâm, hắn sẽ bị đao ý phản phệ, trở thành một con quỷ cuồng sát. Sở Mặc cắn chặt môi, dùng ý chí sắt đá để áp chế cơn khát máu đang trỗi dậy trong lòng.",
+          "characters": [
+            "Sở Mặc"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Sở Mặc thiết lập ranh giới tâm tưởng, lấy tình yêu dành cho Mộc Tuyết làm sợi dây neo giữ nhân tính trước sự tha hóa của công pháp.",
+            "thread": "Yêu cầu về sự đánh đổi và ý chí sắt đá khi luyện tập Bá Huyết Cuồng Đao Quyết."
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [
+            "Bá Huyết Cuồng Đao Quyết"
+          ],
+          "x": 1128,
+          "y": 154
+        },
+        {
+          "id": "node-1780892110605",
+          "title": "Mộc Tuyết tỉnh giấc",
+          "description": "Tiếng gió rít qua khe đao khiến Mộc Tuyết tỉnh giấc. Nàng kinh ngạc nhìn Sở Mặc đang đứng trên chạc cây, toàn thân toát ra sát khí lạnh lẽo nhưng ánh mắt lại vô cùng kiên định. Thấy hắn đang cố gắng chịu đựng cơn đau từ việc luyện công, nàng lặng lẽ tiến lại gần, không nói một lời mà chỉ đặt tay lên lưng hắn, truyền đi chút hơi ấm để hắn bình tâm lại.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [],
+          "techniques": [
+            "Bá Huyết Cuồng Đao Quyết"
+          ],
+          "x": 1400,
+          "y": 373
+        },
+        {
+          "id": "node-1780892110606",
+          "title": "Lời thề dưới trăng",
+          "description": "Sở Mặc thu đao, cảm nhận sự kết nối sâu sắc với Mộc Tuyết. Dưới ánh trăng mờ nhạt của Táng Cốt Lâm, cả hai cùng nhìn về phía xa xăm, nơi những yêu ma đang gào thét. Họ không còn là những phàm nhân chỉ biết chạy trốn, mà đã sẵn sàng đối mặt với mọi thử thách để bảo vệ nhau và tìm ra sự thật về quá khứ nghiệt ngã của chính mình.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "x": 1950,
+          "y": 200
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1780892110600",
+          "to": "node-1780892110601"
+        },
+        {
+          "from": "node-1780892110601",
+          "to": "node-1780892110602"
+        },
+        {
+          "from": "node-1780892110602",
+          "to": "node-1780892110603"
+        },
+        {
+          "from": "node-1780892110603",
+          "to": "node-1780892110604"
+        },
+        {
+          "from": "node-1780892110604",
+          "to": "node-1780892110605"
+        },
+        {
+          "from": "node-1780892110605",
+          "to": "node-1780892110606"
+        }
+      ]
     }
   ],
   "unresolved_threads": [
-    {
-      "thread": "Triết lý sinh tồn mới của Sở Mặc: 'Muốn sống, phải ác hơn cả yêu ma'.",
-      "chapter": 1
-    },
     {
       "thread": "Mục tiêu nghịch thiên mà sống của hai nhân vật chính trong một thế giới đầy rẫy yêu ma.",
       "chapter": 2
@@ -795,12 +989,24 @@
       "chapter": 5
     },
     {
-      "thread": "Yêu cầu về sự đánh đổi và ý chí sắt đá khi luyện tập Bá Huyết Cuồng Đao Quyết.",
+      "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây.",
       "chapter": 6
     },
     {
-      "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây.",
-      "chapter": 6
+      "thread": "Bí ẩn về mảnh ngọc bội hình rồng cuộn quanh ngọn núi trong ký ức của Sở Mặc",
+      "chapter": 7
+    },
+    {
+      "thread": "Nghi vấn về thân thế thực sự và dòng máu của Sở Mặc",
+      "chapter": 7
+    },
+    {
+      "thread": "Lý do thực sự khiến gia đình Sở Mặc bị yêu ma nhắm tới",
+      "chapter": 7
+    },
+    {
+      "thread": "Sự nghi ngờ về việc tư chất Tạp linh căn của Sở Mặc có thể là một sự ngụy trang",
+      "chapter": 7
     }
   ],
   "resolved_threads": [
@@ -821,6 +1027,18 @@
       "chapter_introduced": 4,
       "chapter_resolved": 4,
       "resolution_note": "Vô Trần Tử"
+    },
+    {
+      "thread": "Yêu cầu về sự đánh đổi và ý chí sắt đá khi luyện tập Bá Huyết Cuồng Đao Quyết.",
+      "chapter_introduced": 6,
+      "chapter_resolved": 7,
+      "resolution_note": "Sở Mặc chấp nhận dùng máu làm dẫn, hy sinh một phần tuổi thọ và chịu đựng nỗi đau xé xác để đổi lấy sức mạnh bộc phát cực hạn."
+    },
+    {
+      "thread": "Triết lý sinh tồn mới của Sở Mặc: 'Muốn sống, phải ác hơn cả yêu ma'.",
+      "chapter_introduced": 1,
+      "chapter_resolved": 7,
+      "resolution_note": "Tự động phát hiện giải quyết bởi AI."
     }
   ],
   "locations": [
@@ -838,6 +1056,11 @@
       "name": "Cõi hư vô",
       "chapter": 5,
       "description": "Không gian tĩnh mịch, thanh khiết nơi Mộc Tuyết trải qua thử thách nhân tâm."
+    },
+    {
+      "name": "Vực Sâu",
+      "chapter": 7,
+      "description": "Nơi phát ra tiếng gào thét của yêu ma, được nhắc đến như một địa điểm nguy hiểm."
     }
   ],
   "weapons": [
