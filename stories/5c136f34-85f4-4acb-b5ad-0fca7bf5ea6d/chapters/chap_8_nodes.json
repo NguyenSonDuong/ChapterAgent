@@ -1,0 +1,178 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780896427321",
+      "title": "Bình minh đẫm sát khí",
+      "description": "Ánh bình minh yếu ớt xuyên qua tán lá Táng Cốt Lâm. Sở Mặc và Mộc Tuyết rời khỏi nơi trú ẩn tạm bợ, chuẩn bị hành trình tiến về phía Tây. Không khí buổi sáng lạnh lẽo nhưng nồng nặc mùi tanh của yêu khí, dự báo một ngày đầy hiểm nguy đang chờ đợi.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "Sự nguy hiểm tiềm tàng của Táng Cốt Lâm khi di chuyển về hướng Tây.",
+        "resolution_note": "Cả hai lên kế hoạch di chuyển thận trọng, tận dụng địa hình để tránh né các vùng có yêu khí đậm đặc."
+      },
+      "links": [
+        {
+          "chapter": 7,
+          "nodes": [
+            "node-1780892110606"
+          ]
+        }
+      ],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "x": 149,
+      "y": 200
+    },
+    {
+      "id": "node-1780896427322",
+      "title": "Tập kích bất ngờ",
+      "description": "Khi vừa đi sâu vào khu rừng, một bầy yêu thú cấp thấp dạng linh miêu bất ngờ lao ra từ bụi rậm. Sở Mặc đẩy Mộc Tuyết ra phía sau, tay cầm chặt thanh đao cùn, đối diện với nanh vuốt sắc nhọn của lũ quái vật.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "x": 450,
+      "y": 260
+    },
+    {
+      "id": "node-1780896427323",
+      "title": "Kích hoạt Bá Huyết",
+      "description": "Sức lực phàm nhân không đủ để chống chọi, Sở Mặc dứt khoát thi triển 'Bá Huyết Cuồng Đao Quyết'. Hắn cắn đầu lưỡi, lấy máu làm dẫn, thanh đao cùn bỗng tỏa ra huyết quang đỏ rực, chém bay đầu con linh miêu đầu đàn.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 750,
+      "y": 200
+    },
+    {
+      "id": "node-1780896427324",
+      "title": "Đồng tâm hiệp lực",
+      "description": "Trong khi Sở Mặc dùng sức mạnh bộc phát để càn quét lũ yêu thú, Mộc Tuyết không hề lùi bước. Nàng sử dụng những cành cây nhọn làm vũ khí hỗ trợ - vốn Mộc Tuyết không biết võ, cô gái chỉ vung vẩy que đảm bảo mình sẽ không khiến Sở mặc so lắng mà phân tâm, tạo ra các khe hở để Sở Mặc tung đòn quyết định, thể hiện sự ăn ý tuyệt đối.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 881,
+      "y": 424
+    },
+    {
+      "id": "node-1780896427325",
+      "title": "Cận kề giới hạn",
+      "description": "Trận chiến khốc liệt khiến cơ thể Sở Mặc đạt tới ngưỡng cực hạn. Các mạch máu trên cơ thể hắn nổi lên, da thịt nứt nẻ do áp lực của công pháp. Mộc Tuyết lao đến ôm lấy hắn, dùng hơi ấm và ý chí của mình để giữ cho hắn không bị tâm ma nuốt chửng.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 1230,
+      "y": 189
+    },
+    {
+      "id": "node-1780896427326",
+      "title": "Bước đầu đột phá",
+      "description": "Dưới áp lực của trận chiến và sự tôi luyện của 'Bá Huyết Cuồng Đao Quyết', cơ thể Sở Mặc được tẩy rửa, xương cốt cứng cáp lạ thường. Hắn chính thức đột phá Thối thể cảnh nhất trọng, cảm nhận được sức mạnh phàm nhân đang chuyển hóa thành nội lực sơ khai, sẵn sàng cho con đường nghịch thiên sắp tới. - Tại đây hãy đặt 1 nghi vấn là vốn dĩ Tạp Linh căn không thể tu luyện vậy tại sao Sở mặc có thể đột phá được - điều này chính là bí ẩn ẩn sâu của công pháp mà Sở mặc đang sử dụng - sẽ được hé lộ sau không cần thắc mắc chỉ cần tạo nội dung nghi phần rồi lắc đầu bỏ qua không nghĩ nữa",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 1406,
+      "y": 426
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780896427321",
+      "to": "node-1780896427322"
+    },
+    {
+      "from": "node-1780896427322",
+      "to": "node-1780896427323"
+    },
+    {
+      "from": "node-1780896427323",
+      "to": "node-1780896427324"
+    },
+    {
+      "from": "node-1780896427324",
+      "to": "node-1780896427325"
+    },
+    {
+      "from": "node-1780896427325",
+      "to": "node-1780896427326"
+    }
+  ]
+}
