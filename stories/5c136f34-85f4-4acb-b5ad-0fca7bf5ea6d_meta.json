@@ -10,7 +10,8 @@
       "appearance_context": null,
       "visited_locations": [
         "Táng Cốt Lâm",
-        "Cõi hư vô"
+        "Cõi hư vô",
+        "Con suối cạn"
       ],
       "active_weapon": "Thanh đao cùn",
       "weapons_owned": [
@@ -20,9 +21,9 @@
       "techniques_owned": [
         "Bá Huyết Cuồng Đao Quyết"
       ],
-      "current_cultivation": "",
+      "current_cultivation": "Thối Thể Cảnh nhất trọng",
       "current_location": "Táng Cốt Lâm",
-      "status": "Đang an toàn"
+      "status": "Đang nguy hiểm"
     },
     {
       "name": "Mộc Tuyết",
@@ -32,7 +33,8 @@
       "appearance_context": null,
       "visited_locations": [
         "Táng Cốt Lâm",
-        "Cõi hư vô"
+        "Cõi hư vô",
+        "Con suối cạn"
       ],
       "active_weapon": "",
       "weapons_owned": [],
@@ -42,7 +44,7 @@
       ],
       "current_cultivation": "",
       "current_location": "Táng Cốt Lâm",
-      "status": "Đang an toàn"
+      "status": "Đang nguy hiểm"
     },
     {
       "name": "Vô Trần Tử",
