@@ -1,0 +1,206 @@
+{
+  "nodes": [
+    {
+      "id": "node-1780905980527",
+      "title": "Khoảng trắng vô tận",
+      "description": "Sở Mặc lạc vào một không gian trắng muốt, không có phương hướng, không có âm thanh. Tại đây, hắn đối diện với sự trống rỗng trong tâm hồn và cảm nhận được sự tồn tại của những ký ức bị phong ấn sâu trong dòng máu của mình.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "Những bí mật kinh thiên động địa ẩn giấu bên trong công pháp Bá Huyết Cuồng Đao Quyết.",
+        "resolution_note": "Trong khoảng trắng, Sở Mặc thấu thị bản chất của Bá Huyết Cuồng Đao Quyết không chỉ là công pháp sát phạt mà là cách dẫn dắt huyết mạch cổ xưa để thức tỉnh sức mạnh tiềm ẩn."
+      },
+      "links": [
+        {
+          "chapter": 8,
+          "nodes": [
+            "node-1780899937763"
+          ]
+        },
+        {
+          "chapter": 7,
+          "nodes": [
+            "node-1780892110601",
+            "node-1780892110600"
+          ]
+        }
+      ],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 151,
+      "y": 200
+    },
+    {
+      "id": "node-1780905980528",
+      "title": "Tiếng gọi từ thực tại",
+      "description": "Giữa lúc Sở Mặc đang chìm đắm trong khoảng trắng, âm thanh xé gió và tiếng gầm gừ của con Ma vật ở thực tại vang vọng như sấm sét, kéo ý thức hắn trở về với cơ thể đang trọng thương.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [
+        {
+          "chapter": 8,
+          "nodes": [
+            "node-1780900039711"
+          ]
+        }
+      ],
+      "locations": [
+        "Con suối cạn"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 450,
+      "y": 259
+    },
+    {
+      "id": "node-1780905980529",
+      "title": "Bức tường chắn máu",
+      "description": "Mộc Tuyết dùng thân mình che chắn cho Sở Mặc đang bất tỉnh trước cú vồ của con Ma vật. Nàng không biết võ nhưng lòng dũng cảm khiến nàng đứng vững như một bức tường thành không thể lay chuyển.",
+      "characters": [
+        "Mộc Tuyết",
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Con suối cạn"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 750,
+      "y": 200
+    },
+    {
+      "id": "node-1780905980530",
+      "title": "Tỉnh giấc sát phạt",
+      "description": "Đôi mắt Sở Mặc bừng mở, đỏ rực huyết quang. Hắn không còn là kẻ phàm nhân rụt rè mà là chiến binh mang theo đao ý kinh người, tay siết chặt thanh đao cùn từ tay Mộc Tuyết, chặn đứng đòn tấn công của Ma vật.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Con suối cạn"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 1049,
+      "y": 271
+    },
+    {
+      "id": "node-1780905980531",
+      "title": "Trảm ma tại suối cạn",
+      "description": "Dựa trên hiểu biết mới từ khoảng trắng, Sở Mặc thi triển Bá Huyết Cuồng Đao Quyết với độ chuẩn xác tuyệt đối, nhắm thẳng vào điểm yếu còn lại của Ma vật, kết liễu nó trong một nhát chém đầy uy lực.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Con suối cạn"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [
+        "Bá Huyết Cuồng Đao Quyết"
+      ],
+      "x": 1350,
+      "y": 200
+    },
+    {
+      "id": "node-1780905980532",
+      "title": "Hướng về phía Tây",
+      "description": "Sau trận chiến, Sở Mặc và Mộc Tuyết thu dọn hành lý. Họ nhìn về phía Tây, nơi những rặng núi cao vút ẩn hiện trong sương mù, quyết tâm tìm kiếm lối thoát và những câu trả lời về thân thế thực sự.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "Cả hai xác định mục tiêu là tìm đến Huyền Thiên Tông hoặc các tàn tích thượng cổ để giải mã bí ẩn về huyết mạch và công pháp.",
+        "thread": "Mục tiêu tiếp theo của hai người khi hướng về phía Tây."
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "x": 1650,
+      "y": 260
+    },
+    {
+      "id": "node-1780905980533",
+      "title": "Bước chân đồng hành",
+      "description": "Hai bóng hình nhỏ bé dìu nhau bước đi, vượt qua vũng máu của Ma vật, tiến sâu vào rừng già. Dù phía trước là nghịch cảnh, nhưng sự đồng điệu trong linh hồn đã biến họ thành một thực thể không thể tách rời.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 1950,
+      "y": 200
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1780905980527",
+      "to": "node-1780905980528"
+    },
+    {
+      "from": "node-1780905980528",
+      "to": "node-1780905980529"
+    },
+    {
+      "from": "node-1780905980529",
+      "to": "node-1780905980530"
+    },
+    {
+      "from": "node-1780905980530",
+      "to": "node-1780905980531"
+    },
+    {
+      "from": "node-1780905980531",
+      "to": "node-1780905980532"
+    },
+    {
+      "from": "node-1780905980532",
+      "to": "node-1780905980533"
+    }
+  ]
+}

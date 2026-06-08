@@ -135,15 +135,15 @@
         "Sở Mặc"
       ],
       "resolved_thread": {
-        "thread": "",
-        "resolution_note": ""
+        "resolution_note": "",
+        "thread": ""
       },
       "links": [],
       "locations": [],
       "weapons": [],
       "techniques": [],
-      "x": 1527.3828333831793,
-      "y": 268.5769917507797
+      "x": 1205.3828333831793,
+      "y": 449.5769917507797
     },
     {
       "id": "node-1780900039711",
@@ -154,8 +154,8 @@
         "Mộc Tuyết"
       ],
       "resolved_thread": {
-        "thread": "",
-        "resolution_note": ""
+        "resolution_note": "",
+        "thread": ""
       },
       "links": [],
       "locations": [
@@ -164,8 +164,8 @@
       ],
       "weapons": [],
       "techniques": [],
-      "x": 1636.1952854375972,
-      "y": 464.5270969197468
+      "x": 1494.1952854375972,
+      "y": 521.5270969197468
     }
   ],
   "connections": [
