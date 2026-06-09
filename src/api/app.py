@@ -1073,6 +1073,10 @@ HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
 2. Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí vào các node sao cho tự nhiên nhất.
 3. Nếu có giải quyết nút thắt, hãy chọn đúng nút thắt đó và mô tả cách giải quyết chi tiết trong trường `resolved_thread.resolution_note`.
 4. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
+5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
+   - Sơ đồ các node sự kiện KHÔNG được thiết kế theo cấu trúc đóng của một bài văn độc lập (không tạo node chỉ để 'mở bài/giới thiệu hoàn cảnh' ở đầu, và không tạo node chỉ để 'kết luận/tổng kết diễn biến/rút ra bài học' ở cuối chương).
+   - Node đầu tiên phải là sự kiện trực tiếp bắt đầu nối tiếp ngay vào diễn biến trước đó.
+   - Node cuối cùng của chương phải mở ra một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để chuẩn bị cho chương tiếp theo, tuyệt đối tránh kết thúc đóng hay mang tính khép lại toàn bộ.
 """
 
     try:
@@ -1232,7 +1236,8 @@ YÊU CẦU:
 1. Tạo tiêu đề (title) ngắn gọn, súc tích (dưới 10 từ).
 2. Tạo mô tả kịch bản (description) chi tiết diễn biến (khoảng 50-150 từ), viết mạch lạc và hấp dẫn, kết nối hợp lý với bối cảnh sự kiện trước/sau (nếu có).
 3. Sử dụng đúng các nhân vật, địa điểm, công pháp, binh khí đầu vào đã được chỉ định.
-4. Trả về đúng định dạng có cấu trúc chứa title và description.
+4. KHÔNG tạo mô tả kịch bản mang tính chất "kết bài", tổng kết hay khép lại câu chuyện (như 'kết thúc hành trình...', 'khép lại chương này...'). Nếu đây là sự kiện cuối cùng của chương, hãy tập trung tạo sự kiện chuyển tiếp lấp lửng (cliffhanger) hoặc một chi tiết kết mở để dẫn dắt tiếp tục sang chương sau.
+5. Trả về đúng định dạng có cấu trúc chứa title và description.
 """
 
     try:
