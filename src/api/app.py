@@ -1023,7 +1023,8 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
                 prev_nodes_data = json.loads(prev_nodes_path.read_text(encoding="utf-8"))
                 prev_nodes_ctx += f"\nSơ đồ sự kiện chương trước (Chương {chapter_num - 1}):\n"
                 for node in prev_nodes_data.get("nodes", []):
-                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+                    node_text = node.get("content") or node.get("description") or ""
+                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Nội dung/Mô tả: {node_text}\n"
             except Exception:
                 pass
 
@@ -1037,7 +1038,8 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
                     nodes_data = json.loads(nodes_path.read_text(encoding="utf-8"))
                     prev_nodes_ctx += f"\nSơ đồ sự kiện Chương {chap_num} (Chương liên kết):\n"
                     for node in nodes_data.get("nodes", []):
-                        prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+                        node_text = node.get("content") or node.get("description") or ""
+                        prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Nội dung/Mô tả: {node_text}\n"
         except Exception:
             pass
 

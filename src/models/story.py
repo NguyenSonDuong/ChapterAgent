@@ -140,6 +140,7 @@ class SuggestedNode(BaseModel):
     techniques: List[str] = Field(description="Danh sách các công pháp thi triển trong sự kiện này (chọn từ danh sách công pháp đầu vào)")
     resolved_thread: SuggestedNodeResolvedThread = Field(description="Giải quyết nút thắt nếu có")
     links: List[SuggestedNodeLink] = Field(description="Liên kết với các node của chương cũ nếu có")
+    content: Optional[str] = Field(default=None, description="Nội dung thực tế của chương tương ứng với node này")
 
 class SuggestedConnection(BaseModel):
     from_node: str = Field(description="ID tạm thời của node bắt đầu, ví dụ node-1")
