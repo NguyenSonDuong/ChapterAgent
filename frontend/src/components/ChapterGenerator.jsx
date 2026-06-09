@@ -172,7 +172,8 @@ export default function ChapterGenerator({
     links: [], // [{ chapter: number, nodes: [nodeId, ...] }]
     locations: [],
     weapons: [],
-    techniques: []
+    techniques: [],
+    content: ''
   });
 
   const [chapterNodesCache, setChapterNodesCache] = useState({});
@@ -221,7 +222,8 @@ export default function ChapterGenerator({
           links: node.links || [],
           locations: Array.isArray(node.locations) ? node.locations : [],
           weapons: Array.isArray(node.weapons) ? node.weapons : [],
-          techniques: Array.isArray(node.techniques) ? node.techniques : []
+          techniques: Array.isArray(node.techniques) ? node.techniques : [],
+          content: node.content || ''
         });
       }
     } else {
@@ -234,7 +236,8 @@ export default function ChapterGenerator({
         links: [],
         locations: [],
         weapons: [],
-        techniques: []
+        techniques: [],
+        content: ''
       });
     }
   }, [editingNodeId, nodes]);
@@ -702,7 +705,8 @@ export default function ChapterGenerator({
           links: nodeForm.links,
           locations: nodeForm.locations || [],
           weapons: nodeForm.weapons || [],
-          techniques: nodeForm.techniques || []
+          techniques: nodeForm.techniques || [],
+          content: nodeForm.content || null
         };
       }
       return n;
@@ -722,8 +726,8 @@ export default function ChapterGenerator({
         return;
       }
       finalIdea = {
-        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y }) => ({
-          id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y
+        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y }) => ({
+          id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y
         })),
         connections
       };
@@ -1470,6 +1474,18 @@ export default function ChapterGenerator({
                           />
                         </div>
 
+                        <div>
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Nội dung truyện thực tế (do AI sinh hoặc tự nhập)</label>
+                          <textarea 
+                            className="form-textarea-sm"
+                            rows={6}
+                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '12px' }}
+                            value={nodeForm.content || ''}
+                            onChange={e => setNodeForm({ ...nodeForm, content: e.target.value })}
+                            placeholder="Nội dung văn bản thực tế tương ứng với sự kiện này..."
+                          />
+                        </div>
+
                         {/* Characters Select */}
                         <div>
                           <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Nhân vật tham gia</label>
@@ -1676,6 +1692,11 @@ export default function ChapterGenerator({
                                               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                                                 <span style={{ fontWeight: '500' }}>📍 {pn?.title || nodeId}</span>
                                                 <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{pn?.description || 'Không có mô tả.'}</span>
+                                                {pn?.content && (
+                                                  <span style={{ fontSize: '9px', color: 'var(--color-cyan)', marginTop: '2px', display: 'block', whiteSpace: 'pre-wrap', maxHeight: '60px', overflowY: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2px' }}>
+                                                    <strong>Nội dung:</strong> {pn.content}
+                                                  </span>
+                                                )}
                                               </div>
                                               <button 
                                                 type="button" 

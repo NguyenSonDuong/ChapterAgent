@@ -44,7 +44,8 @@ export default function ChapterReader({
     links: [],
     locations: [],
     weapons: [],
-    techniques: []
+    techniques: [],
+    content: ''
   });
 
 
@@ -203,7 +204,8 @@ export default function ChapterReader({
           links: node.links || [],
           locations: Array.isArray(node.locations) ? node.locations : [],
           weapons: Array.isArray(node.weapons) ? node.weapons : [],
-          techniques: Array.isArray(node.techniques) ? node.techniques : []
+          techniques: Array.isArray(node.techniques) ? node.techniques : [],
+          content: node.content || ''
         });
       }
     } else {
@@ -216,7 +218,8 @@ export default function ChapterReader({
         links: [],
         locations: [],
         weapons: [],
-        techniques: []
+        techniques: [],
+        content: ''
       });
     }
   }, [editingNodeId, nodes]);
@@ -264,8 +267,8 @@ export default function ChapterReader({
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y }) => ({
-            id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y
+          nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y }) => ({
+            id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y
           })),
           connections
         })
@@ -454,7 +457,8 @@ export default function ChapterReader({
           links: nodeForm.links,
           locations: nodeForm.locations || [],
           weapons: nodeForm.weapons || [],
-          techniques: nodeForm.techniques || []
+          techniques: nodeForm.techniques || [],
+          content: nodeForm.content || null
         };
       }
       return n;
@@ -1076,6 +1080,17 @@ export default function ChapterReader({
                       />
                     </div>
 
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '11px' }}>Nội dung truyện thực tế (do AI sinh hoặc tự nhập)</label>
+                      <textarea 
+                        className="form-textarea-sm"
+                        value={nodeForm.content || ''}
+                        onChange={e => setNodeForm(prev => ({ ...prev, content: e.target.value }))}
+                        placeholder="Nội dung văn bản thực tế tương ứng với sự kiện này..."
+                        rows={6}
+                      />
+                    </div>
+
                     {/* Characters toggle list */}
                     <div className="form-group">
                       <label className="form-label" style={{ fontSize: '11px' }}>Nhân vật tham gia</label>
@@ -1210,13 +1225,23 @@ export default function ChapterReader({
                                   {cachedData.nodes.map(pn => {
                                     const isNodeChecked = linkObj?.nodes?.includes(pn.id);
                                     return (
-                                      <label key={pn.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: isNodeChecked ? 'var(--color-cyan)' : 'var(--text-muted)', cursor: 'pointer' }}>
-                                        <input 
-                                          type="checkbox"
-                                          checked={isNodeChecked || false}
-                                          onChange={() => handleLinkedNodeToggle(item.chapter, pn.id)}
-                                        />
-                                        <span>{pn.title}</span>
+                                      <label key={pn.id} style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', color: isNodeChecked ? 'var(--color-cyan)' : 'var(--text-muted)', cursor: 'pointer', marginBottom: '4px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                          <input 
+                                            type="checkbox"
+                                            checked={isNodeChecked || false}
+                                            onChange={() => handleLinkedNodeToggle(item.chapter, pn.id)}
+                                          />
+                                          <span>{pn.title}</span>
+                                        </div>
+                                        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', paddingLeft: '18px' }}>
+                                          {pn.description || 'Không có mô tả.'}
+                                        </span>
+                                        {pn.content && (
+                                          <span style={{ fontSize: '9px', color: 'rgba(6,182,212,0.6)', paddingLeft: '18px', maxHeight: '40px', overflowY: 'auto', whiteSpace: 'pre-wrap', display: 'block' }}>
+                                            <strong>Nội dung:</strong> {pn.content}
+                                          </span>
+                                        )}
                                       </label>
                                     );
                                   })}
