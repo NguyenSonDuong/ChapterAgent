@@ -140,6 +140,92 @@ function ModelChangeForm({ onSubmit, currentModel }) {
   );
 }
 
+function ConflictResolutionForm({ warnings, onSubmit }) {
+  const [resolutions, setResolutions] = useState(
+    warnings.map((w, idx) => ({
+      warning_index: idx,
+      resolve: true,
+      instruction: ''
+    }))
+  );
+
+  const handleResolveChange = (idx, val) => {
+    setResolutions(prev => prev.map(r => r.warning_index === idx ? { ...r, resolve: val } : r));
+  };
+
+  const handleInstructionChange = (idx, val) => {
+    setResolutions(prev => prev.map(r => r.warning_index === idx ? { ...r, instruction: val } : r));
+  };
+
+  const handleSubmit = () => {
+    onSubmit(resolutions);
+  };
+
+  return (
+    <div className="widget-reply-area conflict-resolution-widget" style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', padding: '16px', background: 'rgba(234, 179, 8, 0.05)', border: '1px solid rgba(234, 179, 8, 0.2)', borderRadius: '8px', marginTop: '10px' }}>
+      <p className="instruction-text text-yellow" style={{ fontSize: '13px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px', margin: 0, color: '#facc15' }}>
+        <AlertTriangle className="icon-xs" /> Hãy chọn các mâu thuẫn logic muốn AI sửa và nhập hướng dẫn (nếu có):
+      </p>
+      
+      <div className="conflicts-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {warnings.map((w, idx) => {
+          const res = resolutions.find(r => r.warning_index === idx) || { resolve: false, instruction: '' };
+          const chapterSource = w.conflicting_chapter ? `Chương ${w.conflicting_chapter}` : "Bối cảnh thế giới/nhân vật";
+          
+          return (
+            <div key={idx} className="conflict-item" style={{ background: 'rgba(10, 14, 23, 0.4)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id={`conflict-${idx}`} 
+                  checked={res.resolve} 
+                  onChange={e => handleResolveChange(idx, e.target.checked)}
+                  style={{ marginTop: '3px', cursor: 'pointer' }}
+                />
+                <div style={{ flex: 1 }}>
+                  <label htmlFor={`conflict-${idx}`} style={{ fontWeight: '600', fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer', display: 'block' }}>
+                    Mâu thuẫn {idx + 1} ({chapterSource}):
+                  </label>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '4px 0 8px 0', lineHeight: '1.4' }}>
+                    {w.warning}
+                  </p>
+                  
+                  {res.resolve && (
+                    <input 
+                      type="text"
+                      className="form-input-sm"
+                      placeholder="Nhập hướng dẫn cách sửa (để trống AI sẽ tự giải quyết)..."
+                      value={res.instruction}
+                      onChange={e => handleInstructionChange(idx, e.target.value)}
+                      style={{ width: '100%', marginTop: '4px' }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="actions-row" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '4px' }}>
+        <button 
+          onClick={() => onSubmit(resolutions.map(r => ({ ...r, resolve: false })))} 
+          className="btn-secondary-sm"
+        >
+          Bỏ qua toàn bộ
+        </button>
+        <button 
+          onClick={handleSubmit} 
+          className="btn-primary-sm btn-yellow"
+          style={{ background: 'rgba(234, 179, 8, 0.2)', border: '1px solid rgba(234, 179, 8, 0.4)', color: '#facc15' }}
+        >
+          <Check className="icon-xs" /> Xác nhận sửa lỗi bằng AI
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ChapterGenerator({ 
   storyUuid, 
   defaultModel, 
@@ -322,6 +408,19 @@ export default function ChapterGenerator({
       }]);
     };
 
+    const onConflictReviewNeeded = (data) => {
+      if (data.story_uuid !== storyUuid) return;
+      setStatus('waiting_conflict_review');
+      setMessages((prev) => [...prev, {
+        id: `conflict-review-${Date.now()}-${Math.random()}`,
+        sender: 'agent',
+        type: 'agent_conflict_review',
+        warnings: data.warnings || [],
+        text: data.feedback || '',
+        time: new Date().toLocaleTimeString()
+      }]);
+    };
+
     const onLlmErrorSelectModel = (data) => {
       if (data.story_uuid !== storyUuid) return;
       setStatus('waiting_model_change');
@@ -340,6 +439,7 @@ export default function ChapterGenerator({
     socket.on('clarify_requirements', onClarifyRequirements);
     socket.on('draft_review_needed', onDraftReviewNeeded);
     socket.on('audit_warnings', onAuditWarnings);
+    socket.on('conflict_review_needed', onConflictReviewNeeded);
     socket.on('llm_error_select_model', onLlmErrorSelectModel);
 
     return () => {
@@ -348,6 +448,7 @@ export default function ChapterGenerator({
       socket.off('clarify_requirements', onClarifyRequirements);
       socket.off('draft_review_needed', onDraftReviewNeeded);
       socket.off('audit_warnings', onAuditWarnings);
+      socket.off('conflict_review_needed', onConflictReviewNeeded);
       socket.off('llm_error_select_model', onLlmErrorSelectModel);
     };
   }, [socket, storyUuid, onGenerationComplete]);
@@ -863,6 +964,37 @@ export default function ChapterGenerator({
     setStatus('running');
   };
 
+  const handleSendConflictResolutions = (resolutions) => {
+    if (!socket || !storyUuid) return;
+    
+    const resolvedCount = resolutions.filter(r => r.resolve).length;
+    const userMsg = `Yêu cầu AI giải quyết ${resolvedCount}/${resolutions.length} mâu thuẫn logic.`;
+    
+    setMessages((prev) => [...prev, {
+      id: `user-resolutions-${Date.now()}`,
+      sender: 'user',
+      type: 'text',
+      text: userMsg,
+      time: new Date().toLocaleTimeString()
+    }]);
+    
+    setMessages((prev) => [...prev, {
+      id: `resolve-start-${Date.now()}`,
+      sender: 'system',
+      type: 'system_log',
+      text: 'Đang gửi phương án sửa đổi logic lên server...',
+      level: 'info',
+      time: new Date().toLocaleTimeString()
+    }]);
+    
+    socket.emit('submit_conflict_resolutions', {
+      story_uuid: storyUuid,
+      resolutions: resolutions
+    });
+    
+    setStatus('running');
+  };
+
   const handleCancel = async () => {
     if (cancelling) return;
     setCancelling(true);
@@ -899,6 +1031,7 @@ export default function ChapterGenerator({
     const isLastOfItsType = (() => {
       if (msg.type === 'agent_question') return status === 'waiting_clarification' && index === messages.length - 1;
       if (msg.type === 'agent_review') return status === 'waiting_review' && index === messages.length - 1;
+      if (msg.type === 'agent_conflict_review') return status === 'waiting_conflict_review' && index === messages.length - 1;
       if (msg.type === 'model_error') return status === 'waiting_model_change' && index === messages.length - 1;
       return false;
     })();
@@ -981,9 +1114,10 @@ export default function ChapterGenerator({
                 </div>
                 {msg.warnings && msg.warnings.length > 0 ? (
                   <ul className="warnings-list">
-                    {msg.warnings.map((warn, widx) => (
-                      <li key={widx}>⚠️ {warn}</li>
-                    ))}
+                    {msg.warnings.map((warn, widx) => {
+                      const chapterSource = warn.conflicting_chapter ? `Chương ${warn.conflicting_chapter}` : "Bối cảnh thế giới/nhân vật";
+                      return <li key={widx}>⚠️ [{chapterSource}] {warn.warning}</li>;
+                    })}
                   </ul>
                 ) : (
                   <p className="warnings-empty">✓ Không phát hiện lỗi nhất quán cốt truyện.</p>
@@ -992,6 +1126,34 @@ export default function ChapterGenerator({
                   <div className="auditor-feedback-box">
                     <strong>Đánh giá chi tiết:</strong>
                     <p>{msg.text}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {msg.type === 'agent_conflict_review' && (
+              <div className="widget-warning conflict-review-widget-container" style={{ borderColor: '#facc15' }}>
+                <div className="widget-header text-yellow" style={{ color: '#facc15' }}>
+                  <AlertTriangle className="icon-xs text-yellow" />
+                  <span>Duyệt và khắc phục mâu thuẫn logic</span>
+                </div>
+                {msg.text && (
+                  <div className="auditor-feedback-box" style={{ marginBottom: '12px', background: 'rgba(234, 179, 8, 0.03)', borderLeft: '3px solid #facc15' }}>
+                    <strong>Nhận xét từ Auditor:</strong>
+                    <p>{msg.text}</p>
+                  </div>
+                )}
+                {isLastOfItsType ? (
+                  <ConflictResolutionForm warnings={msg.warnings} onSubmit={handleSendConflictResolutions} />
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <p className="widget-historical-note" style={{ color: '#eab308' }}>✓ Đã gửi yêu cầu tự động xử lý mâu thuẫn logic.</p>
+                    <ul className="warnings-list">
+                      {msg.warnings.map((warn, widx) => {
+                        const chapterSource = warn.conflicting_chapter ? `Chương ${warn.conflicting_chapter}` : "Bối cảnh thế giới/nhân vật";
+                        return <li key={widx}>⚠️ [{chapterSource}] {warn.warning}</li>;
+                      })}
+                    </ul>
                   </div>
                 )}
               </div>

@@ -11,6 +11,8 @@ workflow.add_node("story_drafter", nodes.story_drafter_node)
 workflow.add_node("human_review", nodes.human_review_node)
 workflow.add_node("reviser", nodes.reviser_node)
 workflow.add_node("auditor", nodes.auditor_node)
+workflow.add_node("conflict_review", nodes.conflict_review_node)
+workflow.add_node("conflict_resolver", nodes.conflict_resolver_node)
 workflow.add_node("updater", nodes.state_ledger_updater_node)
 
 # Đặt điểm bắt đầu (Entry Point)
@@ -20,7 +22,8 @@ workflow.set_entry_point("requirement_analyzer")
 workflow.add_edge("requirement_analyzer", "story_drafter")
 workflow.add_edge("story_drafter", "human_review")
 workflow.add_edge("reviser", "human_review")
-workflow.add_edge("auditor", "updater")
+workflow.add_edge("conflict_review", "conflict_resolver")
+workflow.add_edge("conflict_resolver", "updater")
 workflow.add_edge("updater", END)
 
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Human Review (Node 3)
@@ -33,13 +36,30 @@ def route_after_human_review(state: AgentState) -> str:
     else:
         return "reviser"
 
-# Cài đặt Conditional Edges cho vòng lặp Node 3 <-> Node 3.1
+# Hàm kiểm tra logic rẽ nhánh có điều kiện sau Auditor (Node 4)
+def route_after_auditor(state: AgentState) -> str:
+    warnings = state.get("warnings", [])
+    if warnings:
+        return "conflict_review"
+    else:
+        return "updater"
+
+# Cài đặt Conditional Edges cho các vòng lặp rẽ nhánh
 workflow.add_conditional_edges(
     "human_review",
     route_after_human_review,
     {
         "auditor": "auditor",
         "reviser": "reviser"
+    }
+)
+
+workflow.add_conditional_edges(
+    "auditor",
+    route_after_auditor,
+    {
+        "conflict_review": "conflict_review",
+        "updater": "updater"
     }
 )
 

@@ -12,5 +12,6 @@ class AgentState(TypedDict):
     draft_content: str
     revision_feedback: str
     auditor_feedback: str
-    warnings: List[str]
+    warnings: List[Dict[str, Any]]
+    conflict_resolutions: List[Dict[str, Any]]
     is_done: bool

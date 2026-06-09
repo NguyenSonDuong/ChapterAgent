@@ -96,6 +96,20 @@ def handle_submit_review_feedback(data):
     else:
         emit('response_status', {'status': 'error', 'message': 'Session not found'})
 
+@socketio.on('submit_conflict_resolutions')
+def handle_submit_conflict_resolutions(data):
+    """Client provides selected conflicts and instructions to resolve them."""
+    story_uuid = data.get('story_uuid')
+    resolutions = data.get('resolutions')
+    print(f"Received conflict resolutions for story {story_uuid}: {resolutions}")
+    session = session_manager.get_session(story_uuid)
+    if session:
+        session.input_data = resolutions
+        session.input_event.set()
+        emit('response_status', {'status': 'acknowledged', 'story_uuid': story_uuid})
+    else:
+        emit('response_status', {'status': 'error', 'message': 'Session not found'})
+
 @socketio.on('submit_model_change')
 def handle_submit_model_change(data):
     """Client provides a new model selection on LLM error/rate limit."""
@@ -1735,6 +1749,7 @@ def generate_chapter(story_uuid):
             "revision_feedback": "",
             "auditor_feedback": "",
             "warnings": [],
+            "conflict_resolutions": [],
             "is_done": False
         }
         

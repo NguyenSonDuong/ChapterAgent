@@ -13,7 +13,7 @@ export default function ProgressBar({ status }) {
     { label: 'Phân tích Yêu cầu', key: 'analysis', statuses: ['analyzing_requirements', 'waiting_clarification'] },
     { label: 'Soạn thảo Bản nháp', key: 'drafting', statuses: ['drafting'] },
     { label: 'Tác giả phê duyệt', key: 'review', statuses: ['waiting_review', 'revising'] },
-    { label: 'Kiểm duyệt Logic', key: 'auditing', statuses: ['auditing'] },
+    { label: 'Kiểm duyệt Logic', key: 'auditing', statuses: ['auditing', 'waiting_conflict_review'] },
     { label: 'Cập nhật & Hoàn thành', key: 'completion', statuses: ['updating', 'completed'] }
   ];
 
@@ -39,7 +39,7 @@ export default function ProgressBar({ status }) {
     if (stepIdx < currentIdx) {
       return 'completed';
     } else if (stepIdx === currentIdx) {
-      if (status === 'waiting_clarification' || status === 'waiting_review') {
+      if (status === 'waiting_clarification' || status === 'waiting_review' || status === 'waiting_conflict_review') {
         return 'waiting';
       }
       return 'active';

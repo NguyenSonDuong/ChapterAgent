@@ -107,9 +107,13 @@ class RequirementAnalysisResult(BaseModel):
         description="Bản phân tích yêu cầu viết chương chi tiết: bối cảnh, diễn biến chính, nhân vật tham gia, và các nút thắt cần giải quyết/cài cắm."
     )
 
+class ConflictWarning(BaseModel):
+    warning: str = Field(description="Nội dung cảnh báo mâu thuẫn logic phát hiện được (ví dụ: nhân vật ở sai vị trí, vật phẩm thay đổi trạng thái vô lý, nhân vật đã chết xuất hiện...).")
+    conflicting_chapter: Optional[int] = Field(default=None, description="Số chương gây mâu thuẫn trực tiếp với chương hiện tại (ví dụ: 2 nếu nhân vật làm mất vũ khí ở chương 2). Để trống nếu mâu thuẫn với cấu hình bối cảnh nhân vật/thế giới.")
+
 class AuditResult(BaseModel):
-    warnings: List[str] = Field(
-        description="Danh sách các cảnh báo về mâu thuẫn logic phát hiện được (ví dụ: nhân vật ở sai vị trí, vật phẩm thay đổi trạng thái vô lý, nhân vật đã chết xuất hiện...). Để trống nếu cốt truyện hoàn toàn hợp lệ."
+    warnings: List[ConflictWarning] = Field(
+        description="Danh sách các cảnh báo về mâu thuẫn logic phát hiện được. Để trống nếu cốt truyện hoàn toàn hợp lệ."
     )
     auditor_feedback: str = Field(
         description="Nhận xét chi tiết của kiểm duyệt viên về tính hợp lý, tính nhất quán của cốt truyện và đề xuất sửa đổi nếu có."
@@ -535,23 +539,32 @@ Hãy phân tích kỹ chương mới và chỉ ra các lỗi mâu thuẫn cốt 
 - Nhân vật đã chết hoặc bị trọng thương bỗng nhiên khỏe mạnh bình thường.
 
 Trả về kết quả có cấu trúc:
-1. `warnings`: Danh sách các câu cảnh báo lỗi logic cụ thể, ngắn gọn (ví dụ: "Sự kiện X bị bỏ qua", "Nhân vật A không dùng pháp khí Y tại địa điểm Z"). Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
+1. `warnings`: Danh sách các đối tượng mâu thuẫn logic phát hiện được. Mỗi đối tượng gồm:
+   - `warning`: Câu cảnh báo lỗi cụ thể, ngắn gọn (ví dụ: "Nhân vật A sử dụng kiếm đã mất ở chương 2").
+   - `conflicting_chapter`: Số chương gây mâu thuẫn trực tiếp nếu phát hiện được (ví dụ: chương trước làm mất kiếm là chương 2 thì điền 2. Nếu mâu thuẫn với cấu hình bối cảnh hoặc nhân vật nói chung thì để trống/null).
+   Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
 2. `auditor_feedback`: Đánh giá tổng quan về chất lượng logic chương mới này.
 """
     result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
+    
+    warnings_dict = [
+        {"warning": w.warning, "conflicting_chapter": w.conflicting_chapter} 
+        for w in result.warnings
+    ]
         
-    if result.warnings:
+    if warnings_dict:
         console.print("\n[bold red][CẢNH BÁO LOGIC PHÁT HIỆN TỪ AUDITOR]:[/bold red]")
-        for w in result.warnings:
-            console.print(f" ⚠️  {w}", style="yellow")
-            emit_agent_log(state["story_uuid"], f"⚠️ Cảnh báo mâu thuẫn: {w}", level="warning")
+        for w in warnings_dict:
+            source_chap = f"Chương {w['conflicting_chapter']}" if w.get("conflicting_chapter") else "Bối cảnh"
+            console.print(f" ⚠️  [{source_chap}] {w['warning']}", style="yellow")
+            emit_agent_log(state["story_uuid"], f"⚠️ Cảnh báo mâu thuẫn ({source_chap}): {w['warning']}", level="warning")
         
         session = session_manager.get_session(state["story_uuid"])
         if session:
             emit_event("audit_warnings", {
                 "story_uuid": state["story_uuid"],
                 "chapter_num": state["chapter_num"],
-                "warnings": result.warnings,
+                "warnings": warnings_dict,
                 "feedback": result.auditor_feedback
             })
     else:
@@ -562,7 +575,7 @@ Trả về kết quả có cấu trúc:
     emit_agent_log(state["story_uuid"], f"Đánh giá từ Auditor: \"{result.auditor_feedback}\"")
     
     return {
-        "warnings": result.warnings,
+        "warnings": warnings_dict,
         "auditor_feedback": result.auditor_feedback
     }
 
@@ -1215,3 +1228,164 @@ YÊU CẦU:
         session_manager.remove_session(story_uuid)
         
     return {"meta": meta_data, "is_done": True}
+
+
+def conflict_review_node(state: AgentState) -> Dict[str, Any]:
+    """Node 4.1: Conflict Review (Breakpoint)
+    Halts execution to let the user choose which logical conflicts to resolve and provide instructions.
+    """
+    check_cancellation(state["story_uuid"])
+    console.print("\n[bold blue]=== [Node 4.1] Conflict Review Breakpoint ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 4.1] Tác giả xem xét mâu thuẫn logic Chương {state['chapter_num']} ===")
+    
+    warnings = state.get("warnings", [])
+    if not warnings:
+        return {"conflict_resolutions": []}
+        
+    session = session_manager.get_session(state["story_uuid"])
+    if session:
+        emit_agent_log(state["story_uuid"], "Đang chờ tác giả phản hồi phương án giải quyết mâu thuẫn logic...")
+        session.current_node = "conflict_review"
+        session.status = "waiting_conflict_review"
+        emit_event("conflict_review_needed", {
+            "story_uuid": state["story_uuid"],
+            "chapter_num": state["chapter_num"],
+            "warnings": warnings,
+            "feedback": state.get("auditor_feedback", "")
+        })
+        # Block until conflict resolutions are submitted
+        session.input_event.clear()
+        success = session.input_event.wait(timeout=600.0) # 10 minutes timeout
+        check_cancellation(state["story_uuid"])
+        if not success:
+            console.print("[yellow]Hết thời gian chờ duyệt mâu thuẫn logic. Mặc định bỏ qua tất cả.[/yellow]")
+            emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt mâu thuẫn logic. Tự động bỏ qua sửa lỗi.", level="warning")
+            resolutions = []
+        else:
+            resolutions = session.input_data
+            session.input_data = None
+            session.status = "running"
+            if resolutions is None:
+                resolutions = []
+            emit_agent_log(state["story_uuid"], f"Nhận được phương án giải quyết mâu thuẫn: {len(resolutions)} mục.")
+    else:
+        # CLI Mode
+        console.print("\n[bold red][CẢNH BÁO MÂU THUẪN LOGIC PHÁT HIỆN]:[/bold red]")
+        for idx, w in enumerate(warnings):
+            source_chap = f"Chương {w['conflicting_chapter']}" if w.get('conflicting_chapter') else "Bối cảnh"
+            console.print(f"  {idx + 1}. [{source_chap}] {w['warning']}")
+            
+        console.print("\n[bold cyan]=== Chế độ giải quyết mâu thuẫn (CLI) ===[/bold cyan]")
+        resolutions = []
+        for idx, w in enumerate(warnings):
+            resolve_choice = Prompt.ask(
+                f"Bạn có muốn AI sửa lỗi số {idx + 1} không?",
+                choices=["y", "n"],
+                default="y"
+            )
+            if resolve_choice == "y":
+                instruction = Prompt.ask(
+                    "Nhập hướng dẫn sửa lỗi (nhấn Enter để AI tự sửa):",
+                    default=""
+                )
+                resolutions.append({
+                    "warning_index": idx,
+                    "resolve": True,
+                    "instruction": instruction.strip()
+                })
+            else:
+                resolutions.append({
+                    "warning_index": idx,
+                    "resolve": False,
+                    "instruction": ""
+                })
+                
+    return {"conflict_resolutions": resolutions}
+
+
+def conflict_resolver_node(state: AgentState) -> Dict[str, Any]:
+    """Node 4.2: Conflict Resolver AI
+    Revises the draft_content to resolve logical conflicts based on user choice and instructions.
+    """
+    check_cancellation(state["story_uuid"])
+    console.print("\n[bold blue]=== [Node 4.2] Conflict Resolver AI ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 4.2] Tự động sửa lỗi mâu thuẫn cốt truyện ===")
+    
+    resolutions = state.get("conflict_resolutions", [])
+    warnings = state.get("warnings", [])
+    
+    # Filter resolutions where resolve is True
+    active_resolutions = [r for r in resolutions if r.get("resolve") is True]
+    if not active_resolutions:
+        console.print("Không có mâu thuẫn nào được chọn để giải quyết. Bỏ qua bước sửa đổi.")
+        emit_agent_log(state["story_uuid"], "Không có mâu thuẫn nào được chọn để giải quyết. Bỏ qua bước sửa đổi.")
+        return {}
+        
+    session = session_manager.get_session(state["story_uuid"])
+    if session:
+        session.current_node = "conflict_resolver"
+        emit_event("agent_status", {
+            "story_uuid": state["story_uuid"],
+            "chapter_num": state["chapter_num"],
+            "status": "revising",
+            "message": f"Đang tự động sửa mâu thuẫn logic Chương {state['chapter_num']}..."
+        })
+        
+    console.print("Đang tiến hành chỉnh sửa bản thảo để giải quyết các mâu thuẫn logic...")
+    emit_agent_log(state["story_uuid"], f"AI đang tiến hành sửa đổi văn bản để xử lý {len(active_resolutions)} mâu thuẫn logic...")
+    
+    # Format the conflicts and instructions for the LLM
+    resolutions_text = ""
+    for r in active_resolutions:
+        w_idx = r.get("warning_index")
+        if 0 <= w_idx < len(warnings):
+            warning_item = warnings[w_idx]
+            warning_msg = warning_item.get("warning")
+            source_chap = f"Chương {warning_item.get('conflicting_chapter')}" if warning_item.get('conflicting_chapter') else "Bối cảnh"
+            instruction = r.get("instruction", "").strip()
+            
+            resolutions_text += f"- **Mâu thuẫn (Gây ra bởi {source_chap})**: {warning_msg}\n"
+            if instruction:
+                resolutions_text += f"  * Hướng dẫn giải quyết của tác giả: \"{instruction}\"\n"
+            else:
+                resolutions_text += f"  * Hướng dẫn giải quyết: Cho phép AI tự động điều chỉnh văn cảnh để loại bỏ mâu thuẫn này một cách hợp lý nhất.\n"
+
+    draft_content = state["draft_content"]
+    meta = state["meta"]
+    chapter_num = state["chapter_num"]
+    reqs = state.get("analyzed_requirements", "")
+    
+    prompt = f"""
+Bạn là một nhà văn và biên tập viên xuất sắc. Nhiệm vụ của bạn là sửa đổi bản thảo Chương {chapter_num} để khắc phục triệt để các mâu thuẫn logic cốt truyện được liệt kê dưới đây.
+
+DANH SÁCH MÂU THUẪN LOGIC CẦN GIẢI QUYẾT:
+{resolutions_text}
+
+THÔNG TIN TRUYỆN THAM KHẢO:
+- Tên truyện: {meta.get('name')}
+- Nhân vật: {json.dumps(meta.get('characters'), ensure_ascii=False)}
+- Phong cách hành văn: {meta.get('style')}
+- Bối cảnh: {meta.get('context')}
+
+BẢN NHÁP HIỆN TẠI CỦA CHƯƠNG {chapter_num}:
+---
+{draft_content}
+---
+
+Hãy viết lại bản thảo này sao cho:
+1. Giải quyết và sửa đổi tất cả các mâu thuẫn logic được nêu ở trên theo đúng hướng dẫn giải quyết tương ứng (nếu có) hoặc tự sửa đổi một cách logic nhất (nếu không có hướng dẫn cụ thể).
+2. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
+3. Đảm bảo đúng phong cách hành văn dài kỳ và không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
+"""
+    response = invoke_with_retry(state, prompt, temperature=0.7)
+    revised_content = ensure_string(response.content)
+    emit_agent_log(state["story_uuid"], "Đã tự động sửa xong các lỗi mâu thuẫn cốt truyện.")
+    
+    # Update temporary draft file
+    temp_draft_path = config.get_temp_draft_path(state["story_uuid"])
+    try:
+        temp_draft_path.write_text(revised_content, encoding="utf-8")
+    except Exception:
+        pass
+        
+    return {"draft_content": revised_content}
