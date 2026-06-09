@@ -330,8 +330,13 @@ Yêu cầu viết truyện:
 1. Viết trực tiếp nội dung truyện bằng định dạng Markdown.
 2. Tiêu đề chương viết ở dòng đầu tiên dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`.
 3. Tập trung miêu tả sâu sắc về bối cảnh, cảm xúc, biểu cảm, hội thoại và hành động. Đảm bảo đúng phong cách: {meta.get('style')}.
-4. Đảm bảo các diễn biến câu chuyện trong các sự kiện (nodes) tuần tự và sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi sự kiện trong SƠ ĐỒ SỰ KIỆN GỐC.
-5. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
+4. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi node.
+5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
+   - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
+   - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).
+   - Hãy bắt đầu trực tiếp đi thẳng vào diễn biến tiếp nối chương trước, phát triển mạch truyện tự nhiên theo các node sự kiện.
+   - Đoạn kết chương phải là một kết cục mở hoặc một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để lôi cuốn độc giả đọc tiếp chương sau. Tránh tuyệt đối các câu văn mang tính chất "khép lại" chương hoặc tóm tắt lại những gì đã xảy ra.
+6. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
 """
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
@@ -450,9 +455,14 @@ BẢN NHÁP HIỆN TẠI:
 
 Hãy viết lại bản nháp này. Đảm bảo:
 1. Sửa đổi đúng theo ý tác giả (thêm thắt chi tiết, sửa lời thoại, thay đổi nhịp điệu cốt truyện...).
-2. Đảm bảo các diễn biến câu chuyện trong các sự kiện (nodes) vẫn tuân thủ đúng các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được hoạch định trong SƠ ĐỒ SỰ KIỆN GỐC.
-3. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
-4. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
+2. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi node.
+3. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
+   - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
+   - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).
+   - Hãy bắt đầu trực tiếp đi thẳng vào diễn biến tiếp nối chương trước, phát triển mạch truyện tự nhiên theo các node sự kiện.
+   - Đoạn kết chương phải là một kết cục mở hoặc một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để lôi cuốn độc giả đọc tiếp chương sau. Tránh tuyệt đối các câu văn mang tính chất "khép lại" chương hoặc tóm tắt lại những gì đã xảy ra.
+4. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
+5. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
 """
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
