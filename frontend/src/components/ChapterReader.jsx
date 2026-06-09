@@ -33,6 +33,7 @@ export default function ChapterReader({
   const [editingNodeId, setEditingNodeId] = useState(null);
   const [linkingSourceNodeId, setLinkingSourceNodeId] = useState(null);
   const [savingNodes, setSavingNodes] = useState(false);
+  const [syncingNodes, setSyncingNodes] = useState(false);
   const [suggestingNodeId, setSuggestingNodeId] = useState(null);
   const [chapterNodesCache, setChapterNodesCache] = useState({});
   const [nodeForm, setNodeForm] = useState({
@@ -284,6 +285,32 @@ export default function ChapterReader({
       alert('Lỗi kết nối khi lưu sơ đồ sự kiện.');
     } finally {
       setSavingNodes(false);
+    }
+  };
+
+  const handleSyncNodeContents = async () => {
+    if (!selectedNum || !storyUuid) return;
+    setSyncingNodes(true);
+    try {
+      const res = await fetch(`${targetUrl}/api/stories/${storyUuid}/chapters/${selectedNum}/align-nodes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || 'Đồng bộ nội dung vào các node sự kiện thành công.');
+        if (showCanvasModal) {
+          setNodes(data.nodes || []);
+          setConnections(data.connections || []);
+        }
+      } else {
+        alert(data.error || 'Lỗi khi đồng bộ nội dung vào các node.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Lỗi kết nối khi đồng bộ nội dung vào các node.');
+    } finally {
+      setSyncingNodes(false);
     }
   };
 
@@ -633,6 +660,20 @@ export default function ChapterReader({
           <div className="toolbar-right">
             {!editMode ? (
               <>
+                <button 
+                  onClick={handleSyncNodeContents} 
+                  className="btn-toolbar btn-edit"
+                  disabled={syncingNodes}
+                  style={{ 
+                    background: 'rgba(14, 165, 233, 0.15)', 
+                    border: '1px solid rgba(14, 165, 233, 0.3)', 
+                    color: '#38bdf8',
+                    marginRight: '8px'
+                  }}
+                >
+                  <Sparkles className={`icon-xs ${syncingNodes ? 'spin' : ''}`} style={{ color: '#38bdf8' }} /> 
+                  <span>{syncingNodes ? 'Đang cập nhật...' : 'Cập nhật nội dung vào Node'}</span>
+                </button>
                 <button 
                   onClick={handleOpenCanvasModal} 
                   className="btn-toolbar btn-edit"

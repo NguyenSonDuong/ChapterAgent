@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 
 import src.core.config as config
-from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo
+from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo, NodeContentMapping, ChapterNodeContentExtraction
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string, is_higher_cultivation
 from src.utils.llm import invoke_with_retry, check_cancellation
@@ -152,15 +152,6 @@ class WorldEntityExtraction(BaseModel):
     weapons: List[ExtractedWeapon] = Field(default_factory=list, description="Danh sách các binh khí / pháp khí mới xuất hiện trong chương.")
     techniques: List[ExtractedTechnique] = Field(default_factory=list, description="Danh sách các công pháp mới xuất hiện trong chương.")
     character_updates: List[CharacterUpdate] = Field(default_factory=list, description="Cập nhật trạng thái cụ thể cho từng nhân vật tham gia chương này.")
-
-
-class NodeContentMapping(BaseModel):
-    node_id: str = Field(description="ID của node (ví dụ: node-1)")
-    content: str = Field(description="Đoạn văn hoặc nội dung truyện thực tế trong chương tương ứng với node này. Cần trích xuất chính xác và đầy đủ các câu chữ từ bản viết chương.")
-
-class ChapterNodeContentExtraction(BaseModel):
-    mappings: List[NodeContentMapping] = Field(description="Danh sách ánh xạ nội dung truyện thực tế cho từng node")
-
 
 # --- LangGraph Node Functions ---
 

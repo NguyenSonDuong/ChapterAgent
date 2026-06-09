@@ -156,3 +156,11 @@ class SuggestedSingleNodeDetails(BaseModel):
     description: str = Field(description="Mô tả kịch bản / Hướng giải quyết chi tiết diễn biến được gợi ý (bắt buộc, không để trống)")
 
 
+class NodeContentMapping(BaseModel):
+    node_id: str = Field(description="ID của node (ví dụ: node-1)")
+    content: str = Field(description="Đoạn văn hoặc nội dung truyện thực tế trong chương tương ứng với node này. Cần trích xuất chính xác và đầy đủ các câu chữ từ bản viết chương.")
+
+class ChapterNodeContentExtraction(BaseModel):
+    mappings: List[NodeContentMapping] = Field(description="Danh sách ánh xạ nội dung truyện thực tế cho từng node")
+
+
