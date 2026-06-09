@@ -32,7 +32,8 @@
       "weapons": [],
       "techniques": [],
       "x": 151,
-      "y": 200
+      "y": 200,
+      "content": "Trong khoảng không trắng xóa vô tận, không âm thanh, không gió thổi, Sở Mặc cảm thấy ý thức của mình như một chiếc lá khô lạc giữa hư vô. Nơi đây không có đau đớn, không có tiếng gầm rú của yêu ma, chỉ có một luồng hơi nóng âm ỉ chảy tràn trong huyết quản, tựa như dòng nham thạch đang cố gắng phá vỡ lớp vỏ bọc cứng nhắc của phàm nhân. Hắn không nhìn thấy gì, nhưng lại cảm nhận được những hình ảnh mờ nhạt: một con rồng uốn lượn quanh ngọn núi, những ký tự cổ xưa rực sáng trong máu. Đó không phải ảo ảnh, cũng chẳng phải mộng mị, mà là một cảm giác mơ hồ đến lạ kỳ, tựa như có thứ gì đó từ thuở hồng hoang vừa cựa mình thức giấc sau giấc ngủ vùi vĩnh cửu."
     },
     {
       "id": "node-1780905980528",
@@ -60,7 +61,8 @@
       "weapons": [],
       "techniques": [],
       "x": 450,
-      "y": 259
+      "y": 259,
+      "content": "Thế nhưng, giữa lúc tâm thần hắn đang chìm sâu vào sự tĩnh lặng kỳ bí ấy, một luồng sát khí cuồng bạo từ thực tại bất ngờ đâm toạc không gian, kéo phăng ý thức hắn trở về. \"Sở Mặc! Không... không được!\" Tiếng thét xé lòng của Mộc Tuyết vang vọng bên tai, kéo theo mùi máu tanh nồng nặc. Sở Mặc bừng tỉnh. Trước mắt hắn là bầu trời xám xịt của Táng Cốt Lâm và con Ma vật – kẻ vừa bị hắn chém hỏng một mắt – đang gầm lên điên cuồng, móng vuốt sắc nhọn như lưỡi đao vung xuống."
     },
     {
       "id": "node-1780905980529",
@@ -81,7 +83,8 @@
       "weapons": [],
       "techniques": [],
       "x": 750,
-      "y": 200
+      "y": 200,
+      "content": "Trong khoảnh khắc ngàn cân treo sợi tóc, Sở Mặc nhìn thấy Mộc Tuyết. Nàng đang quỳ chắn trước mặt hắn, đôi tay run rẩy cầm một khúc gỗ mục nát, đôi mắt mở to đầy sợ hãi nhưng kiên định đến cực đoan. Nàng không biết võ, hành động ấy chỉ là sự hy sinh vô nghĩa của một phàm nhân trước sức mạnh yêu ma, nhưng chính sự hy sinh đó đã khiến trái tim Sở Mặc như bị bóp nghẹt."
     },
     {
       "id": "node-1780905980530",
@@ -106,7 +109,8 @@
         "Bá Huyết Cuồng Đao Quyết"
       ],
       "x": 1049,
-      "y": 271
+      "y": 271,
+      "content": "\"Tuyết, tránh ra!\" Sở Mặc gầm lên, sức mạnh từ Thối Thể Cảnh nhất trọng bùng phát. Hắn dùng hết chút sức lực cuối cùng, đẩy mạnh Mộc Tuyết ra phía sau, đồng thời xoay người đỡ trọn đòn tấn công của con Ma vật bằng thanh đao cùn. Keng! Tiếng kim loại va chạm khô khốc vang lên. Lần này, cơ thể hắn không còn gục ngã như trước. Sự đột phá trong tu vi đã trở thành đòn bẩy, thúc đẩy Bá Huyết Cuồng Đao Quyết vận chuyển trơn tru qua những kinh mạch vốn đã được đả thông. Đôi mắt Sở Mặc đỏ rực huyết quang, sát khí bốc lên nghi ngút."
     },
     {
       "id": "node-1780905980531",
@@ -130,7 +134,8 @@
         "Bá Huyết Cuồng Đao Quyết"
       ],
       "x": 1350,
-      "y": 200
+      "y": 200,
+      "content": "Hắn gầm lên, thanh đao cùn trong tay không còn là một mảnh sắt vụn, mà trở thành một lưỡi hái tử thần. Hắn bước lên một bước, đao ý cuồng bạo quét ngang. \"Cút!\" Nhát chém chớp nhoáng, chuẩn xác nhắm thẳng vào yết hầu. Máu đen bắn tung tóe lên mặt đất vẩn đục nơi con suối cạn. Con quái vật rống lên một tiếng cuối cùng rồi đổ ập xuống, thân xác tan rã thành tro bụi yêu khí."
     },
     {
       "id": "node-1780905980532",
@@ -153,7 +158,8 @@
       ],
       "techniques": [],
       "x": 1650,
-      "y": 260
+      "y": 260,
+      "content": "Sau trận chiến, cả hai thu dọn hành lý đơn sơ. Sở Mặc nhìn về phía Tây, nơi những rặng núi mờ sương ẩn hiện. Hắn kéo nàng đứng dậy, giọng trầm ổn nhưng kiên quyết: \"Chúng ta không thể ở lại đây, Tuyết nhi. Đi về phía Tây, nơi có làng mạc và bóng người, rời xa vùng đất chết này trước khi lũ yêu ma khác đánh hơi được mùi máu.\""
     },
     {
       "id": "node-1780905980533",
@@ -174,7 +180,8 @@
       "weapons": [],
       "techniques": [],
       "x": 1950,
-      "y": 200
+      "y": 200,
+      "content": "Hai bóng hình nhỏ bé dìu nhau bước đi, vượt qua vũng máu đen của Ma vật, tiến sâu vào rừng già. Dù phía trước là nghịch cảnh tăm tối, nhưng dưới ánh sáng lờ mờ của Táng Cốt Lâm, bước chân của họ đã trở nên đồng nhất, một thực thể không thể tách rời trên con đường nghịch thiên cải mệnh."
     }
   ],
   "connections": [

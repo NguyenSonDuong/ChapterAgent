@@ -1520,10 +1520,6 @@
   ],
   "unresolved_threads": [
     {
-      "thread": "Mục tiêu nghịch thiên mà sống của hai nhân vật chính trong một thế giới đầy rẫy yêu ma.",
-      "chapter": 2
-    },
-    {
       "thread": "Sự tồn tại của thế lực yêu ma đã tàn sát ngôi làng của Mộc Tuyết.",
       "chapter": 2
     },
@@ -1534,10 +1530,6 @@
     {
       "thread": "Tại sao lão giả lại bày tỏ sự ngưỡng mộ đối với hai người có tư chất kém cỏi?",
       "chapter": 4
-    },
-    {
-      "thread": "Tiềm năng thực sự của Thiên Diễn Tàn Trận và Bá Huyết Cuồng Đao Quyết.",
-      "chapter": 5
     },
     {
       "thread": "Hành trình nghịch thiên cải mệnh phía trước với đầy rẫy yêu ma.",
@@ -1572,12 +1564,20 @@
       "chapter": 10
     },
     {
-      "thread": "Sức mạnh và giới hạn của con đường tu luyện Tạp linh căn mới được khai mở.",
+      "thread": "Tàn quyển \"Thiên Diễn Tàn Trận\" vẫn còn nhiều bí ẩn chưa được khám phá.",
       "chapter": 10
     },
     {
-      "thread": "Tàn quyển \"Thiên Diễn Tàn Trận\" vẫn còn nhiều bí ẩn chưa được khám phá.",
-      "chapter": 10
+      "thread": "Sự nguy hiểm tiềm tàng của việc kết nối tâm linh hai chiều nếu một trong hai mất tập trung.",
+      "chapter": 11
+    },
+    {
+      "thread": "Hành trình tiến về Huyền Thiên Tông với nhiều mối đe dọa từ yêu ma và sự khinh miệt của các tông môn tiên đạo.",
+      "chapter": 11
+    },
+    {
+      "thread": "Mục tiêu tìm kiếm sự thật và khẳng định bản thân của hai nhân vật chính trong một thế giới đầy rẫy sự bất công.",
+      "chapter": 11
     }
   ],
   "resolved_threads": [
@@ -1646,6 +1646,24 @@
       "chapter_introduced": 8,
       "chapter_resolved": 10,
       "resolution_note": "Tự động phát hiện giải quyết bởi AI."
+    },
+    {
+      "thread": "Sức mạnh và giới hạn của con đường tu luyện Tạp linh căn mới được khai mở.",
+      "chapter_introduced": 10,
+      "chapter_resolved": 11,
+      "resolution_note": "Cả hai nhận ra sự liên kết linh hồn giúp họ chia sẻ và cân bằng được huyết khí, biến nhược điểm Tạp linh căn thành một dạng 'cộng hưởng' đặc biệt, tạm thời vượt qua giới hạn phàm nhân."
+    },
+    {
+      "thread": "Tiềm năng thực sự của Thiên Diễn Tàn Trận và Bá Huyết Cuồng Đao Quyết.",
+      "chapter_introduced": 5,
+      "chapter_resolved": 11,
+      "resolution_note": "Sự kết hợp giữa trận pháp và đao quyết tạo ra một trạng thái chiến đấu mới, nơi Sở Mặc là mũi nhọn tấn công còn Mộc Tuyết là lá chắn và bộ não điều phối."
+    },
+    {
+      "thread": "Mục tiêu nghịch thiên mà sống của hai nhân vật chính trong một thế giới đầy rẫy yêu ma.",
+      "chapter_introduced": 2,
+      "chapter_resolved": 11,
+      "resolution_note": "Cả hai quyết tâm tìm đến Huyền Thiên Tông để tìm kiếm câu trả lời về thân thế và khẳng định con đường tu luyện của riêng mình, bất chấp mọi rào cản của thiên đạo."
     }
   ],
   "locations": [
@@ -1685,6 +1703,11 @@
       "name": "Thanh đao cùn",
       "chapter": 3,
       "description": "Vật bất ly thân của Sở Mặc, được hắn sử dụng làm điểm tựa và vũ khí phòng thân."
+    },
+    {
+      "name": "Đao cùn",
+      "chapter": 11,
+      "description": "Vũ khí gắn liền với Sở Mặc, được sử dụng để chém vỡ tảng đá cổ thụ."
     }
   ],
   "techniques": [
