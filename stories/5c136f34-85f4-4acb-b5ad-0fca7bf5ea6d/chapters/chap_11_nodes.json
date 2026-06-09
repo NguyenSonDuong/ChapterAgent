@@ -1,0 +1,192 @@
+{
+  "nodes": [
+    {
+      "id": "node-1781022189603",
+      "title": "Tỉnh giấc sau cộng hưởng",
+      "description": "Sở Mặc là người đầu tiên tỉnh dậy sau đêm dài cộng hưởng linh hồn. Hắn cảm nhận được luồng sức mạnh mới lạ đang cuộn chảy trong cơ thể nhưng vẫn còn rất yếu ớt. Nhìn Mộc Tuyết vẫn đang say ngủ với khuôn mặt bình yên, Sở Mặc cẩn thận kiểm tra vết thương của cả hai rồi nhẹ nhàng rời khỏi nơi trú ẩn để tìm kiếm nguồn sống.",
+      "characters": [
+        "Sở Mặc"
+      ],
+      "resolved_thread": {
+        "thread": "Sự nguy hiểm tiềm tàng của việc kết nối tâm linh hai chiều nếu một trong hai mất tập trung.",
+        "resolution_note": "Cả hai đã vượt qua giai đoạn nguy hiểm nhất của việc kết nối linh hồn, cơ thể đang dần thích nghi với luồng sức mạnh mới."
+      },
+      "links": [
+        {
+          "chapter": 10,
+          "nodes": [
+            "node-1780932992643"
+          ]
+        }
+      ],
+      "locations": [
+        "Bìa rừng Táng Cốt Lâm"
+      ],
+      "weapons": [
+        "Thanh đao cùn"
+      ],
+      "techniques": [],
+      "content": "Sở Mặc là người đầu tiên tỉnh dậy sau đêm dài cộng hưởng linh hồn. Hắn khẽ cử động, cảm giác đau đớn xé rách kinh mạch như những ngày trước đã biến mất, thay vào đó là một luồng nhiệt lượng kỳ lạ đang cuộn chảy âm thầm trong từng thớ thịt. Hắn nhìn xuống bàn tay mình, những vết chai sạn và sẹo cũ dường như nhạt đi, da thịt trở nên cứng cáp hơn hẳn. Sở Mặc cẩn thận kiểm tra vết thương của Mộc Tuyết, thấy nàng vẫn đang say ngủ với khuôn mặt bình yên, hắn mới thở phào nhẹ nhõm rồi lặng lẽ rời khỏi nơi trú ẩn để tìm kiếm nguồn sống.",
+      "x": 150,
+      "y": 200
+    },
+    {
+      "id": "node-1781022189604",
+      "title": "Chăm sóc và chờ đợi",
+      "description": "Sở Mặc men theo dòng suối gần đó, tìm được một ít nước sạch và vài loại quả dại có thể ăn được. Hắn quay lại, kiên nhẫn canh gác cho Mộc Tuyết trong suốt một ngày dài. Trong lúc chờ đợi, hắn bắt đầu suy ngẫm về con đường tu tiên đầy chông gai phía trước và cách để bảo vệ người con gái đang nằm cạnh mình.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Bìa rừng Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 450,
+      "y": 260,
+      "content": "Suốt một ngày dài, Sở Mặc không rời xa vị trí ẩn náu quá xa. Hắn men theo dòng suối cạn gần đó, dùng kỹ năng sinh tồn tôi luyện từ những ngày lang bạt để bẫy được vài con thỏ rừng và hái một ít quả dại. Mọi hành động của hắn đều lặng lẽ, cẩn trọng. Hắn không chỉ canh gác thú dữ, mà còn canh gác cả sự an nguy của Mộc Tuyết."
+    },
+    {
+      "id": "node-1781022189605",
+      "title": "Mộc Tuyết tỉnh lại",
+      "description": "Đến cuối ngày, Mộc Tuyết chậm rãi mở mắt. Nàng cảm thấy cơ thể nhẹ nhõm lạ thường như thể những vết thương cũ đã được chữa lành một phần. Sở Mặc nhẹ nhàng đỡ nàng dậy, cho nàng uống nước và ăn chút ít. Hai người dành thêm một ngày để hồi phục hoàn toàn thể lực trước khi quyết định lên đường.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Bìa rừng Táng Cốt Lâm"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 750,
+      "y": 200,
+      "content": "Khi ánh hoàng hôn nhuộm đỏ bìa rừng Táng Cốt Lâm, Mộc Tuyết mới chậm rãi mở mắt. Nàng cảm thấy cơ thể nhẹ nhõm lạ thường như thể những vết thương cũ đã được chữa lành một phần. Sở Mặc nhẹ nhàng đỡ nàng dậy, đưa cho nàng chút nước sạch và miếng thịt thú nướng vội. Hai người dành thêm một ngày để hồi phục hoàn toàn thể lực trước khi quyết định lên đường."
+    },
+    {
+      "id": "node-1781022189606",
+      "title": "Hành trình về phía Tây",
+      "description": "Sau hai ngày nghỉ ngơi, cả hai bắt đầu lên đường tiến về phía Tây. Suốt nửa tháng ròng rã, họ băng qua những cánh rừng và vách đá, giữ khoảng cách với các yêu thú và tránh xa những khu vực nguy hiểm. Dù hành trình dài đằng đẵng, nhưng sự gắn kết giữa họ giúp cả hai luôn vững vàng vượt qua mọi khó khăn.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": "Hai người đã kiên trì di chuyển trong nửa tháng mà không gặp phải rắc rối lớn nào, dần tiệm cận đến khu vực nhân tộc sinh sống."
+      },
+      "links": [],
+      "locations": [
+        "Cửu Châu đại lục"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Hành trình tiến về phía Tây bắt đầu từ đó. Nửa tháng ròng rã, họ băng qua những cánh rừng và vách đá, giữ khoảng cách với các yêu thú và tránh xa những khu vực nguy hiểm. Sở Mặc luôn đi trước, thanh đao cùn trong tay hắn không chỉ để chém yêu thú mà còn để chặt cây dựng lều tạm. Mộc Tuyết thì âm thầm quan sát địa hình, vận dụng những kiến thức \"Thiên Diễn Tàn Trận\" để che giấu dấu vết của cả hai.",
+      "x": 1050,
+      "y": 260
+    },
+    {
+      "id": "node-1781022189607",
+      "title": "Cửa thành đóng chặt",
+      "description": "Cuối cùng, một thành trì đồ sộ của nhân tộc hiện ra trước mắt. Tuy nhiên, khi định tiến vào, họ lập tức bị lính gác chặn lại. Do không có vật xác định danh tính và không thuộc bất kỳ tông môn nào, cả hai bị từ chối nhập thành một cách lạnh lùng, thậm chí còn bị khinh miệt vì vẻ ngoài rách rưới.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "Cả hai thất bại trong việc nhập thành do không có danh tính, buộc phải thay đổi kế hoạch.",
+        "thread": "Mục tiêu tìm kiếm sự thật và khẳng định bản thân của hai nhân vật chính trong một thế giới đầy rẫy sự bất công."
+      },
+      "links": [],
+      "locations": [
+        "Thành trì nhân tộc"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 1350,
+      "y": 200,
+      "content": "Cuối cùng, một bức tường thành cao lớn xuất hiện phía chân trời. Đó là thành trì nhân tộc, biểu tượng của sự an toàn mà họ đã hằng khao khát. Nhưng ngay khi tiến lại gần cổng thành, một gã lính gác khoác giáp sắt đã lạnh lùng chặn ngang cây thương, ngăn cản bước chân họ. \"Dừng lại! Lũ ăn mày rách rưới, tông môn nào? Lệnh bài đâu?\" – Tên lính gác quát lớn, ánh mắt đầy vẻ khinh miệt quét qua bộ dạng tả tơi, đầy sẹo của hai người. Sở Mặc siết chặt chuôi đao cùn, hạ thấp giọng: \"Chúng ta là tán tu, chỉ muốn vào thành tìm nơi tá túc, không có lệnh bài của tông môn.\" Tên lính gác cười khẩy, liếc nhìn gã đồng đội bên cạnh rồi quay lại nhìn họ với ánh mắt như nhìn lũ súc vật: \"Tán tu? Nhìn cái bộ dạng đó mà cũng đòi vào thành? Nơi này không phải là chỗ cho lũ phế vật tạp linh căn các ngươi làm bẩn đất. Cút ngay trước khi ta đổi ý và lấy cái mạng chó của các ngươi!\" \"Chúng tôi không gây gổ, chỉ xin một góc nhỏ để nghỉ ngơi...\" Mộc Tuyết bước lên, giọng run rẩy giải thích, đôi mắt quật cường cố nén sự tủi nhục. \"Ta nói cút!\" – Tên lính gác vung thương, suýt chút nữa đập trúng vai Mộc Tuyết. \"Đừng để ta nhắc lại lần thứ ba, lũ rác rưởi không có tông môn thì chỉ xứng làm thức ăn cho yêu ma ngoài kia thôi!\" Cửa thành đóng sầm lại trước mặt."
+    },
+    {
+      "id": "node-1781022189608",
+      "title": "Lánh nạn trong rừng",
+      "description": "Bị xua đuổi khỏi thành, Sở Mặc và Mộc Tuyết không còn lựa chọn nào khác ngoài việc quay ngược lại khu rừng gần thành trì để tạm lánh qua đêm. Họ tìm một tán cây cổ thụ kín đáo, dựng một chỗ trú ẩn tạm bợ dưới màn đêm đang dần buông xuống, lòng đầy hoang mang về tương lai.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu rừng gần thành trì"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 1650,
+      "y": 260,
+      "content": "Sở Mặc đứng chết lặng, tiếng chốt cửa nặng nề vang lên như nhát búa giáng thẳng vào tim hắn. Trong khoảnh khắc ấy, một luồng phẫn nộ cuộn trào trong huyết quản, thiêu đốt tâm can hắn. Thế đạo này thật bất công, kẻ mạnh thì được tung hô, kẻ yếu như bọn họ chỉ là cỏ rác bị chà đạp. Hắn siết chặt lấy bàn tay Mộc Tuyết, móng tay găm sâu vào lòng bàn tay đến rướm máu. “Được, các người khinh ta, các người đuổi ta. Ta sẽ không bao giờ cúi đầu trước cái thế đạo mục nát này nữa! Mộc Tuyết, nàng hãy đợi đó, ta nhất định sẽ dùng đôi tay này, dùng thanh đao cùn này, đạp đổ cái cổng thành cao ngạo kia, bước lên đỉnh cao mà không cần bất kỳ kẻ nào ban ơn!” Sở Mặc kéo Mộc Tuyết quay lưng rời đi. Họ không còn cách nào khác ngoài việc quay ngược lại khu rừng gần thành trì để lánh nạn."
+    },
+    {
+      "id": "node-1781022189609",
+      "title": "Khách lạ trong đêm (Cliffhanger)",
+      "description": "Trong lúc hai người đang chuẩn bị chìm vào giấc ngủ, một đôi mắt vàng rực bất ngờ xuất hiện giữa bóng tối ngay gần chỗ nghỉ. Không phải yêu thú hung dữ, đó là một con mèo đen tuyền với khí tức vô cùng kỳ bí. Nó cứ lặng lẽ quan sát họ, không tấn công nhưng cũng không rời đi, khiến cả hai không khỏi cảm thấy bất an.",
+      "characters": [
+        "Sở Mặc",
+        "Mộc Tuyết"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu rừng gần thành trì"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "x": 1950,
+      "y": 200,
+      "content": "Đêm dần buông, bóng tối đặc quánh bao trùm lấy chỗ trú ẩn tạm bợ dưới tán cây cổ thụ. Sở Mặc ngồi bó gối, ánh mắt sắc lạnh dõi theo từng nhành lá lay động. Đột nhiên, hắn cảm thấy một luồng áp lực vô hình bao phủ. Trong bóng tối dày đặc, một đôi mắt vàng rực bất ngờ xuất hiện, tĩnh lặng và thâm sâu. Đó không phải là đôi mắt hung dữ của yêu thú, mà là một cái nhìn mang theo khí tức kỳ bí, cao ngạo. Một con mèo đen tuyền đang ngồi cách đó không xa, đuôi khẽ vẫy, lặng lẽ quan sát hai người. Sở Mặc cảm thấy toàn thân cứng đờ, bản năng chiến đấu trỗi dậy. Hắn không chần chừ, tay siết chặt lấy chuôi thanh đao cùn, ánh mắt gườm gườm đối diện thẳng với ánh nhìn của con vật lạ kỳ kia."
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1781022189603",
+      "to": "node-1781022189604"
+    },
+    {
+      "from": "node-1781022189604",
+      "to": "node-1781022189605"
+    },
+    {
+      "from": "node-1781022189605",
+      "to": "node-1781022189606"
+    },
+    {
+      "from": "node-1781022189606",
+      "to": "node-1781022189607"
+    },
+    {
+      "from": "node-1781022189607",
+      "to": "node-1781022189608"
+    },
+    {
+      "from": "node-1781022189608",
+      "to": "node-1781022189609"
+    }
+  ]
+}
