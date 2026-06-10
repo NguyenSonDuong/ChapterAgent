@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, RefreshCw, BookOpen, Share2, HelpCircle } from 'lucide-react';
+import { Search, RefreshCw, BookOpen, Share2, HelpCircle, LayoutGrid, ZoomIn, ZoomOut } from 'lucide-react';
 
 export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
   const [loading, setLoading] = useState(false);
@@ -15,6 +15,31 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
   
   // Ref for the canvas wrapper to calculate scroll bounds
   const canvasContainerRef = useRef(null);
+  
+  const [zoom, setZoom] = useState(1.0);
+
+  // Setup Wheel Event Listener for Ctrl + Mouse Wheel Zoom (non-passive listener)
+  useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container) return;
+
+    const handleWheelEvent = (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const delta = e.deltaY;
+        setZoom(prev => {
+          const factor = delta < 0 ? 0.05 : -0.05;
+          const newZoom = prev + factor;
+          return Math.max(0.3, Math.min(2.0, Math.round(newZoom * 100) / 100));
+        });
+      }
+    };
+
+    container.addEventListener('wheel', handleWheelEvent, { passive: false });
+    return () => {
+      container.removeEventListener('wheel', handleWheelEvent);
+    };
+  }, [loading, nodes]);
 
   // Fetch all nodes
   const fetchAllNodes = async () => {
@@ -145,12 +170,12 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
     if (nodeIndex === -1) return;
 
     const node = nodes[nodeIndex];
-    const startX = e.clientX - node.x;
-    const startY = e.clientY - node.y;
+    const startX = e.clientX / zoom - node.x;
+    const startY = e.clientY / zoom - node.y;
 
     const handleMouseMove = (moveEvent) => {
-      const newX = Math.max(10, Math.min(2200, moveEvent.clientX - startX));
-      const newY = Math.max(10, Math.min(5000, moveEvent.clientY - startY));
+      const newX = Math.max(10, Math.min(2200, moveEvent.clientX / zoom - startX));
+      const newY = Math.max(10, Math.min(5000, moveEvent.clientY / zoom - startY));
 
       setNodes(prev => prev.map(n => n.id === nodeId ? { ...n, x: newX, y: newY } : n));
     };
@@ -176,6 +201,96 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
         return prev.map(n => n.id === nodeId ? { ...n, width: newWidth, height: newHeight } : n);
       }
       return prev;
+    });
+  };
+
+  // --- Auto Arrange Layout Algorithm (Kahn's Topological Sort) ---
+  const handleAutoArrange = () => {
+    setNodes(prevNodes => {
+      // Group nodes by chapter
+      const chaptersMap = {};
+      prevNodes.forEach(node => {
+        if (!chaptersMap[node.chapter]) {
+          chaptersMap[node.chapter] = [];
+        }
+        chaptersMap[node.chapter].push(node);
+      });
+
+      const newNodes = [...prevNodes];
+
+      // For each chapter, sort its nodes and assign new coordinates
+      Object.keys(chaptersMap).forEach(chapStr => {
+        const chapNum = Number(chapStr);
+        const chapNodes = chaptersMap[chapStr];
+        if (chapNodes.length === 0) return;
+
+        // Find connections inside this chapter
+        const chapConns = connections.filter(
+          c => c.chapter === chapNum && c.type === 'intra'
+        );
+
+        // Build adjacency list & count in-degrees
+        const adj = {};
+        const inDegree = {};
+        chapNodes.forEach(n => {
+          adj[n.id] = [];
+          inDegree[n.id] = 0;
+        });
+
+        chapConns.forEach(c => {
+          if (adj[c.from] && adj[c.to] !== undefined) {
+            adj[c.from].push(c.to);
+            inDegree[c.to] = (inDegree[c.to] || 0) + 1;
+          }
+        });
+
+        // Topological sort starting from nodes with 0 in-degree
+        const queue = chapNodes.filter(n => inDegree[n.id] === 0).map(n => n.id);
+        
+        // Fallback if there is a cycle or no starting nodes: sort by current x
+        if (queue.length === 0) {
+          [...chapNodes].sort((a, b) => a.x - b.x).forEach(n => queue.push(n.id));
+        }
+
+        const orderedIds = [];
+        const visited = new Set();
+
+        while (queue.length > 0) {
+          const currId = queue.shift();
+          if (visited.has(currId)) continue;
+          visited.add(currId);
+          orderedIds.push(currId);
+
+          const neighbors = adj[currId] || [];
+          neighbors.forEach(neighId => {
+            inDegree[neighId]--;
+            if (inDegree[neighId] === 0) {
+              queue.push(neighId);
+            }
+          });
+        }
+
+        // Add any remaining nodes (safeguard for cycle components)
+        chapNodes.forEach(n => {
+          if (!visited.has(n.id)) {
+            orderedIds.push(n.id);
+          }
+        });
+
+        // Assign clean coordinates
+        orderedIds.forEach((nodeId, idx) => {
+          const nodeIdx = newNodes.findIndex(n => n.id === nodeId);
+          if (nodeIdx !== -1) {
+            const laneIdx = newNodes[nodeIdx].laneIdx;
+            // X: offset by +320px to clear left lane card, spaced by 340px
+            newNodes[nodeIdx].x = 320 + idx * 340;
+            // Y: centered and slightly staggered vertically to avoid straight overlaps
+            newNodes[nodeIdx].y = laneIdx * 400 + 100 + (idx % 2) * 50;
+          }
+        });
+      });
+
+      return newNodes;
     });
   };
 
@@ -504,7 +619,31 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {/* Zoom controls */}
+          <div className="flow-zoom-controls" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255, 255, 255, 0.02)', padding: '2px 6px', borderRadius: '6px', border: '1px solid var(--border-glass)' }}>
+            <button 
+              type="button"
+              className="btn-icon" 
+              style={{ width: '24px', height: '24px' }} 
+              onClick={() => setZoom(prev => Math.max(0.3, Math.round((prev - 0.1) * 10) / 10))}
+              title="Thu nhỏ (Ctrl + Cuộn chuột xuống)"
+            >
+              <ZoomOut className="icon-xs" />
+            </button>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', minWidth: '38px', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }} onClick={() => setZoom(1.0)} title="Đặt lại 100%">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button 
+              type="button"
+              className="btn-icon" 
+              style={{ width: '24px', height: '24px' }} 
+              onClick={() => setZoom(prev => Math.min(2.0, Math.round((prev + 0.1) * 10) / 10))}
+              title="Phóng to (Ctrl + Cuộn chuột lên)"
+            >
+              <ZoomIn className="icon-xs" />
+            </button>
+          </div>
           {/* Search bar */}
           <div className="flow-search-container">
             <Search className="flow-search-icon icon-xs" />
@@ -516,6 +655,22 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
               onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
+          {/* Auto arrange button */}
+          <button
+            onClick={handleAutoArrange}
+            className="btn-primary-sm"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px',
+              background: 'linear-gradient(135deg, #a855f7 0%, #06b6d4 100%)',
+              color: '#fff',
+              border: 'none'
+            }}
+          >
+            <LayoutGrid className="icon-xs" />
+            Sắp xếp tự động
+          </button>
           {/* Reload button */}
           <button
             onClick={fetchAllNodes}
@@ -555,7 +710,26 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
       ) : (
         /* The main scrollable canvas workspace */
         <div className="flow-canvas-container" ref={canvasContainerRef}>
-          <div className="flow-canvas-wrapper" style={{ height: `${canvasHeight}px` }}>
+          <div 
+            className="flow-canvas-scroll-extender" 
+            style={{ 
+              width: `${2400 * zoom}px`, 
+              height: `${canvasHeight * zoom}px`,
+              position: 'relative'
+            }}
+          >
+            <div 
+              className="flow-canvas-wrapper" 
+              style={{ 
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '2400px',
+                height: `${canvasHeight}px`,
+                transform: `scale(${zoom})`,
+                transformOrigin: '0 0'
+              }}
+            >
             
             {/* SVG Layer for Drawing Lines */}
             <svg className="flow-canvas-svg">
@@ -681,6 +855,7 @@ export default function StoryFlow({ storyUuid, backendUrl, onReadChapter }) {
 
           </div>
         </div>
+      </div>
       )}
     </div>
   );

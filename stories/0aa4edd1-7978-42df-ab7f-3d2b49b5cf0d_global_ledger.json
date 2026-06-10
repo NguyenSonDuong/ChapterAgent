@@ -1,0 +1,357 @@
+{
+  "timeline": [
+    {
+      "chapter": 1,
+      "title": "Nông Phu Chân Núi Và Mẹo Vặt Thôn Quê",
+      "summary": "Chương mở đầu giới thiệu Diệp Trần, một thanh niên nông phu sống dưới chân núi Vô Tẫn, chăm sóc một vườn thảo dược quý hiếm. Dù bề ngoài giản dị, Diệp Trần lại sở hữu những kỹ năng phi thường trong việc chăm sóc cây cối và thậm chí là cải thiện sinh vật, mà bản thân chàng không hề hay biết đó là pháp thuật cấp Tiên gia. Chàng sống cùng sư phụ Vô Thiên Lão Nhân, một ông lão lẩm cẩm, lười biếng nhưng thực chất lại rất tinh tường, và linh thú Lôi Phong Bằng dưới lốt chim ưng nhỏ. Cuối chương, một luồng khí tức kỳ lạ, nặng nề và tanh mùi máu lướt qua khu vườn, khiến Lôi Phong Bằng và Vô Thiên Lão Nhân bất an, nhưng Diệp Trần lại lầm tưởng là dấu hiệu thời tiết, báo hiệu một biến cố lớn sắp ập đến.",
+      "nodes": [
+        {
+          "id": "node-1781080813778",
+          "title": "Cuộc Sống Thường Nhật Ở Chân Núi",
+          "description": "Giới thiệu cuộc sống an nhiên tự tại của Diệp Trần tại khu vườn thảo dược dưới chân núi, công việc hàng ngày của anh là chăm sóc cây cối. Vô Thiên Lão Nhân xuất hiện với dáng vẻ lẩm cẩm, than vãn về một loại thảo dược khó tính nào đó, mở đầu cho màn cà khịa giữa hai thầy trò.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781080813779",
+          "title": "Màn Cà Khịa Sáng Sớm",
+          "description": "Diệp Trần và Vô Thiên Lão Nhân có một cuộc đối thoại hài hước, cà khịa nhau về cách chăm sóc thảo dược, pha trà hoặc nấu ăn. Vô Thiên Lão Nhân thường xuyên 'lười biếng' và sai vặt Diệp Trần, còn Diệp Trần thì âm thầm 'phản kháng' bằng những câu nói khôn khéo. Lôi Phong Bằng, con đại bàng, tham gia vào cuộc trò chuyện bằng những tiếng kêu hoặc hành động 'bóc phốt' sư phụ.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781080813780",
+          "title": "Thử Thách Y Thuật 'Bình Thường'",
+          "description": "Vô Thiên Lão Nhân bày trò, giả vờ bị một chứng bệnh 'khó chữa' hoặc mang về một loại cây cảnh hiếm đang héo úa, thách thức Diệp Trần. Diệp Trần, với tư duy 'nông dân', dùng những phương pháp y thuật hoặc kỹ năng chữa trị 'bình thường' của mình (nhưng thực chất là nghịch thiên) để giải quyết vấn đề một cách dễ dàng và nhanh chóng.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1781080813781",
+          "title": "Sự Ngây Thơ Của Đồ Đệ",
+          "description": "Sau khi Diệp Trần giải quyết xong vấn đề, Vô Thiên Lão Nhân ngầm kinh ngạc trước tài năng của Diệp Trần nhưng vẫn giữ vẻ lẩm cẩm, chỉ buông một câu 'cũng tạm được'. Diệp Trần hoàn toàn không ý thức được độ khủng khiếp của mình, chỉ nghĩ rằng 'ai cũng có thể làm được việc này, chỉ là sư phụ lười biếng thôi'. Sự chênh lệch nhận thức này tạo ra những tình huống dở khóc dở cười.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 1050,
+          "y": 260
+        },
+        {
+          "id": "node-1781080813782",
+          "title": "Lôi Phong Bằng Và Nỗi Khổ 'Nuôi Chủ'",
+          "description": "Lôi Phong Bằng xuất hiện, than vãn (qua hành động hoặc tiếng kêu) về việc phải săn mồi hoặc thực hiện những nhiệm vụ 'khó nhằn' mà Vô Thiên Lão Nhân giao phó. Diệp Trần, vì thương 'bạn', âm thầm giúp đỡ Lôi Phong Bằng bằng cách cải thiện thức ăn, hoặc dùng một 'pháp thuật nhỏ' để giảm bớt gánh nặng cho nó, khiến Lôi Phong Bằng cảm kích nhưng Vô Thiên Lão Nhân thì 'tức tối' vì mất đi trò vui.",
+          "characters": [
+            "Diệp Trần",
+            "Lôi Phong Bằng",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 1350,
+          "y": 200
+        },
+        {
+          "id": "node-1781080813783",
+          "title": "Dấu Hiệu Bất Thường Từ Thế Giới Bên Ngoài",
+          "description": "Khi hoàng hôn buông xuống, cuộc sống yên bình của ba thầy trò và Lôi Phong Bằng bị phá vỡ bởi một dấu hiệu bất thường từ thế giới bên ngoài. Có thể là một luồng khí tức lạ lướt qua, tiếng động vang vọng từ xa, hoặc Lôi Phong Bằng bỗng trở nên bất an. Vô Thiên Lão Nhân thoáng hiện vẻ mặt nghiêm trọng, nhưng nhanh chóng che giấu, còn Diệp Trần thì chỉ coi đó là 'chuyện nhỏ' hoặc 'thời tiết thay đổi'. Đây là điềm báo cho sự xuất hiện của Kỷ Minh Nguyệt.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [],
+          "weapons": [],
+          "techniques": [],
+          "x": 1650,
+          "y": 260
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781080813778",
+          "to": "node-1781080813779"
+        },
+        {
+          "from": "node-1781080813779",
+          "to": "node-1781080813780"
+        },
+        {
+          "from": "node-1781080813780",
+          "to": "node-1781080813781"
+        },
+        {
+          "from": "node-1781080813781",
+          "to": "node-1781080813782"
+        },
+        {
+          "from": "node-1781080813782",
+          "to": "node-1781080813783"
+        }
+      ]
+    },
+    {
+      "chapter": 2,
+      "title": "Mẹo Nông Gia Và Vòng Tròn Thanh Tẩy",
+      "summary": "Diệp Trần phát hiện một con hồ ly tuyết bị thương nặng với ma khí bám trên người trong vườn thảo dược. Anh cứu chữa cho nó bằng cách đắp thảo dược và vô tình sử dụng một trận pháp thanh tẩy thượng cổ để cách ly ma khí, khiến con hồ ly kinh ngạc trước sức mạnh ẩn giấu của anh. Trong khi Diệp Trần vẫn thản nhiên chăm sóc vườn, một luồng sát khí bí ẩn từ bìa rừng đang tiến gần đến khu vườn.",
+      "nodes": [
+        {
+          "id": "node-1781083301816",
+          "title": "Bình minh sau cơn giông",
+          "description": "Ngày mới bắt đầu tại núi Vô Tẫn, Diệp Trần vẫn thản nhiên làm việc như chưa từng có chuyện gì xảy ra. Anh kiểm tra lại vườn thuốc, thầm nghĩ cơn bão tối qua chỉ là hiện tượng thời tiết cực đoan. Vô Thiên Lão Nhân thì vẫn lười biếng nằm phơi nắng, thỉnh thoảng liếc nhìn Diệp Trần bằng ánh mắt đầy ẩn ý.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [
+            {
+              "chapter": 1,
+              "nodes": [
+                "node-1781080813783"
+              ]
+            }
+          ],
+          "locations": [
+            "Núi Vô Tẫn",
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781083301817",
+          "title": "Phát hiện vết máu lạ",
+          "description": "Trong khi đang thu hoạch thảo dược, Diệp Trần tình cờ phát hiện những giọt máu đen kỳ lạ dính trên lá cây ở rìa khu vườn. Anh cho rằng đây là máu của một con thú dữ bị thương, cảm thấy hơi lo lắng cho sự an toàn của khu vườn hơn là sự nguy hiểm của bản thân.",
+          "characters": [
+            "Diệp Trần",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Phát hiện ra luồng khí tức đó là tàn dư của một cuộc truy sát, để lại hậu quả là một sinh vật bị thương nặng lẻn vào vườn.",
+            "thread": "Luồng khí tức kỳ lạ, nặng nề và tanh mùi máu xuất hiện cuối chương là gì và nó sẽ mang đến biến cố gì cho Diệp Trần?"
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781083301818",
+          "title": "Cuộc chạm trán bất đắc dĩ",
+          "description": "Lôi Phong Bằng bỗng nhiên kêu lên cảnh báo, dẫn Diệp Trần đến một bụi rậm. Tại đó, một con hồ ly nhỏ màu trắng (Tuyết Nguyệt) đang nằm thoi thóp, toàn thân bị thương tích do ma khí xâm nhập. Diệp Trần ngạc nhiên nhưng lập tức dùng kinh nghiệm 'nông dân' để xem xét.",
+          "characters": [
+            "Diệp Trần",
+            "Lôi Phong Bằng",
+            "Tuyết Nguyệt"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1781083301819",
+          "title": "Y thuật nông gia cứu mạng",
+          "description": "Diệp Trần không hề hay biết đây là yêu thú cấp cao. Anh bình thản lấy thảo dược trong vườn, giã nát rồi đắp lên vết thươngkèm theo sử dụng các kim châm để châm cứu và các huyệt để lưu thông khí huyết. Anh lầm bầm tự trách: 'Chăm sóc mấy con thú này còn mệt hơn trồng cây, may mà mình biết ít mẹo dân gian'.",
+          "characters": [
+            "Diệp Trần",
+            "Tuyết Nguyệt",
+            "Tuyết Nguyệt (Yêu thú Hồ Ly)"
+          ],
+          "resolved_thread": {
+            "thread": "Luồng khí tức kỳ lạ, nặng nề và tanh mùi máu xuất hiện cuối chương là gì và nó sẽ mang đến biến cố gì cho Diệp Trần?",
+            "resolution_note": "phát hiện ra con hồ ly bị thương ở trong rìa khu vườn"
+          },
+          "links": [
+            {
+              "chapter": 1,
+              "nodes": [
+                "node-1781080813783"
+              ]
+            }
+          ],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 1050,
+          "y": 260
+        },
+        {
+          "id": "node-1781083301820",
+          "title": "Khách quý tỉnh giấc",
+          "description": "Tuyết Nguyệt dần tỉnh lại, ánh mắt đầy vẻ kinh ngạc khi nhìn thấy 'pháp trận' đơn giản Diệp Trần vẽ dưới đất đã thanh tẩy sạch sẽ ma khí trong cơ thể mình. Nó nhìn Diệp Trần với vẻ vừa sợ hãi vừa tò mò, trong khi Diệp Trần chỉ thản nhiên yêu cầu nó: 'Tỉnh rồi thì tự đi kiếm ăn đi, đừng làm hỏng vườn của ta'.",
+          "characters": [
+            "Diệp Trần",
+            "Tuyết Nguyệt",
+            "Tuyết Nguyệt (Yêu thú Hồ Ly)"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "x": 1350,
+          "y": 200
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781083301816",
+          "to": "node-1781083301817"
+        },
+        {
+          "from": "node-1781083301817",
+          "to": "node-1781083301818"
+        },
+        {
+          "from": "node-1781083301818",
+          "to": "node-1781083301819"
+        },
+        {
+          "from": "node-1781083301819",
+          "to": "node-1781083301820"
+        }
+      ]
+    }
+  ],
+  "unresolved_threads": [
+    {
+      "thread": "Bắt đầu cuộc phiêu lưu của nhân vật.",
+      "chapter": null
+    },
+    {
+      "thread": "Năng lực thực sự của Diệp Trần (y thuật và trận pháp cấp Tiên gia) là gì và nguồn gốc của nó?",
+      "chapter": 1
+    },
+    {
+      "thread": "Thân phận thực sự của Vô Thiên Lão Nhân là gì và tại sao ông lại che giấu năng lực của Diệp Trần?",
+      "chapter": 1
+    },
+    {
+      "thread": "Thân phận thực sự của Lôi Phong Bằng là gì (linh thú)?",
+      "chapter": 1
+    },
+    {
+      "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn.",
+      "chapter": 2
+    },
+    {
+      "thread": "Thân phận thực sự của con hồ ly tuyết Tuyết Nguyệt và lý do nó bị ma tộc truy sát.",
+      "chapter": 2
+    },
+    {
+      "thread": "Mối đe dọa tiềm tàng từ ma khí đang lan rộng trong vùng núi Vô Tẫn.",
+      "chapter": 2
+    }
+  ],
+  "resolved_threads": [
+    {
+      "thread": "Luồng khí tức kỳ lạ, nặng nề và tanh mùi máu xuất hiện cuối chương là gì và nó sẽ mang đến biến cố gì cho Diệp Trần?",
+      "chapter_introduced": 1,
+      "chapter_resolved": 2,
+      "resolution_note": "Phát hiện ra luồng khí tức đó là tàn dư của một cuộc truy sát, để lại hậu quả là một sinh vật bị thương nặng lẻn vào vườn."
+    }
+  ],
+  "locations": [
+    {
+      "name": "Núi Vô Tẫn",
+      "chapter": 1,
+      "description": "Một ngọn núi lớn, dưới chân núi có khu vườn thảo dược rộng lớn của Diệp Trần và Vô Thiên Lão Nhân."
+    },
+    {
+      "name": "Khu vườn thảo dược",
+      "chapter": 1,
+      "description": "Khu vườn rộng lớn dưới chân núi Vô Tẫn, nơi Diệp Trần chăm sóc các linh thảo quý hiếm như linh chi ba ngàn năm tuổi và Tử Ngọc Thảo."
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Trận pháp thanh tẩy thượng cổ",
+      "chapter": 2,
+      "description": "Một loại trận pháp cổ xưa có khả năng trấn áp ma tộc và thanh tẩy độc tố, được Diệp Trần vô tình sử dụng dưới dạng một vòng tròn vẽ trên đất."
+    }
+  ],
+  "techniques": []
+}

@@ -44,7 +44,7 @@ Máu từ đầu ngón tay Mộc Tuyết và dòng huyết mạch cuồn cuộn 
 
 Giữa những tia huyết quang chập chờn, một cổ tự kỳ dị bừng sáng rồi vụt tắt, khắc sâu vào tâm hồn cả hai. Đó là "Sinh Tử Ấn" – một loại khế ước cổ xưa mà ngay cả thời đại huy hoàng nhất cũng hiếm kẻ dám thực hiện. Trận pháp không còn rút máu để bạo phát uy năng, mà chuyển sang trạng thái cộng hưởng, ép buộc linh hồn và nhục thân của Sở Mặc cùng Mộc Tuyết phải thắt chặt lấy nhau. Mộc Tuyết bàng hoàng nhận ra dòng máu của mình và Sở Mặc đang luân chuyển trong cơ thể đối phương, nỗi đau xé lòng từ sự hòa quyện cưỡng ép khiến nàng gào lên trong câm lặng. Nàng cố gắng dứt ra, nhưng Sinh Tử Ấn đã cắm rễ, biến hai kẻ phàm nhân thành một thể thống nhất trong sinh tử.
 
-Sở Mặc là người bừng tỉnh trước. Hắn cảm nhận được nhịp đập trái tim Mộc Tuyết đang hòa cùng hơi thở của chính mình, một sự liên kết kỳ lạ mà hắn chưa từng trải qua. Anh vội vã ôm chặt lấy cô vào lòng, dùng chiếc áo tả tơi của mình đắp lên người cô để sưởi ấm cơ thể đang lạnh dần.
+Sở Mặc là người bừng tỉnh trước. Hắn cảm nhận được nhịp đập trái tim Mộc Tuyết đang hòa cùng hơi thở của chính mình, một sự liên kết kỳ lạ mà hắn chưa từng trải qua. Anh vội vã dùng chiếc áo tả tơi của mình đắp lên người cô để sưởi ấm cơ thể đang lạnh dần.
 
 Giữa sự tĩnh lặng của màn đêm, một luồng sức mạnh lạ lẫm bắt đầu luân chuyển trong kinh mạch của cả hai. Nó không phải linh khí, cũng không phải thuần túy là huyết lực. Dòng linh lực hỗn tạp vốn bị coi là phế vật giờ đây không còn xung đột, mà cộng hưởng mãnh liệt, tạo thành một vòng tuần hoàn âm dương hoàn hảo, mạnh mẽ hơn gấp bội.
 
