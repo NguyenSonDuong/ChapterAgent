@@ -1,29 +1,41 @@
-# Chương 11: Ngưỡng Cửa Thành Trì Và Ánh Mắt Trong Đêm
+# Chương 11: Khoảng Lặng Giữa Bão Giông
 
-Sở Mặc là người đầu tiên tỉnh dậy sau đêm dài cộng hưởng linh hồn. Hắn khẽ cử động, cảm giác đau đớn xé rách kinh mạch như những ngày trước đã biến mất, thay vào đó là một luồng nhiệt lượng kỳ lạ đang cuộn chảy âm thầm trong từng thớ thịt. Hắn nhìn xuống bàn tay mình, những vết chai sạn và sẹo cũ dường như nhạt đi, da thịt trở nên cứng cáp hơn hẳn. Sở Mặc cẩn thận kiểm tra vết thương của Mộc Tuyết, thấy nàng vẫn đang say ngủ với khuôn mặt bình yên, hắn mới thở phào nhẹ nhõm rồi lặng lẽ rời khỏi nơi trú ẩn để tìm kiếm nguồn sống.
+Ánh bình minh mờ nhạt xuyên qua màn sương mù dày đặc, rọi xuống vạt cỏ úa nơi Sở Mặc và Mộc Tuyết đang nằm co quắp. Sở Mặc là người đầu tiên tỉnh giấc. Cảm giác đau đớn xé thịt của đêm qua đã biến mất, thay vào đó là một luồng nhiệt lượng ấm áp, dẻo dai đang luân chuyển không ngừng nghỉ trong kinh mạch. Hắn khẽ cử động, cảm nhận được sự vững chãi lạ thường của cơ thể, rồi lập tức cúi xuống nhìn Mộc Tuyết. Nàng vẫn đang chìm trong giấc ngủ sâu, hơi thở đều đặn và bình ổn hơn bao giờ hết.
 
-Suốt một ngày dài, Sở Mặc không rời xa vị trí ẩn náu quá xa. Hắn men theo dòng suối cạn gần đó, dùng kỹ năng sinh tồn tôi luyện từ những ngày lang bạt để bẫy được vài con thỏ rừng và hái một ít quả dại. Mọi hành động của hắn đều lặng lẽ, cẩn trọng. Hắn không chỉ canh gác thú dữ, mà còn canh gác cả sự an nguy của Mộc Tuyết.
+Thở phào nhẹ nhõm, Sở Mặc cẩn thận gỡ cánh tay nàng đang ôm lấy eo mình, nhẹ nhàng đặt xuống thảm cỏ. Hắn đứng dậy, cầm lấy thanh đao cùn – vật bất ly thân – rồi lặng lẽ tiến về phía bụi rậm gần đó để tìm kiếm củi khô. Giữa tiếng xào xạc của lá khô, một âm thanh rên rỉ yếu ớt vang lên. Sở Mặc dừng bước, gạt đám cỏ tranh, phát hiện một con cáo nhỏ lông trắng pha lẫn vết bùn đất đang nằm co quắp, chân sau bị một cành cây khô đâm xuyên qua. 
 
-Khi ánh hoàng hôn nhuộm đỏ bìa rừng Táng Cốt Lâm, Mộc Tuyết mới chậm rãi mở mắt. Nàng cảm thấy cơ thể nhẹ nhõm lạ thường như thể những vết thương cũ đã được chữa lành một phần. Sở Mặc nhẹ nhàng đỡ nàng dậy, đưa cho nàng chút nước sạch và miếng thịt thú nướng vội. Hai người dành thêm một ngày để hồi phục hoàn toàn thể lực trước khi quyết định lên đường.
+Con vật nhìn hắn với đôi mắt đượm buồn, không hề có ý phản kháng. Sự đồng cảm của một kẻ từng bị thế đạo ruồng bỏ trỗi dậy, Sở Mặc đưa tay, nhẹ nhàng nhổ cành cây ra, xé một mảnh vải từ vạt áo tả tơi của chính mình để băng bó cho nó. Khi hắn mang con cáo nhỏ trở lại bãi cỏ, Mộc Tuyết đã tỉnh giấc.
 
-Hành trình tiến về phía Tây bắt đầu từ đó. Nửa tháng ròng rã, họ băng qua những cánh rừng và vách đá, giữ khoảng cách với các yêu thú và tránh xa những khu vực nguy hiểm. Sở Mặc luôn đi trước, thanh đao cùn trong tay hắn không chỉ để chém yêu thú mà còn để chặt cây dựng lều tạm. Mộc Tuyết thì âm thầm quan sát địa hình, vận dụng những kiến thức "Thiên Diễn Tàn Trận" để che giấu dấu vết của cả hai.
+Nàng vừa mở mắt ra đã thấy một khối lông xù trắng muốt đang dụi đầu vào gò má mình. Mộc Tuyết giật mình lùi lại, đôi mắt mở to ngơ ngác, cho đến khi nhìn thấy Sở Mặc đang ngồi gần đó với ánh mắt dịu dàng.
 
-Cuối cùng, một bức tường thành cao lớn xuất hiện phía chân trời. Đó là thành trì nhân tộc, biểu tượng của sự an toàn mà họ đã hằng khao khát. Nhưng ngay khi tiến lại gần cổng thành, một gã lính gác khoác giáp sắt đã lạnh lùng chặn ngang cây thương, ngăn cản bước chân họ.
+"Nó bị thương ở bìa rừng, muội thấy sao?" Sở Mặc khẽ hỏi, giọng hắn khàn đặc vì sương lạnh.
 
-"Dừng lại! Lũ ăn mày rách rưới, tông môn nào? Lệnh bài đâu?" – Tên lính gác quát lớn, ánh mắt đầy vẻ khinh miệt quét qua bộ dạng tả tơi, đầy sẹo của hai người.
+Mộc Tuyết đưa tay vuốt ve lớp lông mềm mại của con cáo, nụ cười hiếm hoi nở trên môi: "Nó thật đáng yêu. Chúng ta gọi nó là Tiểu Bạch nhé?"
 
-Sở Mặc siết chặt chuôi đao cùn, hạ thấp giọng: "Chúng ta là tán tu, chỉ muốn vào thành tìm nơi tá túc, không có lệnh bài của tông môn."
+Sở Mặc gật đầu, ánh mắt hắn dán chặt vào gương mặt thanh tú của nàng. Hắn ngồi xuống cạnh, khẽ nắm lấy bàn tay gầy guộc đầy vết xước, cảm nhận hơi ấm từ nàng truyền sang. Mộc Tuyết đang bận rộn dùng những ngón tay thon dài gãi nhẹ vào cằm Tiểu Bạch, khiến con cáo nhỏ lim dim đôi mắt, phát ra tiếng kêu "ư ử" đầy thỏa mãn.
 
-Tên lính gác cười khẩy, liếc nhìn gã đồng đội bên cạnh rồi quay lại nhìn họ với ánh mắt như nhìn lũ súc vật: "Tán tu? Nhìn cái bộ dạng đó mà cũng đòi vào thành? Nơi này không phải là chỗ cho lũ phế vật tạp linh căn các ngươi làm bẩn đất. Cút ngay trước khi ta đổi ý và lấy cái mạng chó của các ngươi!"
+"Huynh xem, con nhóc này thật tinh ranh," Mộc Tuyết bật cười, đôi mắt cong lại như vầng trăng khuyết. "Muội cảm giác như nó đang trêu chọc chúng ta vậy. Nãy giờ nó cứ dụi đầu vào tay muội, như thể đang đòi hỏi điều gì đó mà muội mãi chẳng hiểu nổi."
 
-"Chúng tôi không gây gổ, chỉ xin một góc nhỏ để nghỉ ngơi..." Mộc Tuyết bước lên, giọng run rẩy giải thích, đôi mắt quật cường cố nén sự tủi nhục.
+Sở Mặc nhìn theo cử chỉ của nàng, khóe môi khẽ nhếch: "Có lẽ nó cũng giống chúng ta, đang tìm kiếm một chút hơi ấm giữa cái chốn hoang tàn này chăng?"
 
-"Ta nói cút!" – Tên lính gác vung thương, suýt chút nữa đập trúng vai Mộc Tuyết. "Đừng để ta nhắc lại lần thứ ba, lũ rác rưởi không có tông môn thì chỉ xứng làm thức ăn cho yêu ma ngoài kia thôi!"
+Mộc Tuyết tựa đầu vào vai hắn, ánh mắt xa xăm dõi theo những đốm lửa nhảy múa trong không trung. Nàng khẽ thở dài, giọng nói trở nên trầm tư: "Cũng lạ thật, Sở Mặc. Dạo này muội luôn cảm thấy trong lồng ngực mình có một luồng khí lạ, cứ âm ỉ, dịu dàng như dòng nước chảy qua kinh mạch. Không rõ rệt, cũng chẳng phải linh lực hùng hậu như trong mấy cuốn tàn quyển, chỉ là... cảm giác rất an tâm."
 
-Cửa thành đóng sầm lại trước mặt. Sở Mặc đứng chết lặng, tiếng chốt cửa nặng nề vang lên như nhát búa giáng thẳng vào tim hắn. Trong khoảnh khắc ấy, một luồng phẫn nộ cuộn trào trong huyết quản, thiêu đốt tâm can hắn. Thế đạo này thật bất công, kẻ mạnh thì được tung hô, kẻ yếu như bọn họ chỉ là cỏ rác bị chà đạp. Hắn siết chặt lấy bàn tay Mộc Tuyết, móng tay găm sâu vào lòng bàn tay đến rướm máu. 
+Sở Mặc siết nhẹ bàn tay nàng, giọng trầm ấm: "Ta cũng thấy vậy. Như thể một phần bản năng nào đó đang thức tỉnh sau bao ngày chìm trong bóng tối. Dù nó là gì, chỉ cần chúng ta còn ở bên nhau, con đường phía trước dù có hiểm nguy đến đâu cũng chẳng thể ngăn bước được chúng ta."
 
-Sở Mặc kéo Mộc Tuyết quay lưng rời đi. Họ không còn cách nào khác ngoài việc quay ngược lại khu rừng gần thành trì để lánh nạn.
+Mộc Tuyết mỉm cười, siết chặt lấy tay hắn: "Đúng vậy. Dù trời có sập xuống, chỉ cần huynh còn giữ thanh đao này, và muội còn ở đây bên cạnh huynh, thì chẳng có gì phải sợ nữa."
 
-Đêm dần buông, bóng tối đặc quánh bao trùm lấy chỗ trú ẩn tạm bợ dưới tán cây cổ thụ. Sở Mặc ngồi bó gối, ánh mắt sắc lạnh dõi theo từng nhành lá lay động. Đột nhiên, hắn cảm thấy một luồng áp lực vô hình bao phủ.
+Ngày hôm đó, họ dành thời gian nghỉ ngơi trọn vẹn tại bìa rừng. Sở Mặc cố gắng bắt cá dưới con suối cạn, nhưng con cá dường như cũng tinh quái, cứ vọt qua kẽ tay hắn một cách đầy khiêu khích. Hắn vung đao mấy lần đều trượt, nước bắn tung tóe lên gương mặt cương nghị. Mộc Tuyết ngồi trên tảng đá gần đó, nhìn dáng vẻ lúng túng của người thương mà bật cười khúc khích: "Sở Mặc, huynh chém yêu ma thì sắc bén bao nhiêu, sao giờ lại thua một con cá nhỏ thế kia? Hay là tại nó cũng biết huynh không nỡ ra tay sát sinh với 'người quen' dưới nước?"
 
-Trong bóng tối dày đặc, một đôi mắt vàng rực bất ngờ xuất hiện, tĩnh lặng và thâm sâu. Đó không phải là đôi mắt hung dữ của yêu thú, mà là một cái nhìn mang theo khí tức kỳ bí, cao ngạo. Một con mèo đen tuyền đang ngồi cách đó không xa, đuôi khẽ vẫy, lặng lẽ quan sát hai người. Sở Mặc cảm thấy toàn thân cứng đờ, bản năng chiến đấu trỗi dậy. Hắn không chần chừ, tay siết chặt lấy chuôi thanh đao cùn, ánh mắt gườm gườm đối diện thẳng với ánh nhìn của con vật lạ kỳ kia.
+Sở Mặc gãi đầu, nụ cười hiếm hoi thoáng qua trên gương mặt đầy sẹo: "Nàng đừng cười, con cá này chắc chắn đã tu luyện thành tinh rồi, đợi ta bắt được, nhất định phải phạt nó bằng cách nướng thật thơm để nàng thưởng thức."
+
+Tiểu Bạch dường như cũng hiểu chuyện, nó lanh lợi chạy quanh, thỉnh thoảng lại dùng mũi hít hà mặt đất, rồi bất ngờ dừng lại bên một bụi cỏ lạ, dùng chân trước cào cào ra hiệu. Mộc Tuyết bước tới, đôi mắt sáng rực: "Nhìn xem, Tiểu Bạch còn giỏi hơn huynh đấy, nó vừa tìm thấy thảo dược này!" Sở Mặc bước lại gần, giả vờ thở dài đầy vẻ chịu thua: "Xem ra từ nay ta phải nhường vị trí trụ cột gia đình cho con cáo nhỏ này rồi, bằng không chắc ta chỉ có nước nhịn đói qua ngày." Bầu không khí gia đình ấm áp, thuần khiết này như một nốt nhạc trong trẻo, tương phản gay gắt với thế giới tàn khốc đầy rẫy yêu ma ngoài kia.
+
+Khi màn đêm buông xuống, ánh lửa bập bùng soi rọi bóng hình hai con người nhỏ bé. Tiểu Bạch cuộn tròn nằm giữa họ, trở thành sợi dây kết nối bình yên. 
+
+"Sở Mặc," Mộc Tuyết khẽ thì thầm, "Sau khi đến được Vọng Nguyệt Thành, muội muốn cùng huynh trồng một mảnh vườn nhỏ. Ở đó sẽ không có yêu ma, không có những lần chạy trốn trong bóng tối..."
+
+Sở Mặc nhìn nàng, trong đôi mắt cương nghị hiện lên một sự dịu dàng chưa từng thấy. Hắn không hứa hẹn những điều xa vời, chỉ nhẹ nhàng đáp: "Chỉ cần là nơi có muội, đó chính là nhà của ta."
+
+Hắn nắm lấy tay nàng, thề nguyện bằng cả sinh mệnh. Mộc Tuyết cảm nhận được hơi ấm từ bàn tay hắn, tim nàng đập liên hồi trong lồng ngực. Sự cộng hưởng linh hồn khiến họ hiểu rằng, kể từ giây phút này, họ không còn là hai cá thể riêng biệt, mà là hai mảnh ghép định mệnh đã được gắn kết trong sinh tử.
+
+Sáng hôm sau, khi sương mù tan hẳn, Sở Mặc kiểm tra lại hành trang: thanh đao cùn đã được lau sạch, cuốn tàn quyển được Mộc Tuyết cất kỹ trong ngực áo. Tiểu Bạch đứng bên cạnh, đôi mắt linh hoạt nhìn về hướng Tây. Họ nhìn về phía chân trời, nơi Vọng Nguyệt Thành – thành trì phàm nhân đang chờ đợi. Những yêu ma trong Táng Cốt Lâm vẫn gào thét phía sau lưng, nhưng lần này, mỗi bước chân của họ đều trở nên vững vàng và chủ động hơn bao giờ hết. Cuộc hành trình nghịch thiên chính thức bắt đầu.

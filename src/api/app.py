@@ -996,6 +996,37 @@ def get_chapter_nodes(story_uuid, chapter_num):
         return jsonify({'error': f'Failed to read nodes: {str(e)}'}), 500
 
 
+@app.route('/api/stories/<story_uuid>/all-nodes', methods=['GET'])
+def get_all_story_nodes(story_uuid):
+    """Get all event nodes & connections for all chapters in a story."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({})
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        timeline = ledger.get('timeline', [])
+        
+        all_nodes_data = {}
+        for chap in timeline:
+            chap_num = chap.get('chapter')
+            nodes_path = config.get_chapter_nodes_path(story_uuid, chap_num)
+            if nodes_path.exists():
+                try:
+                    data = json.loads(nodes_path.read_text(encoding="utf-8"))
+                    if data.get("nodes"):
+                        all_nodes_data[str(chap_num)] = {
+                            "nodes": data.get("nodes", []),
+                            "connections": data.get("connections", []),
+                            "chapter_title": chap.get("title", ""),
+                            "chapter_summary": chap.get("summary", "")
+                        }
+                except Exception:
+                    pass
+        return jsonify(all_nodes_data)
+    except Exception as e:
+        return jsonify({'error': f'Failed to read all nodes: {str(e)}'}), 500
+
+
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/suggest-nodes', methods=['POST'])
 def suggest_chapter_nodes(story_uuid, chapter_num):
     """Call Gemini to get suggestions for the next chapter's event nodes."""

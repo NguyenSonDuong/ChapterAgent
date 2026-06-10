@@ -1,16 +1,17 @@
-# Cập nhật Trạng thái: Ngưỡng Cửa Thành Trì Và Ánh Mắt Trong Đêm
+# Cập nhật Trạng thái: Khoảng Lặng Giữa Bão Giông
         
 ## Tóm tắt nội dung
-Sau khi hồi phục sức khỏe nhờ sự cộng hưởng linh hồn, Sở Mặc và Mộc Tuyết vượt qua hành trình gian khổ để đến được thành trì nhân tộc. Tuy nhiên, họ bị lính gác cổng sỉ nhục và từ chối cho vào vì không có lệnh bài tông môn. Sự kiện này khơi dậy lòng căm thù và ý chí mạnh mẽ trong Sở Mặc. Cả hai buộc phải quay lại khu rừng gần đó để trú ẩn, nơi họ bất ngờ bị một con mèo đen bí ẩn với ánh mắt kỳ lạ theo dõi trong đêm.
+Sau đêm sinh tử, Sở Mặc và Mộc Tuyết tỉnh dậy với sức mạnh kinh mạch được cải thiện đáng kể nhờ sự cộng hưởng linh hồn. Họ dành một ngày nghỉ ngơi tại bìa rừng Táng Cốt Lâm, cứu giúp một con cáo nhỏ bị thương đặt tên là Tiểu Bạch, và cùng nhau chia sẻ những ước mơ về một cuộc sống bình yên. Sự gắn kết giữa hai người trở nên sâu sắc hơn bao giờ hết, giúp họ củng cố quyết tâm tiến về Vọng Nguyệt Thành.
 
 ## Trạng thái Nhân vật
-- **Sở Mặc**: Thể chất đã hồi phục và trở nên cứng cáp hơn, tâm lý chuyển từ nhẫn nhịn sang phẫn nộ và quyết tâm mạnh mẽ, đang cầm thanh đao cùn và đối mặt với con mèo đen.
-- **Mộc Tuyết**: Vết thương đã hồi phục một phần, tâm lý bị tổn thương sau khi bị sỉ nhục, đang cùng Sở Mặc trú ẩn dưới tán cây cổ thụ.
+- **Sở Mặc**: Sức khỏe hồi phục, kinh mạch được cường hóa, tâm lý vững vàng và quyết tâm, mang theo thanh đao cùn.
+- **Mộc Tuyết**: Sức khỏe ổn định, tâm lý bình yên, giữ cuốn tàn quyển trong ngực áo, có sự kết nối linh hồn sâu sắc với Sở Mặc.
+- **Tiểu Bạch**: Con cáo nhỏ được cứu sống, đã bình phục vết thương ở chân, trở thành người bạn đồng hành dẫn đường cho cả hai.
 
 ## Nút thắt đã giải quyết
-- Sở Mặc và Mộc Tuyết đã hồi phục sau đêm cộng hưởng linh hồn.
-- Hành trình tìm kiếm nơi trú ẩn an toàn tại thành trì nhân tộc đã kết thúc trong thất bại.
+- Hành trình nghịch thiên cải mệnh phía trước với đầy rẫy yêu ma.
 
 ## Nút thắt mới mở ra
-- Sự phẫn nộ của Sở Mặc đối với thế đạo bất công và mục tiêu đạp đổ cổng thành trong tương lai.
-- Danh tính và mục đích của con mèo đen có ánh mắt vàng rực đang theo dõi hai người trong đêm.
+- Khả năng đặc biệt của Tiểu Bạch trong việc tìm kiếm thảo dược và dẫn đường.
+- Mối đe dọa từ yêu ma trong Táng Cốt Lâm vẫn đang bám đuổi phía sau.
+- Bí ẩn về sức mạnh mới trong kinh mạch của Sở Mặc và Mộc Tuyết cần được khám phá thêm.

@@ -1,0 +1,132 @@
+{
+  "uuid": "0aa4edd1-7978-42df-ab7f-3d2b49b5cf0d",
+  "name": "Đoạn Tiên Lộ: Nhất Y Nhất Kiếm Phá Thương Khung",
+  "characters": [
+    {
+      "name": "Diệp Trần",
+      "role": "Nam chính",
+      "description": "Ngoại hình: Mặc áo vải thô, thanh tú, sạch sẽ, mang khí chất mộc mạc của một nông dân trồng thuốc.  Tính cách: Trầm tĩnh, ít nói, suy nghĩ thấu đáo và quyết đoán. Cực kỳ thông minh nhưng lại rất dịu dàng, kiên nhẫn với người mình yêu. Tốt bụng nhưng không thánh mẫu, ra tay dứt khoát nếu có kẻ đe dọa đến người thân.  Sức mạnh: Đỉnh cao về y thuật, trận pháp, vẽ phù, luyện dược. Có thể dùng một cành cây tàn tạ vẽ trận pháp giết chết cao thủ, nhưng luôn tự nhận mình chỉ dùng \"mẹo vặt nông thôn\".  Gợi ý triển khai: Tạo sự chênh lệch nhận thức. Hãy để Diệp Trần coi những việc kinh thiên động địa mình làm là \"chuyện bình thường\", tạo ra yếu tố bất ngờ liên tục cho kẻ địch.Ngoại hình: Mặc áo vải thô, thanh tú, sạch sẽ, mang khí chất mộc mạc của một nông dân trồng thuốc.  Tính cách: Trầm tĩnh, ít nói, suy nghĩ thấu đáo và quyết đoán. Cực kỳ thông minh nhưng lại rất dịu dàng, kiên nhẫn với người mình yêu. Tốt bụng nhưng không thánh mẫu, ra tay dứt khoát nếu có kẻ đe dọa đến người thân.  Sức mạnh: Đỉnh cao về y thuật, trận pháp, vẽ phù, luyện dược. Có thể dùng một cành cây tàn tạ vẽ trận pháp giết chết cao thủ, nhưng luôn tự nhận mình chỉ dùng \"mẹo vặt nông thôn\".  Gợi ý triển khai: Tạo sự chênh lệch nhận thức. Hãy để Diệp Trần coi những việc kinh thiên động địa mình làm là \"chuyện bình thường\", tạo ra yếu tố bất ngờ liên tục cho kẻ địch.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Núi Vô Tẫn",
+        "Khu vườn thảo dược"
+      ],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": "Trận pháp thanh tẩy thượng cổ",
+      "techniques_owned": [
+        "Trận pháp thanh tẩy thượng cổ"
+      ],
+      "current_cultivation": "Luyện Khí Kỳ",
+      "current_location": "Khu vườn thảo dược",
+      "status": "Đang an toàn"
+    },
+    {
+      "name": "Kỷ Minh Nguyệt",
+      "role": "Nữ chính",
+      "description": "Ngoại hình: Dung mạo tuyệt mỹ, khí chất thanh tao nhưng lạnh lẽo như sương tuyết. Thường vận y phục trắng hoặc lục nhạt, ánh mắt sắc bén, luôn mang theo một thanh trường kiếm bên người.  Sức mạnh: Thiên kiêu kiếm tu vạn người có một. Lực chiến viễn siêu cấp bậc, ra kiếm sát phạt, dứt khoát, am hiểu các kiếm trận và cấm thuật chiến đấu của gia tộc. Không bao giờ nương tay với kẻ thù.  Tính cách & Diễn biến tâm lý (Quan trọng):  Bản chất gốc / Với người ngoài: Băng lãnh, cao ngạo, cảnh giác cao độ, ít nói và xa cách. Tuyệt đối không để ai chạm vào người.  Giai đoạn 1 (Khi mới quen và được Nam chính cứu): Lạnh lùng, giữ khoảng cách an toàn. Chỉ coi Nam chính là ân nhân, cư xử lịch sự, khách sáo nhưng vẫn mang thái độ phòng bị. Đôi lúc cảm thấy khó hiểu và nghi ngờ trước những hành động kỳ lạ của anh, tuyệt đối chưa nảy sinh tình cảm.  Giai đoạn 2 (Sau khi cùng trải qua sinh tử và xác nhận tình cảm): Trạng thái tâm lý thay đổi hoàn toàn (Chỉ áp dụng với Nam chính). Cô trút bỏ vỏ bọc băng giá, trở nên vô cùng ôn nhu, hoạt bát và lanh lợi. Đặc biệt sinh ra thói quen làm nũng với Nam chính: thích dựa dẫm, hay đòi Nam chính nấu ăn, pha thuốc, dỗ dành; ghen tuông ngầm khi có nữ phụ đến gần anh. Cô hoàn toàn tin tưởng, giao phó tính mạng cho anh.  Cơ chế đối lập: Dù đã yêu Nam chính và nũng nịu ở bên anh, nhưng ngay khi bước ra ngoài đối mặt với kẻ thù, cô lập tức trở lại làm một \"nữ thần chiến tranh\" vô tình và tàn nhẫn để bảo vệ anh. Chung thủy tuyệt đối.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": null,
+      "techniques_owned": [],
+      "current_cultivation": "Kim Đan Kỳ",
+      "current_location": null,
+      "status": "Mới xuất hiện"
+    },
+    {
+      "name": "Vô Thiên Lão Nhân - Lão bát quái (Hoặc Sư phụ nam chính)",
+      "role": "Sư phụ Nam chính / Trưởng bối",
+      "description": "Ngoại hình: Bề ngoài như một ông lão nông dân lẩm cẩm, râu tóc bạc phơ, thích đội nón lá, uống rượu bầu.  Tính cách: Hay lải nhải, mắng mỏ nam chính lười biếng, tỏ ra vụng về nhưng thực chất thâm tàng bất lộ, nhìn thấu thiên cơ. Cực kỳ thương đồ đệ.  Sức mạnh: Nắm giữ quy tắc thiên địa. Dạy nam chính những thứ \"cơ bản\" nhưng toàn là Đại đạo thượng cổ.  Gợi ý triển khai: Sư phụ là người biết rõ con đường Tiên - Phàm bị đứt đoạn, ông coi Diệp Trần là quân cờ hy vọng để phá giải ván cờ thiên hạ này.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Núi Vô Tẫn",
+        "Khu vườn thảo dược"
+      ],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": null,
+      "techniques_owned": [],
+      "current_cultivation": "Tiên Tôn ẩn thế",
+      "current_location": "Khu vườn thảo dược",
+      "status": "Đang an toàn"
+    },
+    {
+      "name": "Tuyết Nguyệt (Yêu thú Hồ Ly)",
+      "role": "Bạn đồng hành / Linh thú của Nữ chính",
+      "description": "Ngoại hình: Một con hồ ly tuyết nhỏ bằng bắp chân, lông trắng muốt như bông, mắt to tròn, đuôi bồng bềnh.  Tính cách: Trẻ con, hoạt bát, dí dỏm. Cực kỳ ham ăn, đặc biệt ghiền các loại đan dược nam chính luyện (coi như ăn kẹo). Rất hay làm nũng nữ chính.  Sức mạnh: Sở hữu tốc độ cực nhanh, có khả năng thi triển huyễn thuật (ảo giác) và tạo ra lớp băng giáp phòng thủ bảo vệ chủ nhân.  Gợi ý triển khai: Tuyết Nguyệt là cầu nối tấu hài, làm giảm bớt sự căng thẳng của những trận chiến và là \"nhân chứng\" dễ thương cho tình cảm của hai người.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Khu vườn thảo dược"
+      ],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [],
+      "current_cultivation": "Yêu Đan Kỳ (Tương đương Trúc Cơ)",
+      "current_location": "Khu vườn thảo dược",
+      "status": "Đang nguy hiểm"
+    },
+    {
+      "name": "Lôi Phong Bằng  (Yêu thú đại bàng)",
+      "role": "Linh thú bảo vệ Nam chính",
+      "description": "Ngoại hình: Bình thường thu nhỏ trông như một con chim ưng săn thỏ lông xám đen mộc mạc đậu trên vai Diệp Trần. Khi giải phóng, thân hình to lớn che khuất bầu trời, lông vũ sắc bén như kim loại.  Tính cách: Trầm tĩnh, kiêu hãnh, ánh mắt sắc lạnh. Rất khinh bỉ Tuyết Cầu vì tính tình trẻ con, nhưng lại ngoan ngoãn tuyệt đối và trung thành với Diệp Trần.  Sức mạnh: Thao túng Gió và Sấm Sét. Tốc độ phi hành có thể xé rách không gian, lực phòng thủ thân thể cực cao.  Gợi ý triển khai: Nam chính chỉ nghĩ đây là con chim sư phụ cho để đuổi chuột bọ cắn phá vườn thuốc. Hãy để Phong Bằng thường xuyên lặng lẽ \"giải quyết\" những con yêu thú cường đại đến phá đám mà nam chính không hề hay biết.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Núi Vô Tẫn",
+        "Khu vườn thảo dược"
+      ],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [],
+      "current_cultivation": "Yêu Vương (Bị phong ấn giả dạng thành chim ưng nhỏ).",
+      "current_location": "Khu vườn thảo dược",
+      "status": "Đang an toàn"
+    }
+  ],
+  "context": "Bối cảnh: Kỷ nguyên tu tiên vạn pháp phồn vinh nhưng \"Thiên Môn\" đã đóng chặt vạn năm, con đường phi thăng từ Phàm giới lên Tiên giới bị đoạn tuyệt hoàn toàn. Tu sĩ kẹt ở cảnh giới cao nhất chỉ có thể chờ thọ nguyên cạn kiệt.\n\nCốt truyện: Truyện mở đầu với Diệp Trần - một thanh niên trầm tính, quyết đoán nhưng cực kỳ tốt bụng và thông minh. Anh luôn tự nhận mình là một nông dân trồng thảo dược bình thường ở chân núi. Anh không hề biết vị sư phụ già lẩm cẩm thường dạy mình trồng cây, bốc thuốc thực chất là một vị Tiên Tôn thượng cổ. Diệp Trần sở hữu năng lực luyện dược, vẽ phù, bày trận ở mức độ \"nghịch thiên\", nhưng anh coi đó chỉ là kỹ năng sinh tồn cơ bản và hoàn toàn không ý thức được độ khủng khiếp của mình.\n\nBiến cố xảy ra khi Kỷ Minh Nguyệt - thiên kiêu đệ nhất của gia tộc kiếm tu lâu đời, sở hữu nhan sắc tuyệt mỹ và tính cách băng lãnh - bị kẻ thù ám toán trọng thương và rơi vào vườn thuốc của Diệp Trần. Diệp Trần dùng y thuật \"bình thường\" của mình cứu sống cô. Từ đây, hai người bắt đầu đồng hành.\n\nTrên hành trình đầy gian nan và hiểm ác của thế giới tu chân, sự thông minh, chu toàn của Diệp Trần cùng kiếm pháp sát phạt quả đoán của Minh Nguyệt giúp họ vượt qua mọi tử cục. Trải qua sinh tử, Minh Nguyệt lột bỏ lớp vỏ băng lãnh, trở nên hoạt bát, lanh lợi và vô cùng ôn nhu với Diệp Trần. Ngược lại, Diệp Trần luôn dành sự dịu dàng tuyệt đối để bảo vệ cô. Bằng tình yêu thuần khiết và lòng chung thủy tuyệt đối, họ cùng nhau tìm ra bí mật của Đoạn Tiên Lộ, phá vỡ gông cùm vạn năm để nối lại con đường Tiên - Phàm.\n\nGợi ý thêm về phương án triển khai(dành cho viết truyện):\nVấn đề ẩn tàng sức mạnh của Nam chính: Đừng viết theo mô-típ \"giả heo ăn thịt hổ\" cố tình giấu giếm, hãy viết theo hướng sự chênh lệch nhận thức (Cognitive Dissonance). Nghĩa là Nam chính thực sự nghĩ rằng \"vẽ cái bùa này chặn được 1 đòn của cao thủ là chuyện rất bình thường ai cũng làm được\", điều này sẽ tạo ra sự thú vị và ngỡ ngàng liên tục cho Nữ chính cũng như kẻ địch.\n\nTương tác tình cảm: Khai thác sự tương phản. Nữ chính ra ngoài là một nữ thần chiến tranh lạnh lùng chém giết, nhưng về nhà lại hoạt bát, nũng nịu đòi Nam chính nấu ăn hoặc pha thuốc cho mình. Nam chính ít nói nhưng hành động cực kỳ tinh tế, giải quyết toàn bộ hậu phương (giải độc, trận pháp bảo vệ, đan dược hồi phục) để Nữ chính yên tâm tung hoành.",
+  "style": "Tiên hiệp, Ngôn tình, Song Cường (Cả 2 đều mạnh), Trầm tĩnh, Lãng mạn chậm nhiệt (Slow-burn), Kịch tính. Chung tình",
+  "tags": [
+    "tiên hiệp",
+    "kiếm tu",
+    "luyện dược",
+    "trận pháp",
+    "vô địch lưu ẩn tàng (nam chính)",
+    "thiên kiêu (nữ chính)",
+    "1v1",
+    "chung thủy",
+    "nghịch thiên."
+  ],
+  "max_chapters": 200,
+  "max_words_per_chapter": 900,
+  "model": "gemini-3.1-flash-lite",
+  "cultivation_stages": [
+    {
+      "name": "Luyện Khí",
+      "description": "Giai đoạn tích lũy linh khí vào cơ thể."
+    },
+    {
+      "name": "Trúc Cơ",
+      "description": "Xây dựng nền móng tu tiên vững chắc."
+    },
+    {
+      "name": "Kim Đan",
+      "description": "Nguyên anh ngưng tụ linh khí thành thực thể Kim Đan."
+    },
+    {
+      "name": "Nguyên Anh",
+      "description": "Hóa hình linh hồn thành Nguyên Anh."
+    },
+    {
+      "name": "Hóa Thần",
+      "description": "Linh hồn giao hòa cùng trời đất."
+    }
+  ]
+}
