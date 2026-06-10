@@ -50,8 +50,10 @@ def format_user_idea(user_idea: Any, story_uuid: Optional[str] = None) -> str:
         weapons_str = ", ".join(n.get("weapons", [])) if isinstance(n.get("weapons"), list) else str(n.get("weapons", ""))
         techs = ", ".join(n.get("techniques", [])) if isinstance(n.get("techniques"), list) else str(n.get("techniques", ""))
 
+        tone = n.get("tone") or n.get("style") or "bình thường"
         res += f"  - Sự kiện [{node_id}]: {title}\n"
         res += f"    * Mô tả diễn biến: {desc}\n"
+        res += f"    * Văn phong yêu cầu: {tone}\n"
         res += f"    * Nhân vật tham gia: {chars}\n"
         if locs.strip():
             res += f"    * Địa điểm xuất hiện: {locs.strip()}\n"
@@ -224,7 +226,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
 3. Nếu thông tin đã đầy đủ hoặc sau khi tác giả đã trả lời thêm, hãy tổng hợp bản yêu cầu chi tiết nhất trong `analyzed_requirements`, nêu rõ yêu cầu tích hợp các địa điểm, pháp khí, và công pháp cụ thể đã được hoạch định vào nội dung chương truyện.
 4. Trong `analyzed_requirements`, hãy đặc biệt hướng dẫn viết chương truyện theo phong cách tiểu thuyết dài kỳ (serial novel): bắt đầu trực tiếp nối tiếp chương trước và khép lại chương lấp lửng (cliffhanger), tuyệt đối tránh cấu trúc đóng kiểu bài văn (không có tóm tắt mở đầu, không có kết luận/tổng kết diễn biến ở cuối chương).
 """
-        result = invoke_with_retry(state, prompt, temperature=0.3, output_schema=RequirementAnalysisResult)
+        result = invoke_with_retry(state, prompt, temperature=0.7, output_schema=RequirementAnalysisResult)
             
         # If there are missing info questions, ask user
         if result.missing_info_questions and loop_count < max_loops - 1:
@@ -335,7 +337,7 @@ Yêu cầu viết truyện:
 1. Viết trực tiếp nội dung truyện bằng định dạng Markdown.
 2. Tiêu đề chương viết ở dòng đầu tiên dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`.
 3. Tập trung miêu tả sâu sắc về bối cảnh, cảm xúc, biểu cảm, hội thoại và hành động. Đảm bảo đúng phong cách: {meta.get('style')}.
-4. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi node.
+4. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, công pháp thi triển, và BẮT BUỘC TUÂN THỦ VĂN PHONG (tone) đã được chỉ định cho mỗi node (ví dụ: đoạn tương ứng node hài hước phải hóm hỉnh, đoạn tương ứng node bi thương/đau khổ phải bi thiết, cảm xúc tuyệt vọng, đoạn tương ứng node tình cảm phải sâu lắng, ấm áp...).
 5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
    - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
    - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).
@@ -460,7 +462,7 @@ BẢN NHÁP HIỆN TẠI:
 
 Hãy viết lại bản nháp này. Đảm bảo:
 1. Sửa đổi đúng theo ý tác giả (thêm thắt chi tiết, sửa lời thoại, thay đổi nhịp điệu cốt truyện...).
-2. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển đã được chỉ định cho mỗi node.
+2. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, công pháp thi triển, và BẮT BUỘC TUÂN THỦ VĂN PHONG (tone) đã được chỉ định cho mỗi node (ví dụ: đoạn tương ứng node hài hước phải hóm hỉnh, đoạn tương ứng node bi thương/đau khổ phải bi thiết, cảm xúc tuyệt vọng, đoạn tương ứng node tình cảm phải sâu lắng, ấm áp...).
 3. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
    - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
    - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).

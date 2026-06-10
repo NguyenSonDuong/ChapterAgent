@@ -259,7 +259,8 @@ export default function ChapterGenerator({
     locations: [],
     weapons: [],
     techniques: [],
-    content: ''
+    content: '',
+    tone: ''
   });
 
   const [chapterNodesCache, setChapterNodesCache] = useState({});
@@ -274,7 +275,8 @@ export default function ChapterGenerator({
     techniques: [],
     locations: [],
     weapons: [],
-    notes: ''
+    notes: '',
+    tone: ''
   });
   const [suggesting, setSuggesting] = useState(false);
   const [suggestError, setSuggestError] = useState(null);
@@ -309,7 +311,8 @@ export default function ChapterGenerator({
           locations: Array.isArray(node.locations) ? node.locations : [],
           weapons: Array.isArray(node.weapons) ? node.weapons : [],
           techniques: Array.isArray(node.techniques) ? node.techniques : [],
-          content: node.content || ''
+          content: node.content || '',
+          tone: node.tone || ''
         });
       }
     } else {
@@ -323,7 +326,8 @@ export default function ChapterGenerator({
         locations: [],
         weapons: [],
         techniques: [],
-        content: ''
+        content: '',
+        tone: ''
       });
     }
   }, [editingNodeId, nodes]);
@@ -497,6 +501,7 @@ export default function ChapterGenerator({
       locations: [],
       weapons: [],
       techniques: [],
+      tone: 'bình thường',
       x: 150 + Math.random() * 200,
       y: 100 + Math.random() * 150
     };
@@ -545,7 +550,8 @@ export default function ChapterGenerator({
       techniques: [],
       locations: [],
       weapons: [],
-      notes: ''
+      notes: '',
+      tone: ''
     });
     setSuggestError(null);
     setShowSuggestModal(true);
@@ -582,7 +588,8 @@ export default function ChapterGenerator({
           techniques: suggestForm.techniques,
           locations: suggestForm.locations,
           weapons: suggestForm.weapons,
-          notes: suggestForm.notes
+          notes: suggestForm.notes,
+          tone: suggestForm.tone
         })
       });
       const data = await res.json();
@@ -626,6 +633,7 @@ export default function ChapterGenerator({
       resolution_note: nodeForm.resolutionNote
     } : (node.resolved_thread || {});
     const lnkList = isNodeEditing ? nodeForm.links : (node.links || []);
+    const toneVal = isNodeEditing ? nodeForm.tone : (node.tone || '');
 
     // Identify linked nodes in the same chapter
     const linkedNodes = [];
@@ -665,7 +673,8 @@ export default function ChapterGenerator({
           resolved_thread: resThread,
           links: lnkList,
           notes: '',
-          linked_nodes: linkedNodes
+          linked_nodes: linkedNodes,
+          tone: toneVal
         })
       });
 
@@ -807,7 +816,8 @@ export default function ChapterGenerator({
           locations: nodeForm.locations || [],
           weapons: nodeForm.weapons || [],
           techniques: nodeForm.techniques || [],
-          content: nodeForm.content || null
+          content: nodeForm.content || null,
+          tone: nodeForm.tone || 'bình thường'
         };
       }
       return n;
@@ -827,8 +837,8 @@ export default function ChapterGenerator({
         return;
       }
       finalIdea = {
-        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y }) => ({
-          id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, x, y
+        nodes: nodes.map(({ id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, tone, x, y }) => ({
+          id, title, description, characters, resolved_thread, links, locations, weapons, techniques, content, tone, x, y
         })),
         connections
       };
@@ -1626,6 +1636,18 @@ export default function ChapterGenerator({
                         </div>
 
                         <div>
+                          <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Văn phong</label>
+                          <input 
+                            type="text"
+                            className="form-input-sm"
+                            style={{ width: '100%', background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', padding: '6px', borderRadius: '4px' }}
+                            value={nodeForm.tone}
+                            onChange={e => setNodeForm({ ...nodeForm, tone: e.target.value })}
+                            placeholder="Ví dụ: hài hước, bi thương, đau khổ tuyệt vọng, tình cảm..."
+                          />
+                        </div>
+
+                        <div>
                           <label className="form-label" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>Mô tả kịch bản / Hướng giải quyết</label>
                           <textarea 
                             className="form-textarea-sm"
@@ -2130,7 +2152,7 @@ export default function ChapterGenerator({
                   </div>
                 )}
 
-                <div className="form-row">
+                <div className="form-row" style={{ display: 'flex', gap: '12px' }}>
                   <div className="form-group flex-1">
                     <label className="form-label required">Số lượng sự kiện (Nodes) cần tạo</label>
                     <select 
@@ -2147,6 +2169,16 @@ export default function ChapterGenerator({
                       <option value="7">7 Nodes</option>
                       <option value="8">8 Nodes (Chi tiết)</option>
                     </select>
+                  </div>
+                  <div className="form-group flex-1">
+                    <label className="form-label">Văn phong mong muốn</label>
+                    <input 
+                      type="text"
+                      className="form-input"
+                      value={suggestForm.tone}
+                      onChange={e => setSuggestForm(prev => ({ ...prev, tone: e.target.value }))}
+                      placeholder="Ví dụ: hài hước, bi thương, tình cảm..."
+                    />
                   </div>
                 </div>
 

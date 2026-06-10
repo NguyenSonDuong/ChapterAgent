@@ -138,6 +138,7 @@ class SuggestedNode(BaseModel):
     locations: List[str] = Field(description="Danh sách các địa điểm xuất hiện trong sự kiện này (chọn từ danh sách địa điểm đầu vào)")
     weapons: List[str] = Field(description="Danh sách các binh khí / pháp khí sử dụng trong sự kiện này (chọn từ danh sách binh khí đầu vào)")
     techniques: List[str] = Field(description="Danh sách các công pháp thi triển trong sự kiện này (chọn từ danh sách công pháp đầu vào)")
+    tone: Optional[str] = Field(default="bình thường", description="Văn phong của node này (ví dụ: hài hước, bi thương, đau khổ tuyệt vọng, tình cảm...)")
     resolved_thread: SuggestedNodeResolvedThread = Field(description="Giải quyết nút thắt nếu có")
     links: List[SuggestedNodeLink] = Field(description="Liên kết với các node của chương cũ nếu có")
     content: Optional[str] = Field(default=None, description="Nội dung thực tế của chương tương ứng với node này")

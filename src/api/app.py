@@ -1057,6 +1057,7 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
     locations = req_data.get('locations', [])
     weapons = req_data.get('weapons', [])
     notes = req_data.get('notes', '').strip()
+    tone = req_data.get('tone', '').strip()
 
     # Build context of previous nodes
     prev_nodes_ctx = ""
@@ -1111,14 +1112,17 @@ YÊU CẦU CHO CHƯƠNG {chapter_num}:
 - Các công pháp sẽ sử dụng: {', '.join(techniques) if techniques else 'Không chỉ định'}
 - Binh khí/Pháp khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
 - Nút thắt sẽ giải quyết (nếu có, hãy tự nghĩ phương án giải quyết và điền vào resolution_note): {', '.join(resolved_threads) if resolved_threads else 'Không chỉ định'}
+- Văn phong mong muốn của tác giả: {tone if tone else 'Không chỉ định (bình thường)'}
 - Lưu ý/chú thích của tác giả: "{notes}"
 
 HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
-1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) với node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
+1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) with node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
 2. Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí vào các node sao cho tự nhiên nhất.
 3. Nếu có giải quyết nút thắt, hãy chọn đúng nút thắt đó và mô tả cách giải quyết chi tiết trong trường `resolved_thread.resolution_note`.
 4. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
-5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
+5. Đề xuất một Văn Phong (tone) cụ thể và phù hợp cho mỗi node tại trường `tone` (ví dụ: "hài hước", "bi thương", "đau khổ tuyệt vọng", "tình cảm", "kịch tính", "bình thường").
+   ĐẶC BIỆT: Nếu tác giả có chỉ định "Văn phong mong muốn của tác giả" cụ thể ở trên (khác với không chỉ định/bình thường), bạn BẮT BUỘC phải tạo ra ít nhất 50% số lượng node (ví dụ: tối thiểu 2 node nếu tổng số là 3 hoặc 4 node) có văn phong (`tone`) chính xác như yêu cầu đó của tác giả. Các node còn lại hãy tự dựa vào nội dung và nhịp điệu của câu chuyện để lựa chọn văn phong phù hợp nhất.
+6. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
    - Sơ đồ các node sự kiện KHÔNG được thiết kế theo cấu trúc đóng của một bài văn độc lập (không tạo node chỉ để 'mở bài/giới thiệu hoàn cảnh' ở đầu, và không tạo node chỉ để 'kết luận/tổng kết diễn biến/rút ra bài học' ở cuối chương).
    - Node đầu tiên phải là sự kiện trực tiếp bắt đầu nối tiếp ngay vào diễn biến trước đó.
    - Node cuối cùng của chương phải mở ra một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để chuẩn bị cho chương tiếp theo, tuyệt đối tránh kết thúc đóng hay mang tính khép lại toàn bộ.
@@ -1178,6 +1182,7 @@ HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
                 "locations": node.locations or [],
                 "weapons": node.weapons or [],
                 "techniques": node.techniques or [],
+                "tone": node.tone.strip() if node.tone else "bình thường",
                 "resolved_thread": res_thread,
                 "links": links,
                 "x": 150 + idx * 300,
@@ -1238,6 +1243,7 @@ def suggest_node_details(story_uuid, chapter_num):
     resolved_thread = req_data.get('resolved_thread', {})
     notes = req_data.get('notes', '').strip()
     linked_nodes = req_data.get('linked_nodes', [])
+    tone = req_data.get('tone', '').strip()
 
     # Build context of linked nodes in this chapter
     linked_nodes_ctx = ""
@@ -1272,6 +1278,7 @@ CÁC THÔNG SỐ ĐẦU VÀO CỦA SỰ KIỆN NÀY (BẮT BUỘC PHẢI DỰA V
 - Công pháp thi triển: {', '.join(techniques) if techniques else 'Không chỉ định'}
 - Binh khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
 {resolved_thread_str}
+- Văn phong yêu cầu cho sự kiện này: {tone if tone else 'Không chỉ định (bình thường)'}
 - Ghi chú thêm từ tác giả: "{notes if notes else 'Không có'}"
 
 BỐI CẢNH CỦA CÁC SỰ KIỆN LIÊN KẾT TRONG CÙNG CHƯƠNG (BẮT BUỘC PHẢI ĐẢM BẢO TÍNH LIỀN MẠCH):
@@ -1282,7 +1289,8 @@ YÊU CẦU:
 2. Tạo mô tả kịch bản (description) chi tiết diễn biến (khoảng 50-150 từ), viết mạch lạc và hấp dẫn, kết nối hợp lý với bối cảnh sự kiện trước/sau (nếu có).
 3. Sử dụng đúng các nhân vật, địa điểm, công pháp, binh khí đầu vào đã được chỉ định.
 4. KHÔNG tạo mô tả kịch bản mang tính chất "kết bài", tổng kết hay khép lại câu chuyện (như 'kết thúc hành trình...', 'khép lại chương này...'). Nếu đây là sự kiện cuối cùng của chương, hãy tập trung tạo sự kiện chuyển tiếp lấp lửng (cliffhanger) hoặc một chi tiết kết mở để dẫn dắt tiếp tục sang chương sau.
-5. Trả về đúng định dạng có cấu trúc chứa title và description.
+5. Hãy đảm bảo Tiêu đề (title) và Mô tả kịch bản (description) được gợi ý phải thể hiện đúng Văn phong yêu cầu (ví dụ: hài hước, bi thương, đau khổ tuyệt vọng, tình cảm...).
+6. Trả về đúng định dạng có cấu trúc chứa title và description.
 """
 
     try:

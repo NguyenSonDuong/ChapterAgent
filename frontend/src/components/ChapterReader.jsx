@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Edit2, Save, Trash2, Eye, FileText, Settings, Plus, XCircle, X, Link, Check, Sparkles, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { BookOpen, Edit2, Save, Trash2, Eye, FileText, Settings, Plus, XCircle, X, Link, Check, Sparkles, AlertTriangle, Volume2, Download } from 'lucide-react';
 
 export default function ChapterReader({ 
   storyUuid, 
@@ -19,6 +19,11 @@ export default function ChapterReader({
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Audio TTS States
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const audioRef = useRef(null);
 
   // Selection states for AI editing
   const [selectionInfo, setSelectionInfo] = useState(null); // { text: '', rect: { top, left, width, height } }
@@ -64,6 +69,12 @@ export default function ChapterReader({
 
   // Fetch chapter files from backend when selectedNum changes
   useEffect(() => {
+    // Stop any playing audio when selected chapter changes
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
     if (!selectedNum || !storyUuid) {
       setChapterData(null);
       return;
@@ -90,6 +101,14 @@ export default function ChapterReader({
     };
 
     fetchChapter();
+
+    return () => {
+      // Clean up audio when component unmounts or selectedNum changes
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, [selectedNum, storyUuid]);
 
   // Handle text selection events inside the textarea in Edit Mode
@@ -188,6 +207,112 @@ export default function ChapterReader({
         setSelectedNum('');
         if (setActiveChapterNum) setActiveChapterNum(null);
       }
+    }
+  };
+
+  const cleanTextForTts = (text) => {
+    if (!text) return '';
+    return text
+      .replace(/[#*`~_\[\]()]/g, '') // remove markdown symbols
+      .replace(/- /g, '') // remove list hyphens
+      .trim();
+  };
+
+  const handlePlayAudio = async () => {
+    if (!chapterData || !chapterData.content) return;
+    
+    // Toggle pause/play if already playing
+    if (audioRef.current && audioPlaying) {
+      audioRef.current.pause();
+      setAudioPlaying(false);
+      return;
+    }
+
+    setAudioLoading(true);
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      
+      const cleanText = cleanTextForTts(chapterData.content);
+      const response = await fetch('http://127.0.0.1:5005/api/v1/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: cleanText,
+          ref_audio: '',
+          sample_rate: 128000
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('TTS server returned error ' + response.status);
+      }
+      
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      
+      audio.onended = () => {
+        setAudioPlaying(false);
+        audioRef.current = null;
+      };
+      
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        setAudioPlaying(false);
+        audioRef.current = null;
+      };
+
+      setAudioLoading(false);
+      setAudioPlaying(true);
+      await audio.play();
+    } catch (error) {
+      console.error(error);
+      alert('Không thể phát Audio: ' + error.message);
+      setAudioLoading(false);
+      setAudioPlaying(false);
+    }
+  };
+
+  const handleDownloadAudio = async () => {
+    if (!chapterData || !chapterData.content) return;
+    setAudioLoading(true);
+    try {
+      const cleanText = cleanTextForTts(chapterData.content);
+      const response = await fetch('http://127.0.0.1:5005/api/v1/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: cleanText,
+          ref_audio: '',
+          sample_rate: 128000
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('TTS server returned error ' + response.status);
+      }
+      
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = audioUrl;
+      link.download = `chap_${selectedNum}_audio.wav`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error(error);
+      alert('Không thể tải Audio: ' + error.message);
+    } finally {
+      setAudioLoading(false);
     }
   };
 
@@ -685,6 +810,34 @@ export default function ChapterReader({
                   }}
                 >
                   <Settings className="icon-xs" style={{ color: '#c084fc' }} /> <span>Sửa Sơ Đồ (Canvas)</span>
+                </button>
+                <button 
+                  onClick={handlePlayAudio} 
+                  className="btn-toolbar"
+                  disabled={audioLoading}
+                  style={{ 
+                    background: audioPlaying ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)', 
+                    border: `1px solid ${audioPlaying ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`, 
+                    color: audioPlaying ? '#ef4444' : '#10b981',
+                    marginRight: '8px'
+                  }}
+                >
+                  <Volume2 className={`icon-xs ${audioLoading ? 'spin' : ''}`} style={{ color: audioPlaying ? '#ef4444' : '#10b981' }} /> 
+                  <span>{audioLoading ? 'Đang xử lý...' : (audioPlaying ? 'Dừng Audio' : 'Nghe Audio')}</span>
+                </button>
+                <button 
+                  onClick={handleDownloadAudio} 
+                  className="btn-toolbar"
+                  disabled={audioLoading}
+                  style={{ 
+                    background: 'rgba(245, 158, 11, 0.15)', 
+                    border: '1px solid rgba(245, 158, 11, 0.3)', 
+                    color: '#f59e0b',
+                    marginRight: '8px'
+                  }}
+                >
+                  <Download className="icon-xs" style={{ color: '#f59e0b' }} /> 
+                  <span>Tải Audio</span>
                 </button>
                 <button 
                   onClick={() => setEditMode(true)} 
