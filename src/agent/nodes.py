@@ -235,7 +235,7 @@ Hãy phân tích và trả về kết quả cấu trúc:
                 # Block until user provides input
                 session.input_event.clear()
                 # Wait for max 5 minutes (300 seconds)
-                success = session.input_event.wait(timeout=300.0)
+                success = session.input_event.wait(timeout=1200.0)
                 check_cancellation(state["story_uuid"])
                 if not success:
                     console.print("[yellow]Hết thời gian chờ phản hồi làm rõ. Tiếp tục quy trình...[/yellow]")
