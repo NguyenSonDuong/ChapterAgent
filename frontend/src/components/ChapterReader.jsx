@@ -239,7 +239,7 @@ export default function ChapterReader({
       }
       
       const cleanText = cleanTextForTts(chapterData.content);
-      const response = await fetch('http://127.0.0.1:5005/api/v1/tts', {
+      const response = await fetch(`${targetUrl}/api/tts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -287,7 +287,7 @@ export default function ChapterReader({
     setAudioLoading(true);
     try {
       const cleanText = cleanTextForTts(chapterData.content);
-      const response = await fetch('http://127.0.0.1:5005/api/v1/tts', {
+      const response = await fetch(`${targetUrl}/api/tts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

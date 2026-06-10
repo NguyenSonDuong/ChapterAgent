@@ -13,6 +13,7 @@ import os
 import uuid
 import json
 import threading
+import requests
 from flask import Flask, jsonify, request
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
@@ -1844,6 +1845,25 @@ def cancel_chapter_generation(story_uuid):
         'status': 'cancelled',
         'message': 'Đã gửi yêu cầu hủy tiến trình sáng tác.'
     })
+
+@app.route('/api/tts', methods=['POST'])
+def proxy_tts():
+    """Proxy requests to the local TTS server on port 8000 to bypass CORS restrictions."""
+    try:
+        data = request.json or {}
+        tts_url = "http://127.0.0.1:8000/api/v1/tts"
+        # Use timeout=None for infinite timeout as requested
+        response = requests.post(tts_url, json=data, timeout=None)
+        
+        # Build Flask response to forward headers and contents
+        from flask import Response
+        res = Response(response.content, status=response.status_code)
+        for header_name in ['Content-Type', 'Content-Disposition']:
+            if header_name in response.headers:
+                res.headers[header_name] = response.headers[header_name]
+        return res
+    except Exception as e:
+        return jsonify({'error': f'Failed to contact TTS server: {str(e)}'}), 500
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', port=5000, debug=True, allow_unsafe_werkzeug=True)
