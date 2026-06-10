@@ -982,6 +982,37 @@ def get_chapter_nodes(story_uuid, chapter_num):
         return jsonify({'error': f'Failed to read nodes: {str(e)}'}), 500
 
 
+@app.route('/api/stories/<story_uuid>/all-nodes', methods=['GET'])
+def get_all_story_nodes(story_uuid):
+    """Get all event nodes & connections for all chapters in a story."""
+    ledger_path = config.get_ledger_path(story_uuid)
+    if not ledger_path.exists():
+        return jsonify({})
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        timeline = ledger.get('timeline', [])
+        
+        all_nodes_data = {}
+        for chap in timeline:
+            chap_num = chap.get('chapter')
+            nodes_path = config.get_chapter_nodes_path(story_uuid, chap_num)
+            if nodes_path.exists():
+                try:
+                    data = json.loads(nodes_path.read_text(encoding="utf-8"))
+                    if data.get("nodes"):
+                        all_nodes_data[str(chap_num)] = {
+                            "nodes": data.get("nodes", []),
+                            "connections": data.get("connections", []),
+                            "chapter_title": chap.get("title", ""),
+                            "chapter_summary": chap.get("summary", "")
+                        }
+                except Exception:
+                    pass
+        return jsonify(all_nodes_data)
+    except Exception as e:
+        return jsonify({'error': f'Failed to read all nodes: {str(e)}'}), 500
+
+
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/suggest-nodes', methods=['POST'])
 def suggest_chapter_nodes(story_uuid, chapter_num):
     """Call Gemini to get suggestions for the next chapter's event nodes."""
@@ -1023,7 +1054,8 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
                 prev_nodes_data = json.loads(prev_nodes_path.read_text(encoding="utf-8"))
                 prev_nodes_ctx += f"\nSơ đồ sự kiện chương trước (Chương {chapter_num - 1}):\n"
                 for node in prev_nodes_data.get("nodes", []):
-                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+                    node_text = node.get("content") or node.get("description") or ""
+                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Nội dung/Mô tả: {node_text}\n"
             except Exception:
                 pass
 
@@ -1037,7 +1069,8 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
                     nodes_data = json.loads(nodes_path.read_text(encoding="utf-8"))
                     prev_nodes_ctx += f"\nSơ đồ sự kiện Chương {chap_num} (Chương liên kết):\n"
                     for node in nodes_data.get("nodes", []):
-                        prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Mô tả: {node.get('description', '')}\n"
+                        node_text = node.get("content") or node.get("description") or ""
+                        prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Nội dung/Mô tả: {node_text}\n"
         except Exception:
             pass
 
@@ -1367,6 +1400,135 @@ def update_chapter_nodes(story_uuid, chapter_num):
             }), 200
 
     return jsonify({'message': f'Chapter {chapter_num} nodes updated successfully'})
+
+
+@app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>/align-nodes', methods=['POST'])
+def align_chapter_nodes(story_uuid, chapter_num):
+    """Align/partition the finalized chapter markdown content into its event nodes using AI."""
+    meta_path = config.get_meta_path(story_uuid)
+    if not meta_path.exists():
+        return jsonify({'error': 'Story metadata not found'}), 404
+
+    try:
+        meta_data = json.loads(meta_path.read_text(encoding="utf-8") if meta_path.exists() else '{}')
+        model_name = meta_data.get('model', 'gemini-2.5-flash')
+    except Exception as e:
+        return jsonify({'error': f'Failed to read metadata: {str(e)}'}), 500
+
+    content_path = config.get_chapter_content_path(story_uuid, chapter_num)
+    if not content_path.exists():
+        return jsonify({'error': f'Không tìm thấy nội dung chương {chapter_num}. Vui lòng viết truyện trước khi thực hiện cập nhật nội dung vào node.'}), 404
+
+    nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
+    if not nodes_path.exists():
+        return jsonify({'error': f'Chương {chapter_num} chưa có sơ đồ sự kiện (nodes). Vui lòng tạo sơ đồ sự kiện trước.'}), 400
+
+    try:
+        nodes_data = json.loads(nodes_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return jsonify({'error': f'Failed to read chapter nodes: {str(e)}'}), 500
+
+    nodes_list = nodes_data.get('nodes', [])
+    if not nodes_list:
+        return jsonify({'error': f'Sơ đồ sự kiện của Chương {chapter_num} đang trống. Vui lòng thêm các node sự kiện trước.'}), 400
+
+    # Build nodes list context for LLM
+    nodes_info = []
+    for n in nodes_list:
+        nodes_info.append({
+            "id": n.get("id"),
+            "title": n.get("title"),
+            "description": n.get("description")
+        })
+
+    try:
+        chapter_content = content_path.read_text(encoding="utf-8")
+    except Exception as e:
+        return jsonify({'error': f'Failed to read chapter content: {str(e)}'}), 500
+
+    prompt = f"""
+Hãy đọc nội dung Chương {chapter_num} dưới đây và phân tách/ánh xạ các đoạn văn (hoặc nội dung câu chữ thực tế) tương ứng với từng sự kiện (node) đã được lên kịch bản.
+
+DANH SÁCH CÁC SỰ KIỆN (NODES) KỊCH BẢN:
+{json.dumps(nodes_info, ensure_ascii=False, indent=2)}
+
+NỘI DUNG CHƯƠNG {chapter_num}:
+---
+{chapter_content}
+---
+
+YÊU CẦU:
+1. Phân tách chính xác nội dung chương truyện đã hoàn thiện ở trên thành các phần tương ứng với danh sách sự kiện (nodes) kịch bản.
+2. Với mỗi sự kiện, trích xuất nguyên văn hoặc đầy đủ đoạn câu chữ trong truyện mô tả sự kiện đó. Nội dung phải là văn bản truyện thực tế (câu kể, thoại, miêu tả cảnh vật/nội tâm...), không phải là mô tả kịch bản tóm tắt.
+3. Nếu một sự kiện không có nội dung trực tiếp tương ứng (hoặc bị gộp), hãy gán nội dung phù hợp nhất hoặc để trống.
+4. Trả về dưới cấu trúc dữ liệu JSON chứa mảng các đối tượng có trường "node_id" và "content" (nội dung câu chữ thực tế).
+"""
+
+    try:
+        from src.utils.llm import invoke_with_retry
+        state = {
+            "story_uuid": story_uuid,
+            "model": model_name
+        }
+        
+        # Call LLM with output schema ChapterNodeContentExtraction
+        mapping_result = invoke_with_retry(
+            state, 
+            prompt, 
+            temperature=0.2, 
+            output_schema=models.ChapterNodeContentExtraction
+        )
+        
+        # Map back to nodes
+        mapping_dict = {m.node_id: m.content for m in mapping_result.mappings}
+        for n in nodes_list:
+            node_id = n.get("id")
+            if node_id in mapping_dict:
+                n["content"] = mapping_dict[node_id]
+            else:
+                n["content"] = None
+
+        # Write updated nodes back to disk
+        nodes_path.write_text(json.dumps(nodes_data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        # Sync and update global ledger (timeline nodes MUST NOT have "content")
+        ledger_path = config.get_ledger_path(story_uuid)
+        if ledger_path.exists():
+            try:
+                ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+                timeline = ledger.get('timeline', [])
+                updated = False
+                for item in timeline:
+                    if item.get('chapter') == chapter_num:
+                        # Clean content attribute from nodes copy
+                        timeline_nodes = []
+                        for n in nodes_list:
+                            n_copy = n.copy()
+                            n_copy.pop("content", None)
+                            timeline_nodes.append(n_copy)
+                        item['nodes'] = timeline_nodes
+                        item['connections'] = nodes_data.get('connections', [])
+                        updated = True
+                        break
+                if updated:
+                    ledger['timeline'] = timeline
+                    validated_ledger = models.GlobalLedger(**ledger)
+                    ledger_path.write_text(validated_ledger.model_dump_json(indent=2), encoding="utf-8")
+            except Exception as e:
+                return jsonify({
+                    'warning': f'Đã cập nhật nội dung vào node trên đĩa, nhưng đồng bộ sổ cái thất bại: {str(e)}',
+                    'nodes': nodes_list,
+                    'connections': nodes_data.get('connections', [])
+                }), 200
+
+        return jsonify({
+            'message': f'Cập nhật nội dung vào các node của Chương {chapter_num} thành công.',
+            'nodes': nodes_list,
+            'connections': nodes_data.get('connections', [])
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'Failed to align nodes with AI: {str(e)}'}), 500
 
 
 @app.route('/api/stories/<story_uuid>/chapters/<int:chapter_num>', methods=['PUT'])

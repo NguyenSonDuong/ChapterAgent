@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { BookOpen, Sparkles, HelpCircle, FileText, LayoutDashboard, RefreshCw } from 'lucide-react';
+import { BookOpen, Sparkles, HelpCircle, FileText, LayoutDashboard, RefreshCw, Share2 } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import NewStoryModal from './components/NewStoryModal';
 import StoryOverview from './components/StoryOverview';
 import ChapterReader from './components/ChapterReader';
 import ChapterGenerator from './components/ChapterGenerator';
+import StoryFlow from './components/StoryFlow';
 import './App.css';
 
 const BACKEND_URL = 'http://127.0.0.1:5000';
@@ -218,6 +219,13 @@ export default function App() {
                 <Sparkles className="icon-xs" />
                 <span>Sáng Tác Chương Mới</span>
               </button>
+              <button 
+                className={`nav-tab-btn ${activeTab === 'flow' ? 'active' : ''}`}
+                onClick={() => setActiveTab('flow')}
+              >
+                <Share2 className="icon-xs" />
+                <span>Sơ Đồ Cốt Truyện</span>
+              </button>
             </div>
 
             <div className="tab-content-container" style={{ position: 'relative' }}>
@@ -252,6 +260,16 @@ export default function App() {
                   socket={socket}
                   onGenerationComplete={handleGenerationComplete}
                   backendUrl={BACKEND_URL}
+                />
+              </div>
+              <div style={{ display: activeTab === 'flow' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>
+                <StoryFlow
+                  storyUuid={selectedStoryId}
+                  backendUrl={BACKEND_URL}
+                  onReadChapter={(chapNum) => {
+                    setActiveChapterNum(chapNum);
+                    setActiveTab('reader');
+                  }}
                 />
               </div>
             </div>

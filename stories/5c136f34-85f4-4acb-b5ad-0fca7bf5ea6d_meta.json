@@ -12,18 +12,20 @@
         "Táng Cốt Lâm",
         "Cõi hư vô",
         "Con suối cạn",
-        "bãi cỏ mềm mại bên rìa rừng"
+        "bãi cỏ mềm mại bên rìa rừng",
+        "Trên đường đến Huyền Thiên Tông"
       ],
-      "active_weapon": "thanh đao cùn",
+      "active_weapon": "Thanh đao cùn",
       "weapons_owned": [
-        "Thanh đao cùn"
+        "Thanh đao cùn",
+        "Đao cùn"
       ],
       "active_technique": "Bá Huyết Cuồng Đao Quyết",
       "techniques_owned": [
         "Bá Huyết Cuồng Đao Quyết"
       ],
       "current_cultivation": "Thối Thể Cảnh",
-      "current_location": "bãi cỏ mềm mại bên rìa rừng",
+      "current_location": "Táng Cốt Lâm",
       "status": "Đang an toàn"
     },
     {
@@ -36,7 +38,8 @@
         "Táng Cốt Lâm",
         "Cõi hư vô",
         "Con suối cạn",
-        "bãi cỏ mềm mại bên rìa rừng"
+        "bãi cỏ mềm mại bên rìa rừng",
+        "Trên đường đến Huyền Thiên Tông"
       ],
       "active_weapon": "",
       "weapons_owned": [],
@@ -46,7 +49,7 @@
         "Huyết Dẫn Bạo Ngũ Trấn Hồn Trận"
       ],
       "current_cultivation": "",
-      "current_location": "bãi cỏ mềm mại bên rìa rừng",
+      "current_location": "Táng Cốt Lâm",
       "status": "Đang an toàn"
     },
     {
@@ -63,6 +66,21 @@
       "current_cultivation": "",
       "current_location": "",
       "status": "Đang an toàn"
+    },
+    {
+      "name": "Tiểu Bạch",
+      "role": "Thú cưng đồng hành",
+      "description": "Một con cáo nhỏ có bộ lông màu trắng, thông minh, lanh lợi, có khả năng tìm kiếm thảo dược quý.",
+      "first_chapter": 11,
+      "appearance_context": "Sở Mặc phát hiện con cáo này đang bị thương ở chân sau do cành cây đâm xuyên qua tại bìa rừng Táng Cốt Lâm khi hắn đang đi tìm củi khô.",
+      "visited_locations": [],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": null,
+      "techniques_owned": [],
+      "current_cultivation": null,
+      "current_location": null,
+      "status": "Mới xuất hiện"
     }
   ],
   "context": "Cửu Châu đại lục đang trong thời kỳ tăm tối, phong ấn rạn nứt, yêu ma từ Vực Sâu tràn ra hoành hành khắp nơi. Các tông môn tu tiên lớn đều đóng cửa bế quan hoặc chỉ thu nhận những thiên tài tuyệt đỉnh để dồn tài nguyên chống đỡ. Đạo thống suy tàn, mạng phàm nhân như cỏ rác.\n\nNam chính và nữ chính vốn là thanh mai trúc mã, đều mang \"Tạp linh căn\" (tư chất thấp kém nhất), bị các tiên môn từ chối và ruồng bỏ giữa thế đạo loạn lạc. Thay vì chấp nhận số phận làm thức ăn cho yêu ma, hai người nương tựa vào nhau, lấy tình yêu sâu đậm làm động lực sinh tồn. Tình cờ phát hiện một tàn quyển công pháp thượng cổ yêu cầu sự đồng điệu tuyệt đối về linh hồn giữa hai người thi triển, họ quyết tâm bước lên con đường nghịch thiên cải mệnh. Không có tài nguyên, họ dùng máu và mồ hôi để tranh đoạt; không có thiên phú, họ lấy ý chí và tình yêu làm đạo tâm. Cùng nhau trảm yêu, sát ma, đạp phá thiên đạo bất công để bảo vệ người mình yêu.",

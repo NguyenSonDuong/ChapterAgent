@@ -140,6 +140,7 @@ class SuggestedNode(BaseModel):
     techniques: List[str] = Field(description="Danh sách các công pháp thi triển trong sự kiện này (chọn từ danh sách công pháp đầu vào)")
     resolved_thread: SuggestedNodeResolvedThread = Field(description="Giải quyết nút thắt nếu có")
     links: List[SuggestedNodeLink] = Field(description="Liên kết với các node của chương cũ nếu có")
+    content: Optional[str] = Field(default=None, description="Nội dung thực tế của chương tương ứng với node này")
 
 class SuggestedConnection(BaseModel):
     from_node: str = Field(description="ID tạm thời của node bắt đầu, ví dụ node-1")
@@ -153,5 +154,13 @@ class SuggestedChapterNodes(BaseModel):
 class SuggestedSingleNodeDetails(BaseModel):
     title: str = Field(description="Tiêu đề / Tiến trình sự kiện được gợi ý (bắt buộc, không để trống, ngắn gọn)")
     description: str = Field(description="Mô tả kịch bản / Hướng giải quyết chi tiết diễn biến được gợi ý (bắt buộc, không để trống)")
+
+
+class NodeContentMapping(BaseModel):
+    node_id: str = Field(description="ID của node (ví dụ: node-1)")
+    content: str = Field(description="Đoạn văn hoặc nội dung truyện thực tế trong chương tương ứng với node này. Cần trích xuất chính xác và đầy đủ các câu chữ từ bản viết chương.")
+
+class ChapterNodeContentExtraction(BaseModel):
+    mappings: List[NodeContentMapping] = Field(description="Danh sách ánh xạ nội dung truyện thực tế cho từng node")
 
 

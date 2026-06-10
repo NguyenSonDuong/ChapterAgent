@@ -1,0 +1,150 @@
+{
+  "nodes": [
+    {
+      "id": "node-1781080813778",
+      "title": "Cuộc Sống Thường Nhật Ở Chân Núi",
+      "description": "Giới thiệu cuộc sống an nhiên tự tại của Diệp Trần tại khu vườn thảo dược dưới chân núi, công việc hàng ngày của anh là chăm sóc cây cối. Vô Thiên Lão Nhân xuất hiện với dáng vẻ lẩm cẩm, than vãn về một loại thảo dược khó tính nào đó, mở đầu cho màn cà khịa giữa hai thầy trò.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 150,
+      "y": 200,
+      "content": "Sương sớm còn vương trên những tán lá xanh non, phủ một lớp bạc lấp lánh lên khu vườn thảo dược rộng lớn dưới chân núi Vô Tẫn. Diệp Trần, trong bộ áo vải thô đã sờn màu nhưng sạch sẽ tinh tươm, đang tỉ mẩn dùng chiếc gáo gỗ múc nước suối tưới từng gốc linh chi ba ngàn năm tuổi. Động tác của chàng thanh niên thanh tú, thoạt nhìn như một nông phu bình thường, lại ẩn chứa sự cẩn trọng và tinh tế đến lạ. Mỗi giọt nước rơi xuống đều như được tính toán kỹ lưỡng, không thừa không thiếu, nuôi dưỡng những linh thảo quý hiếm mà người đời nhìn thấy ắt phải kinh hãi. Một con chim ưng nhỏ lông xám đen, trông có vẻ mộc mạc, đậu trên vai Diệp Trần, đôi mắt sắc lạnh lẳng lặng quan sát. Đó là Lôi Phong Bằng, linh thú mà Diệp Trần vẫn tưởng là một con chim săn mồi bình thường được sư phụ nhặt về. “Thằng nhóc thối!” Một giọng nói lẩm cẩm vang lên, phá tan sự yên tĩnh của buổi sớm. Vô Thiên Lão Nhân, với mái tóc bạc phơ buộc lỏng và chiếc nón lá đã ngả màu, chống gậy đi tập tễnh từ con đường mòn xuống, tay xách một cái bầu rượu lớn. Ông lão nhăn nhó chỉ vào một luống Tử Ngọc Thảo đang hơi ngả vàng. “Ngươi xem, thứ này mà cũng không chăm sóc tử tế! Bao nhiêu công ta vất vả đem về, giờ sắp chết khô rồi!”"
+    },
+    {
+      "id": "node-1781080813779",
+      "title": "Màn Cà Khịa Sáng Sớm",
+      "description": "Diệp Trần và Vô Thiên Lão Nhân có một cuộc đối thoại hài hước, cà khịa nhau về cách chăm sóc thảo dược, pha trà hoặc nấu ăn. Vô Thiên Lão Nhân thường xuyên 'lười biếng' và sai vặt Diệp Trần, còn Diệp Trần thì âm thầm 'phản kháng' bằng những câu nói khôn khéo. Lôi Phong Bằng, con đại bàng, tham gia vào cuộc trò chuyện bằng những tiếng kêu hoặc hành động 'bóc phốt' sư phụ.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 450,
+      "y": 260,
+      "content": "Diệp Trần ngẩng đầu, ánh mắt trầm tĩnh thoáng qua một tia ý cười khó nhận thấy. “Sư phụ à, Tử Ngọc Thảo ưa ẩm nhưng kỵ nước đọng. Người hôm qua tưới quá tay, lá ngả vàng là phải. Con đã dặn đi dặn lại rồi mà.” “Hừ! Lão già này thỉnh thoảng sơ ý một chút thì sao? Đồ đệ như ngươi không biết bù đắp hay sao?” Vô Thiên Lão Nhân khua khua tay, vờ vịt ho khan. “Hay là pha cho lão già này ấm trà Bích Lạc sương sớm, đỡ khát. Lão già này khát khô cổ rồi.” Lôi Phong Bằng trên vai Diệp Trần kêu lên một tiếng “quác” đầy khinh bỉ, như thể đang “bóc phốt” sự lười biếng của ông lão. Diệp Trần khẽ vuốt ve đầu nó, đoạn đáp: “Trà Bích Lạc phải chờ hái nụ khi sương tan hẳn mới thơm. Sư phụ cứ đợi một lát. Để con xem Tử Ngọc Thảo của người trước đã.”"
+    },
+    {
+      "id": "node-1781080813780",
+      "title": "Thử Thách Y Thuật 'Bình Thường'",
+      "description": "Vô Thiên Lão Nhân bày trò, giả vờ bị một chứng bệnh 'khó chữa' hoặc mang về một loại cây cảnh hiếm đang héo úa, thách thức Diệp Trần. Diệp Trần, với tư duy 'nông dân', dùng những phương pháp y thuật hoặc kỹ năng chữa trị 'bình thường' của mình (nhưng thực chất là nghịch thiên) để giải quyết vấn đề một cách dễ dàng và nhanh chóng.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 750,
+      "y": 200,
+      "content": "Diệp Trần tiến đến luống Tử Ngọc Thảo, nhẹ nhàng dùng ngón tay chạm vào một chiếc lá. Chàng không dùng bất kỳ pháp lực nào, chỉ đơn thuần là cảm nhận sinh cơ đang suy yếu của nó. Sau đó, chàng nhặt một cành cây khô nhỏ trên đất, khẽ vẽ vài đường phức tạp lên mặt đất cạnh gốc cây, tạo thành một trận pháp đơn giản mà người phàm không thể nào hiểu được. Khí tức sinh cơ từ trận pháp lập tức lan tỏa, Tử Ngọc Thảo đang héo úa bỗng chốc xanh tươi trở lại, thậm chí còn tỏa ra một luồng linh khí nhàn nhạt, mạnh mẽ hơn trước."
+    },
+    {
+      "id": "node-1781080813781",
+      "title": "Sự Ngây Thơ Của Đồ Đệ",
+      "description": "Sau khi Diệp Trần giải quyết xong vấn đề, Vô Thiên Lão Nhân ngầm kinh ngạc trước tài năng của Diệp Trần nhưng vẫn giữ vẻ lẩm cẩm, chỉ buông một câu 'cũng tạm được'. Diệp Trần hoàn toàn không ý thức được độ khủng khiếp của mình, chỉ nghĩ rằng 'ai cũng có thể làm được việc này, chỉ là sư phụ lười biếng thôi'. Sự chênh lệch nhận thức này tạo ra những tình huống dở khóc dở cười.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 1050,
+      "y": 260,
+      "content": "Vô Thiên Lão Nhân đứng sau lưng, ánh mắt lấp lánh tinh quang, nhưng ngoài mặt vẫn giữ vẻ lẩm cẩm. “Hừ, mấy cái thủ thuật vặt vãnh lão già này chỉ cho ngươi, xem ra ngươi cũng không quên sạch sành sanh.” Diệp Trần không hề hay biết rằng mình vừa thi triển một thủ pháp y thuật và trận pháp cấp Tiên gia, thứ có thể khiến các đại tông sư phải tranh giành đến đổ máu. Chàng chỉ cười nhẹ: “Sư phụ dạy những thứ này là căn bản của người làm nông, để con chăm sóc vườn thuốc, sao con dám lơ là? Chẳng qua là sư phụ không chịu tự mình động thủ thôi, chứ ai mà chẳng làm được mấy việc này.”"
+    },
+    {
+      "id": "node-1781080813782",
+      "title": "Lôi Phong Bằng Và Nỗi Khổ 'Nuôi Chủ'",
+      "description": "Lôi Phong Bằng xuất hiện, than vãn (qua hành động hoặc tiếng kêu) về việc phải săn mồi hoặc thực hiện những nhiệm vụ 'khó nhằn' mà Vô Thiên Lão Nhân giao phó. Diệp Trần, vì thương 'bạn', âm thầm giúp đỡ Lôi Phong Bằng bằng cách cải thiện thức ăn, hoặc dùng một 'pháp thuật nhỏ' để giảm bớt gánh nặng cho nó, khiến Lôi Phong Bằng cảm kích nhưng Vô Thiên Lão Nhân thì 'tức tối' vì mất đi trò vui.",
+      "characters": [
+        "Diệp Trần",
+        "Lôi Phong Bằng",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "x": 1350,
+      "y": 200,
+      "content": "Lôi Phong Bằng lại “quác” thêm một tiếng, gật gù phụ họa, khiến Vô Thiên Lão Nhân tức tối trừng mắt. “Ngươi đúng là đồ điểu không có mắt! Có ngày lão già này cho ngươi nhịn đói!” Con chim ưng nhỏ rụt cổ, lùi ra sau vai Diệp Trần, nhưng đôi mắt vẫn không che giấu vẻ khinh thường. Nó khẽ hạ xuống bên cạnh Diệp Trần, khéo léo đặt một con thỏ rừng béo múp vừa săn được xuống đất. Diệp Trần hiểu ý, đây là chiến lợi phẩm sáng nay Lôi Phong Bằng mang về. “Vất vả cho ngươi rồi, Phong Bằng. Sư phụ lại bắt ngươi đi xa lắm đúng không?” Lôi Phong Bằng cất tiếng kêu trầm thấp, như thể đang than vãn về những nhiệm vụ “nuôi chủ” khó nhằn mà Vô Thiên Lão Nhân giao phó. Diệp Trần cười, nhẹ nhàng vẽ một đạo phù văn đơn giản lên con thỏ rừng, khiến nó lập tức trở nên béo tốt hơn, thịt thà căng mọng, ẩn chứa một luồng linh khí tinh thuần. “Hôm nay có thêm cái này, ngươi sẽ không phải đi xa nữa. Cái này đủ cho ngươi ăn no hai ngày rồi.” Lôi Phong Bằng vui vẻ dụi dụi đầu vào cổ Diệp Trần, vẻ mặt hớn hở. Vô Thiên Lão Nhân thấy vậy, liền giận dỗi quay đi. “Cái thằng nhóc này, suốt ngày chiều hư nó! Mai mốt lão già này để nó đi săn linh thú cấp cao về cho lão!”"
+    },
+    {
+      "id": "node-1781080813783",
+      "title": "Dấu Hiệu Bất Thường Từ Thế Giới Bên Ngoài",
+      "description": "Khi hoàng hôn buông xuống, cuộc sống yên bình của ba thầy trò và Lôi Phong Bằng bị phá vỡ bởi một dấu hiệu bất thường từ thế giới bên ngoài. Có thể là một luồng khí tức lạ lướt qua, tiếng động vang vọng từ xa, hoặc Lôi Phong Bằng bỗng trở nên bất an. Vô Thiên Lão Nhân thoáng hiện vẻ mặt nghiêm trọng, nhưng nhanh chóng che giấu, còn Diệp Trần thì chỉ coi đó là 'chuyện nhỏ' hoặc 'thời tiết thay đổi'. Đây là điềm báo cho sự xuất hiện của Kỷ Minh Nguyệt.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [],
+      "weapons": [],
+      "techniques": [],
+      "content": "Diệp Trần chỉ lắc đầu cười, tiếp tục công việc chăm sóc vườn. Hoàng hôn dần buông, nhuộm đỏ cả một góc trời. Khi Diệp Trần đang định thu dọn dụng cụ, một luồng khí tức kỳ lạ bỗng lướt qua khu vườn. Đó là một cảm giác nặng nề, xen lẫn chút tanh nồng của máu và sự hỗn loạn của linh lực. Lôi Phong Bằng trên vai Diệp Trần bỗng nhiên dựng thẳng lông, đôi mắt sắc lạnh nhìn chằm chằm về phía chân núi xa xăm, vẻ mặt hiếm hoi lộ ra sự bất an. Vô Thiên Lão Nhân đang uống rượu cũng khựng lại, đôi mắt lờ đờ thoáng qua một tia nghiêm trọng đến lạ, nhưng rồi nhanh chóng che giấu, lại tiếp tục lẩm bẩm. Diệp Trần cũng cảm nhận được điều gì đó không ổn, nhưng chàng chỉ ngẩng đầu nhìn về phía chân trời, đoạn nhíu mày. “Hình như sắp có mưa bão thì phải. Thời tiết thay đổi thật thất thường.” Chàng không hề biết, cơn bão thực sự sắp ập đến, không phải từ bầu trời, mà từ chính nơi luồng khí tức kia vừa lướt qua, mang theo một vận mệnh hoàn toàn mới cho cuộc đời chàng.",
+      "x": 1650,
+      "y": 260
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1781080813778",
+      "to": "node-1781080813779"
+    },
+    {
+      "from": "node-1781080813779",
+      "to": "node-1781080813780"
+    },
+    {
+      "from": "node-1781080813780",
+      "to": "node-1781080813781"
+    },
+    {
+      "from": "node-1781080813781",
+      "to": "node-1781080813782"
+    },
+    {
+      "from": "node-1781080813782",
+      "to": "node-1781080813783"
+    }
+  ]
+}
