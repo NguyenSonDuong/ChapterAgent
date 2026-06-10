@@ -212,7 +212,10 @@ export default function ChapterReader({
 
   const cleanTextForTts = (text) => {
     if (!text) return '';
-    return text
+    const lines = text.split('\n');
+    const filteredLines = lines.filter(line => !line.trim().startsWith('#'));
+    const cleanedText = filteredLines.join('\n');
+    return cleanedText
       .replace(/[#*`~_\[\]()]/g, '') // remove markdown symbols
       .replace(/- /g, '') // remove list hyphens
       .trim();
@@ -244,7 +247,7 @@ export default function ChapterReader({
         body: JSON.stringify({
           text: cleanText,
           ref_audio: '',
-          sample_rate: 128000
+          sample_rate: 24000
         })
       });
       
@@ -292,7 +295,7 @@ export default function ChapterReader({
         body: JSON.stringify({
           text: cleanText,
           ref_audio: '',
-          sample_rate: 128000
+          sample_rate: 24000
         })
       });
       
