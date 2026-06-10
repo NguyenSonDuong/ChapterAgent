@@ -294,6 +294,360 @@
           "to": "node-1781083301820"
         }
       ]
+    },
+    {
+      "chapter": 3,
+      "title": "Khách Quý Trong Vườn Và Con Chim Ưng \"Bất Thường\"",
+      "summary": "Tuyết Nguyệt, một con hồ ly đang hồi phục trong vòng tròn thanh tẩy, dần nhận ra sự phi thường của Diệp Trần và Vô Thiên Lão Nhân khi được cho ăn linh dược ngàn năm. Khi sát khí của Ma tộc ập đến, con chim ưng Lôi Phong Bằng của Diệp Trần đã ra tay tiêu diệt kẻ địch chỉ trong chớp mắt với sức mạnh của một Yêu Vương, khiến Tuyết Nguyệt vô cùng kinh hãi. Chương truyện kết thúc với sự xuất hiện của một luồng ánh sáng lạ trên đỉnh núi, báo hiệu một kẻ lạ mặt đầy quyền năng đang tiến vào vùng núi Vô Tẫn.",
+      "nodes": [
+        {
+          "id": "node-1781100038439",
+          "title": "Sự nhầm lẫn tai hại của hồ ly",
+          "description": "Tuyết Nguyệt nhìn vòng tròn thanh tẩy rồi lại nhìn Diệp Trần đang lúi húi cuốc đất, sau đó nhìn sang Vô Thiên Lão Nhân đang nhàn nhã uống rượu. Nó suy diễn rằng Diệp Trần chỉ là kẻ tay sai, còn lão già kia mới là cao nhân đã ra tay cứu mạng mình bằng thủ pháp vô hình. Nó bắt đầu cung kính cúi đầu với Vô Thiên Lão Nhân thay vì Diệp Trần.",
+          "characters": [
+            "Diệp Trần",
+            "Tuyết Nguyệt",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [
+            {
+              "chapter": 2,
+              "nodes": [
+                "node-1781083301820"
+              ]
+            }
+          ],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781100038440",
+          "title": "Tiểu Tuyết gia nhập gia đình nông phu",
+          "description": "Diệp Trần thấy con hồ ly cứ quấn lấy sư phụ thì lắc đầu ngán ngẩm, cho rằng nó là loại thú nuôi thích nịnh. Anh ném cho nó một củ linh dược để nó tự gặm, Tuyết Nguyệt ăn vào liền cảm thấy tu vi tăng tiến, bắt đầu thực sự cảm nhận được sự 'tận tâm' của người nông phu này.- Bổ sung nhiều hội thoại ở đây",
+          "characters": [
+            "Diệp Trần",
+            "Tuyết Nguyệt",
+            "Vô Thiên Lão Nhân",
+            "Vô Thiên Lão Nhân - Lão bát quái (Hoặc Sư phụ nam chính)",
+            "Tuyết Nguyệt (Yêu thú Hồ Ly)"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781100038441",
+          "title": "Cuộc sống bình yên bị quấy nhiễu",
+          "description": "Tuyết Nguyệt dần hòa nhập, bắt đầu học cách giúp Diệp Trần xua đuổi lũ chim chóc phá hoại vườn. Trong lúc đang vui vẻ, cả ba thầy trò cùng cảm nhận được một luồng sát khí đen tối từ bìa rừng đang tiến sát lại gần, mang theo mùi của sự chết chóc.",
+          "characters": [
+            "Diệp Trần",
+            "Tuyết Nguyệt",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Phát hiện sát khí là do kẻ thù truy sát Tuyết Nguyệt đã tìm ra dấu vết, đang áp sát khu vườn.",
+            "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn."
+          },
+          "links": [],
+          "locations": [
+            "Núi Vô Tẫn",
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "kịch tính",
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1781100038442",
+          "title": "Lôi Phong Bằng ra tay",
+          "description": "Diệp Trần vẫn mải mê tưới cây, không hề hay biết sự nguy hiểm. Lôi Phong Bằng bỗng nhiên vỗ cánh bay vút lên, hóa thành một đạo kim quang lao về phía bìa rừng. Diệp Trần ngước nhìn theo, lẩm bẩm: 'Con chim này hôm nay bị sao vậy, lại đi săn thú rừng à?' - Bổ sung nhiều hội thoại ở đây",
+          "characters": [
+            "Diệp Trần",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn.",
+            "resolution_note": "Lôi Phong Bằng âm thầm tiêu diệt kẻ truy sát trước khi chúng kịp đặt chân vào vườn."
+          },
+          "links": [],
+          "locations": [
+            "Núi Vô Tẫn"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "tếu táo, cà khịa",
+          "x": 1050,
+          "y": 260
+        },
+        {
+          "id": "node-1781100038443",
+          "title": "Sát khí tan biến trong hư vô",
+          "description": "Chỉ trong chớp mắt, luồng sát khí kinh người ngoài bìa rừng biến mất hoàn toàn. Lôi Phong Bằng bay trở lại, đậu xuống vai Diệp Trần, rỉa lông một cách bình thản. Tuyết Nguyệt chứng kiến toàn bộ quá trình, nó bàng hoàng nhận ra con chim ưng nhỏ này mới chính là một đại yêu kinh khủng.",
+          "characters": [
+            "Lôi Phong Bằng",
+            "Tuyết Nguyệt"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "nghịch ngợm",
+          "x": 1350,
+          "y": 200
+        },
+        {
+          "id": "node-1781100038444",
+          "title": "Bão tố ngầm sau màn đêm",
+          "description": "Đêm xuống, Diệp Trần ngủ say, không biết rằng kẻ thù của Tuyết Nguyệt chỉ là toán tiên phong. Ở phía xa xa trên đỉnh núi, một luồng ánh sáng lạ đang dần hội tụ, báo hiệu một thế lực lớn hơn đang bắt đầu chú ý đến 'nông phu' này.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Núi Vô Tẫn"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "bình yên",
+          "x": 1650,
+          "y": 260
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781100038439",
+          "to": "node-1781100038440"
+        },
+        {
+          "from": "node-1781100038440",
+          "to": "node-1781100038441"
+        },
+        {
+          "from": "node-1781100038441",
+          "to": "node-1781100038442"
+        },
+        {
+          "from": "node-1781100038442",
+          "to": "node-1781100038443"
+        },
+        {
+          "from": "node-1781100038443",
+          "to": "node-1781100038444"
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "title": "Bà Lão Chống Gậy Và Sóng Ngầm Cửu Châu",
+      "summary": "Một bà lão bí ẩn tên Vân Nương xuất hiện tại núi Vô Tẫn, khiến Vô Thiên Lão Nhân vốn bất cần đời phải tỏ ra e dè và kính trọng. Trong bữa sáng, Vân Nương tiết lộ về sự xuất hiện của một Ma Tôn mới tại vùng đất Ma tộc, gây ra những dư chấn làm rung chuyển cả không gian. Sự kiện này báo hiệu cuộc sống yên bình của Diệp Trần sắp kết thúc khi anh bắt đầu cảm nhận được những biến động lớn từ thế giới bên ngoài.",
+      "nodes": [
+        {
+          "id": "node-1781101533260",
+          "title": "Vị khách lạ trên đỉnh núi",
+          "description": "Sáng sớm, không khí trên núi Vô Tẫn bỗng trở nên tĩnh lặng kỳ lạ. Diệp Trần đang tưới nước cho vườn thảo dược thì thấy bóng dáng một bà lão chống gậy tre từ đỉnh núi đi xuống. Luồng ánh sáng lạ đêm qua biến mất, thay vào đó là sự xuất hiện của bà lão, dường như chính bà là nguồn gốc của dị tượng.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Kẻ lạ mặt thực chất là bà lão tên Vân Nương, vợ của Vô Thiên Lão Nhân, vừa bế quan thành công.",
+            "thread": "Sự xuất hiện của kẻ lạ mặt bí ẩn trên đỉnh núi Vô Tẫn."
+          },
+          "links": [
+            {
+              "chapter": 3,
+              "nodes": [
+                "node-1781100038444"
+              ]
+            }
+          ],
+          "locations": [
+            "Núi Vô Tẫn",
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [
+            "Gậy tre"
+          ],
+          "techniques": [],
+          "tone": "bình yên",
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781101533261",
+          "title": "Sư phụ 'sợ vợ' lộ mặt",
+          "description": "Vô Thiên Lão Nhân đang nằm ghế mây, nhìn thấy Vân Nương liền bật dậy, mặt mày tái mét, giấu vội bầu rượu ra sau lưng. Vẻ lẩm cẩm thường ngày bay sạch, ông lắp bắp chào hỏi. Diệp Trần ngơ ngác chứng kiến cảnh sư phụ mình - người luôn tỏ ra cao thâm - lại khúm núm sợ sệt trước một bà lão.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân",
+            "Vân Nương"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Vườn của Vô Thiên Lão Nhân"
+          ],
+          "weapons": [
+            "Gậy tre"
+          ],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781101533262",
+          "title": "Sự quan tâm ấm áp của Vân Nương",
+          "description": "Vân Nương không thèm nhìn lão già, mà tiến lại gần Diệp Trần, ánh mắt hiền từ đầy yêu mến. Bà khen ngợi chàng trai trẻ biết chăm sóc vườn tược, rồi quay sang quở trách lão già vì để Diệp Trần vất vả. Diệp Trần cảm thấy ấm lòng, lần đầu tiên có người bênh vực mình trước mặt sư phụ.",
+          "characters": [
+            "Diệp Trần",
+            "Vân Nương",
+            "Vô Thiên Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "vui vẻ",
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1781101533263",
+          "title": "Gia đình nhỏ tếu táo",
+          "description": "Bữa sáng diễn ra với những màn đối thoại trêu đùa. Vân Nương lấy gậy tre gõ nhẹ vào đầu Vô Thiên Lão Nhân vì tội lười biếng, khiến ông chỉ biết cười trừ. Diệp Trần cười tươi rói, nhiệt tình dâng trà, chăm sóc bà lão khiến không khí gia đình trở nên vô cùng hòa thuận.",
+          "characters": [
+            "Diệp Trần",
+            "Vô Thiên Lão Nhân",
+            "Vân Nương"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Vườn của Vô Thiên Lão Nhân"
+          ],
+          "weapons": [
+            "Gậy tre"
+          ],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 1050,
+          "y": 260
+        },
+        {
+          "id": "node-1781101533264",
+          "title": "Tuyết Nguyệt và Lôi Phong Bằng nhập cuộc",
+          "description": "Tuyết Nguyệt và Lôi Phong Bằng cũng tiến đến gần, tỏ vẻ thân thiết với Vân Nương. Vân Nương khen con hồ ly xinh xắn, làm nó quấn quýt không rời. Diệp Trần nhìn cảnh tượng này, thấy cuộc sống nông phu của mình dường như đã đủ đầy và hạnh phúc hơn bao giờ hết.",
+          "characters": [
+            "Diệp Trần",
+            "Vân Nương",
+            "Tuyết Nguyệt",
+            "Lôi Phong Bằng"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Khu vườn thảo dược"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "bình dị",
+          "x": 1350,
+          "y": 200
+        },
+        {
+          "id": "node-1781101533265",
+          "title": "Bão tố chưa dứt hẳn",
+          "description": "Đang lúc vui vẻ, Vân Nương đột nhiên nhìn về phía chân trời, nụ cười trên môi hơi khựng lại. Bà thì thầm với Diệp Trần rằng thế giới bên ngoài sắp có biến động, và khu vườn này sẽ không thể mãi yên tĩnh. Diệp Trần chưa kịp hiểu ý bà, một luồng dư chấn nhẹ từ xa dội tới, báo hiệu sự bất ổn đang lan rộng.",
+          "characters": [
+            "Diệp Trần",
+            "Vân Nương"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Núi Vô Tẫn"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "Kịch tính",
+          "x": 1650,
+          "y": 260
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781101533260",
+          "to": "node-1781101533261"
+        },
+        {
+          "from": "node-1781101533261",
+          "to": "node-1781101533262"
+        },
+        {
+          "from": "node-1781101533262",
+          "to": "node-1781101533263"
+        },
+        {
+          "from": "node-1781101533263",
+          "to": "node-1781101533264"
+        },
+        {
+          "from": "node-1781101533264",
+          "to": "node-1781101533265"
+        }
+      ]
     }
   ],
   "unresolved_threads": [
@@ -310,20 +664,24 @@
       "chapter": 1
     },
     {
-      "thread": "Thân phận thực sự của Lôi Phong Bằng là gì (linh thú)?",
-      "chapter": 1
-    },
-    {
-      "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn.",
-      "chapter": 2
-    },
-    {
       "thread": "Thân phận thực sự của con hồ ly tuyết Tuyết Nguyệt và lý do nó bị ma tộc truy sát.",
       "chapter": 2
     },
     {
-      "thread": "Mối đe dọa tiềm tàng từ ma khí đang lan rộng trong vùng núi Vô Tẫn.",
-      "chapter": 2
+      "thread": "Ma tộc đã đánh hơi được vị trí của Tuyết Nguyệt và sẽ tiếp tục truy đuổi.",
+      "chapter": 3
+    },
+    {
+      "thread": "Sự nghi ngờ của Tuyết Nguyệt về thân phận thực sự của Diệp Trần và sư phụ hắn.",
+      "chapter": 3
+    },
+    {
+      "thread": "Sự xuất hiện của một Ma Tôn mới tại vùng đất Ma tộc.",
+      "chapter": 4
+    },
+    {
+      "thread": "Dự báo về sự hỗn loạn sắp xảy ra tại Cửu Châu.",
+      "chapter": 4
     }
   ],
   "resolved_threads": [
@@ -332,6 +690,30 @@
       "chapter_introduced": 1,
       "chapter_resolved": 2,
       "resolution_note": "Phát hiện ra luồng khí tức đó là tàn dư của một cuộc truy sát, để lại hậu quả là một sinh vật bị thương nặng lẻn vào vườn."
+    },
+    {
+      "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn.",
+      "chapter_introduced": 2,
+      "chapter_resolved": 3,
+      "resolution_note": "Phát hiện sát khí là do kẻ thù truy sát Tuyết Nguyệt đã tìm ra dấu vết, đang áp sát khu vườn."
+    },
+    {
+      "thread": "Thân phận thực sự của Lôi Phong Bằng là gì (linh thú)?",
+      "chapter_introduced": 1,
+      "chapter_resolved": 3,
+      "resolution_note": "Tự động phát hiện giải quyết bởi AI."
+    },
+    {
+      "thread": "Sự xuất hiện của kẻ lạ mặt bí ẩn trên đỉnh núi Vô Tẫn.",
+      "chapter_introduced": 3,
+      "chapter_resolved": 4,
+      "resolution_note": "Kẻ lạ mặt thực chất là bà lão tên Vân Nương, vợ của Vô Thiên Lão Nhân, vừa bế quan thành công."
+    },
+    {
+      "thread": "Mối đe dọa tiềm tàng từ ma khí đang lan rộng trong vùng núi Vô Tẫn.",
+      "chapter_introduced": 2,
+      "chapter_resolved": 4,
+      "resolution_note": "Tự động phát hiện giải quyết bởi AI."
     }
   ],
   "locations": [
@@ -344,6 +726,21 @@
       "name": "Khu vườn thảo dược",
       "chapter": 1,
       "description": "Khu vườn rộng lớn dưới chân núi Vô Tẫn, nơi Diệp Trần chăm sóc các linh thảo quý hiếm như linh chi ba ngàn năm tuổi và Tử Ngọc Thảo."
+    },
+    {
+      "name": "Vườn của Vô Thiên Lão Nhân",
+      "chapter": 3,
+      "description": "Khu vườn nơi Diệp Trần sinh sống, có trận pháp thượng cổ bảo vệ."
+    },
+    {
+      "name": "Vùng đất Ma tộc",
+      "chapter": 4,
+      "description": "Vùng đất phía xa nơi một vị Ma Tôn mới vừa xuất thế."
+    },
+    {
+      "name": "Cửu Châu",
+      "chapter": 4,
+      "description": "Thế giới rộng lớn đang đứng trước nguy cơ loạn lạc."
     }
   ],
   "weapons": [
@@ -351,6 +748,21 @@
       "name": "Trận pháp thanh tẩy thượng cổ",
       "chapter": 2,
       "description": "Một loại trận pháp cổ xưa có khả năng trấn áp ma tộc và thanh tẩy độc tố, được Diệp Trần vô tình sử dụng dưới dạng một vòng tròn vẽ trên đất."
+    },
+    {
+      "name": "Quạt nan",
+      "chapter": 3,
+      "description": "Vật dụng Vô Thiên Lão Nhân thường cầm trên tay."
+    },
+    {
+      "name": "Gậy tre",
+      "chapter": 4,
+      "description": "Chiếc gậy tre mộc mạc của Vân Nương."
+    },
+    {
+      "name": "Cuốc",
+      "chapter": 4,
+      "description": "Dụng cụ làm vườn của Diệp Trần."
     }
   ],
   "techniques": []

@@ -1,0 +1,177 @@
+{
+  "nodes": [
+    {
+      "id": "node-1781100038439",
+      "title": "Sự nhầm lẫn tai hại của hồ ly",
+      "description": "Tuyết Nguyệt nhìn vòng tròn thanh tẩy rồi lại nhìn Diệp Trần đang lúi húi cuốc đất, sau đó nhìn sang Vô Thiên Lão Nhân đang nhàn nhã uống rượu. Nó suy diễn rằng Diệp Trần chỉ là kẻ tay sai, còn lão già kia mới là cao nhân đã ra tay cứu mạng mình bằng thủ pháp vô hình. Nó bắt đầu cung kính cúi đầu với Vô Thiên Lão Nhân thay vì Diệp Trần.",
+      "characters": [
+        "Diệp Trần",
+        "Tuyết Nguyệt",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [
+        {
+          "chapter": 2,
+          "nodes": [
+            "node-1781083301820"
+          ]
+        }
+      ],
+      "locations": [
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "hài hước",
+      "x": 150,
+      "y": 200,
+      "content": "Tuyết Nguyệt nằm co ro trong vòng tròn thanh tẩy, đôi mắt hồ ly to tròn, ngập nước vẫn không ngừng quan sát. Nó nhìn Diệp Trần đang lúi húi cuốc đất, lại nhìn sang Vô Thiên Lão Nhân đang nằm ngửa trên chiếc ghế mây cũ kỹ, tay phe phẩy chiếc quạt nan, miệng ngâm nga mấy câu hát khó hiểu. \"Thì ra là vậy...\" Tuyết Nguyệt thầm nghĩ. \"Cái vòng tròn này... chắc chắn là do vị tiền bối ẩn thế kia âm thầm thi triển. Tên nông phu này chỉ là một kẻ phàm nhân may mắn được làm đồ đệ, chẳng hiểu biết gì về uy lực của trận pháp thượng cổ mà sư phụ hắn bày ra.\" Nó cung kính cúi đầu về phía Vô Thiên Lão Nhân, đôi mắt biểu lộ sự biết ơn sâu sắc."
+    },
+    {
+      "id": "node-1781100038440",
+      "title": "Tiểu Tuyết gia nhập gia đình nông phu",
+      "description": "Diệp Trần thấy con hồ ly cứ quấn lấy sư phụ thì lắc đầu ngán ngẩm, cho rằng nó là loại thú nuôi thích nịnh. Anh ném cho nó một củ linh dược để nó tự gặm, Tuyết Nguyệt ăn vào liền cảm thấy tu vi tăng tiến, bắt đầu thực sự cảm nhận được sự 'tận tâm' của người nông phu này.- Bổ sung nhiều hội thoại ở đây",
+      "characters": [
+        "Diệp Trần",
+        "Tuyết Nguyệt",
+        "Vô Thiên Lão Nhân",
+        "Vô Thiên Lão Nhân - Lão bát quái (Hoặc Sư phụ nam chính)",
+        "Tuyết Nguyệt (Yêu thú Hồ Ly)"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Diệp Trần lau mồ hôi trên trán, liếc nhìn con hồ ly đang hành lễ với sư phụ, khẽ lắc đầu: \"Sư phụ, con thấy con hồ ly này có vẻ hơi ngốc. Từ lúc tỉnh dậy cứ nhìn người rồi cúi đầu, chắc là do ma khí làm ảnh hưởng đến thần trí rồi.\" Vô Thiên Lão Nhân cười khà khà, bầu rượu trong tay lắc lư: \"Ngốc mới tốt, ngốc thì mới biết đường nịnh bợ. Mà này, con đừng để nó chết đấy, ta nhìn con vật này thấy cũng thuận mắt, để nó ở đây trông coi vườn cũng được.\" \"Con biết rồi, sư phụ chỉ khéo nói.\" Diệp Trần thở dài, tiện tay ném cho Tuyết Nguyệt một củ linh thảo màu tím nhạt. \"Ăn đi, củ này con vừa nhổ, chắc giúp ích cho việc hồi phục của nó.\" Tuyết Nguyệt vốn định khước từ, nhưng khi mùi hương nồng đượm của linh thảo xộc vào mũi, nó không nhịn được mà gặm một miếng. Chỉ trong chớp mắt, một luồng linh khí tinh thuần cuồn cuộn tuôn trào trong cơ thể, những vết thương do ma khí để lại vốn đã được trận pháp thanh tẩy, nay càng nhanh chóng khép miệng. Nó kinh hãi nhìn Diệp Trần – đây đâu phải linh thảo bình thường, đây là linh dược ngàn năm! Vậy mà hắn lại coi như củ cải ném cho nó ăn?",
+      "tone": "hài hước",
+      "x": 450,
+      "y": 260
+    },
+    {
+      "id": "node-1781100038441",
+      "title": "Cuộc sống bình yên bị quấy nhiễu",
+      "description": "Tuyết Nguyệt dần hòa nhập, bắt đầu học cách giúp Diệp Trần xua đuổi lũ chim chóc phá hoại vườn. Trong lúc đang vui vẻ, cả ba thầy trò cùng cảm nhận được một luồng sát khí đen tối từ bìa rừng đang tiến sát lại gần, mang theo mùi của sự chết chóc.",
+      "characters": [
+        "Diệp Trần",
+        "Tuyết Nguyệt",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "resolution_note": "Phát hiện sát khí là do kẻ thù truy sát Tuyết Nguyệt đã tìm ra dấu vết, đang áp sát khu vườn.",
+        "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn."
+      },
+      "links": [],
+      "locations": [
+        "Núi Vô Tẫn",
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "kịch tính",
+      "x": 750,
+      "y": 200,
+      "content": "Đang lúc Tuyết Nguyệt còn đang ngẩn ngơ, bầu không khí trong vườn bỗng thay đổi. Từ bìa rừng, một luồng sát khí đen kịt, lạnh lẽo như băng tuyết ập đến, những tán lá trong vườn xào xạc dữ dội. \"Trời sắp mưa thật rồi, gió mạnh quá.\" Diệp Trần đứng thẳng dậy, phủi bụi trên áo, hoàn toàn không nhận ra sát khí đang áp sát. Tuyết Nguyệt dựng đứng lông đuôi, tiếng gầm gừ trong cổ họng phát ra đầy sợ hãi. Đó là thuộc hạ của Ma tộc! Bọn chúng đã đánh hơi thấy dấu vết của nó."
+    },
+    {
+      "id": "node-1781100038442",
+      "title": "Lôi Phong Bằng ra tay",
+      "description": "Diệp Trần vẫn mải mê tưới cây, không hề hay biết sự nguy hiểm. Lôi Phong Bằng bỗng nhiên vỗ cánh bay vút lên, hóa thành một đạo kim quang lao về phía bìa rừng. Diệp Trần ngước nhìn theo, lẩm bẩm: 'Con chim này hôm nay bị sao vậy, lại đi săn thú rừng à?' - Bổ sung nhiều hội thoại ở đây",
+      "characters": [
+        "Diệp Trần",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "thread": "Sự xuất hiện của một luồng sát khí bí ẩn từ bìa rừng đang tiến về phía khu vườn.",
+        "resolution_note": "Lôi Phong Bằng âm thầm tiêu diệt kẻ truy sát trước khi chúng kịp đặt chân vào vườn."
+      },
+      "links": [],
+      "locations": [
+        "Núi Vô Tẫn"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Diệp Trần vẫn mải mê kiểm tra luống thuốc, nhưng Lôi Phong Bằng đang đậu trên vai anh đột nhiên mở mắt. Ánh mắt vốn dĩ lười biếng của con chim ưng nhỏ bỗng trở nên sắc lạnh như dao cạo. Nó vỗ cánh, một đạo kim quang chói mắt xé toạc không gian, vút bay về phía bìa rừng với tốc độ không thể nhìn bằng mắt thường. \"Này! Phong Bằng, ngươi đi đâu đấy? Về ngay, đừng có đi săn bậy bạ làm hỏng cảnh quan!\" Diệp Trần gọi với theo, giọng điệu trách móc như thể con chim chỉ đi nghịch phá.",
+      "tone": "tếu táo, cà khịa",
+      "x": 1050,
+      "y": 260
+    },
+    {
+      "id": "node-1781100038443",
+      "title": "Sát khí tan biến trong hư vô",
+      "description": "Chỉ trong chớp mắt, luồng sát khí kinh người ngoài bìa rừng biến mất hoàn toàn. Lôi Phong Bằng bay trở lại, đậu xuống vai Diệp Trần, rỉa lông một cách bình thản. Tuyết Nguyệt chứng kiến toàn bộ quá trình, nó bàng hoàng nhận ra con chim ưng nhỏ này mới chính là một đại yêu kinh khủng.",
+      "characters": [
+        "Lôi Phong Bằng",
+        "Tuyết Nguyệt"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "nghịch ngợm",
+      "x": 1350,
+      "y": 200,
+      "content": "Tuyết Nguyệt trợn tròn mắt. Một đạo kim quang? Uy áp đó... nó suýt chút nữa quỳ rạp xuống. Đó là khí tức của Yêu Vương! Con chim ưng nhỏ bé này thực chất là một đại yêu kinh khủng đến mức nào? Chưa đầy ba nhịp thở, luồng sát khí kinh người ngoài bìa rừng đột ngột biến mất, không để lại một dấu vết, như thể chưa từng tồn tại. Lôi Phong Bằng ung dung bay trở lại, đậu xuống vai Diệp Trần, rỉa rỉa bộ lông xám đen mộc mạc như chưa hề có chuyện gì xảy ra. Diệp Trần gãi đầu, lầm bẩm: \"Con chim này, càng lúc càng khó dạy, chắc lại đi đuổi chuột rồi.\""
+    },
+    {
+      "id": "node-1781100038444",
+      "title": "Bão tố ngầm sau màn đêm",
+      "description": "Đêm xuống, Diệp Trần ngủ say, không biết rằng kẻ thù của Tuyết Nguyệt chỉ là toán tiên phong. Ở phía xa xa trên đỉnh núi, một luồng ánh sáng lạ đang dần hội tụ, báo hiệu một thế lực lớn hơn đang bắt đầu chú ý đến 'nông phu' này.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Núi Vô Tẫn"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "bình yên",
+      "x": 1650,
+      "y": 260,
+      "content": "Tuyết Nguyệt nhìn con chim ưng, rồi lại nhìn Diệp Trần, trong lòng dấy lên một sự hoảng loạn tột độ. Nó bắt đầu nghi ngờ về thế giới quan của chính mình. Đêm xuống, trăng treo trên đỉnh núi Vô Tẫn. Diệp Trần đã vào lều gỗ ngủ say. Vô Thiên Lão Nhân vẫn ngồi đó, ánh mắt không còn vẻ lẩm cẩm mà nhìn xa xăm về phía chân trời. Cách đó không xa, trên đỉnh núi cao nhất, một luồng ánh sáng lạ lùng, bạc trắng như sao rơi đang dần hội tụ, lặng lẽ chiếu sáng cả một góc trời, báo hiệu một kẻ lạ mặt đang âm thầm đặt chân đến vùng núi này."
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1781100038439",
+      "to": "node-1781100038440"
+    },
+    {
+      "from": "node-1781100038440",
+      "to": "node-1781100038441"
+    },
+    {
+      "from": "node-1781100038441",
+      "to": "node-1781100038442"
+    },
+    {
+      "from": "node-1781100038442",
+      "to": "node-1781100038443"
+    },
+    {
+      "from": "node-1781100038443",
+      "to": "node-1781100038444"
+    }
+  ]
+}

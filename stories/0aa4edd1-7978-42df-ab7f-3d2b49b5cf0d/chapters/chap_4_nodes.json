@@ -1,0 +1,183 @@
+{
+  "nodes": [
+    {
+      "id": "node-1781101533260",
+      "title": "Vị khách lạ trên đỉnh núi",
+      "description": "Sáng sớm, không khí trên núi Vô Tẫn bỗng trở nên tĩnh lặng kỳ lạ. Diệp Trần đang tưới nước cho vườn thảo dược thì thấy bóng dáng một bà lão chống gậy tre từ đỉnh núi đi xuống. Luồng ánh sáng lạ đêm qua biến mất, thay vào đó là sự xuất hiện của bà lão, dường như chính bà là nguồn gốc của dị tượng.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "Kẻ lạ mặt thực chất là bà lão tên Vân Nương, vợ của Vô Thiên Lão Nhân, vừa bế quan thành công.",
+        "thread": "Sự xuất hiện của kẻ lạ mặt bí ẩn trên đỉnh núi Vô Tẫn."
+      },
+      "links": [
+        {
+          "chapter": 3,
+          "nodes": [
+            "node-1781100038444"
+          ]
+        }
+      ],
+      "locations": [
+        "Núi Vô Tẫn",
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [
+        "Gậy tre"
+      ],
+      "techniques": [],
+      "tone": "bình yên",
+      "x": 150,
+      "y": 200,
+      "content": "Sáng sớm, ánh dương nhạt nhòa xuyên qua làn sương mỏng trên núi Vô Tẫn. Diệp Trần vừa vác cuốc ra vườn, thói quen hằng ngày khiến anh chẳng mảy may bận tâm đến luồng sáng bạc kỳ lạ đêm qua. Thế nhưng, khi vừa bước chân đến mép luống thảo dược, anh khựng lại. Từ phía đỉnh núi cao nhất, một bà lão dáng người mảnh khảnh, chống một chiếc gậy tre mộc mạc, đang chậm rãi bước xuống. Cụ bà vận y phục màu tro, gương mặt phúc hậu nhưng ánh mắt lại sáng ngời như chứa cả bầu trời sao. \"Sư phụ, có khách tới thăm người này,\" Diệp Trần cất tiếng, giọng bình thản như thể chỉ là hàng xóm ghé chơi."
+    },
+    {
+      "id": "node-1781101533261",
+      "title": "Sư phụ 'sợ vợ' lộ mặt",
+      "description": "Vô Thiên Lão Nhân đang nằm ghế mây, nhìn thấy Vân Nương liền bật dậy, mặt mày tái mét, giấu vội bầu rượu ra sau lưng. Vẻ lẩm cẩm thường ngày bay sạch, ông lắp bắp chào hỏi. Diệp Trần ngơ ngác chứng kiến cảnh sư phụ mình - người luôn tỏ ra cao thâm - lại khúm núm sợ sệt trước một bà lão.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân",
+        "Vân Nương"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Vườn của Vô Thiên Lão Nhân"
+      ],
+      "weapons": [
+        "Gậy tre"
+      ],
+      "techniques": [],
+      "content": "Vô Thiên Lão Nhân, kẻ đang nằm vắt vẻo trên ghế mây với bầu rượu trên tay, vừa nghe tiếng bước chân liền quay sang. Khoảnh khắc nhìn thấy bóng dáng bà lão, vị Tiên Tôn ẩn thế vốn luôn tỏ ra bất cần đời bỗng giật nảy mình. Bầu rượu quý trên tay ông suýt nữa rơi xuống đất, ông vội vàng giấu nó ra sau lưng, vẻ lẩm cẩm biến mất không dấu vết, thay vào đó là gương mặt cười lấy lòng đầy gượng gạo: \"Vân... Vân Nương? Sao bà lại xuất quan sớm thế?\"",
+      "tone": "hài hước",
+      "x": 450,
+      "y": 260
+    },
+    {
+      "id": "node-1781101533262",
+      "title": "Sự quan tâm ấm áp của Vân Nương",
+      "description": "Vân Nương không thèm nhìn lão già, mà tiến lại gần Diệp Trần, ánh mắt hiền từ đầy yêu mến. Bà khen ngợi chàng trai trẻ biết chăm sóc vườn tược, rồi quay sang quở trách lão già vì để Diệp Trần vất vả. Diệp Trần cảm thấy ấm lòng, lần đầu tiên có người bênh vực mình trước mặt sư phụ.",
+      "characters": [
+        "Diệp Trần",
+        "Vân Nương",
+        "Vô Thiên Lão Nhân"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "vui vẻ",
+      "x": 750,
+      "y": 200,
+      "content": "Vân Nương không thèm liếc nhìn lão già một cái, bà bước thẳng về phía Diệp Trần. Ánh mắt bà nhìn chàng thanh niên đầy vẻ từ ái, bà gõ nhẹ gậy tre xuống đất, cất giọng dịu dàng: \"Đứa nhỏ này, vất vả cho con rồi. Trông vườn thuốc này mà gầy đi bao nhiêu.\" Diệp Trần ngơ ngác, gãi đầu cười hiền: \"Bà quá lời rồi, con chỉ làm mấy việc đồng áng thôi.\" Vân Nương quay sang lườm Vô Thiên Lão Nhân, gậy tre gõ \"cộp\" một tiếng xuống nền đất: \"Ông xem, chỉ biết nằm ườn ra đó, để đứa nhỏ này làm hết mọi việc. Ông định để nó làm nông phu cả đời đấy à?\" Vô Thiên Lão Nhân chỉ biết cười trừ, lẩm bẩm: \"Ta... ta đang dạy nó cách 'hòa mình vào thiên địa' mà...\" \"Hòa cái gì mà hòa!\" Vân Nương hừ lạnh, nhưng rồi bà lại quay sang Diệp Trần, ân cần lấy từ trong tay áo ra một chiếc khăn tay, lau vệt đất trên trán anh."
+    },
+    {
+      "id": "node-1781101533263",
+      "title": "Gia đình nhỏ tếu táo",
+      "description": "Bữa sáng diễn ra với những màn đối thoại trêu đùa. Vân Nương lấy gậy tre gõ nhẹ vào đầu Vô Thiên Lão Nhân vì tội lười biếng, khiến ông chỉ biết cười trừ. Diệp Trần cười tươi rói, nhiệt tình dâng trà, chăm sóc bà lão khiến không khí gia đình trở nên vô cùng hòa thuận.",
+      "characters": [
+        "Diệp Trần",
+        "Vô Thiên Lão Nhân",
+        "Vân Nương"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Vườn của Vô Thiên Lão Nhân"
+      ],
+      "weapons": [
+        "Gậy tre"
+      ],
+      "techniques": [],
+      "tone": "hài hước",
+      "x": 1050,
+      "y": 260,
+      "content": "Bữa sáng gia đình diễn ra trong không khí lạ lẫm. Vô Thiên Lão Nhân bị Vân Nương \"chỉnh\" cho một trận ra trò, còn Diệp Trần thì tận tình rót trà, dâng cơm, lần đầu tiên anh cảm thấy khu vườn này ấm áp như một gia đình thực thụ."
+    },
+    {
+      "id": "node-1781101533264",
+      "title": "Tuyết Nguyệt và Lôi Phong Bằng nhập cuộc",
+      "description": "Tuyết Nguyệt và Lôi Phong Bằng cũng tiến đến gần, tỏ vẻ thân thiết với Vân Nương. Vân Nương khen con hồ ly xinh xắn, làm nó quấn quýt không rời. Diệp Trần nhìn cảnh tượng này, thấy cuộc sống nông phu của mình dường như đã đủ đầy và hạnh phúc hơn bao giờ hết.",
+      "characters": [
+        "Diệp Trần",
+        "Vân Nương",
+        "Tuyết Nguyệt",
+        "Lôi Phong Bằng"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "Khu vườn thảo dược"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "bình dị",
+      "x": 1350,
+      "y": 200,
+      "content": "Tuyết Nguyệt và Lôi Phong Bằng lúc này cũng chạy lại. Con hồ ly tuyết vốn tinh quái, thế mà khi thấy Vân Nương, nó bỗng nhiên thu mình lại, dụi đầu vào chân bà như một con mèo nhỏ. Lôi Phong Bằng – kẻ vốn luôn kiêu hãnh – cũng thu nhỏ đôi cánh, khẽ cúi đầu tỏ vẻ phục tùng. Diệp Trần nhìn cảnh tượng ấy, cảm thấy thú vị: \"Xem ra bà có duyên với mấy con thú này thật, bình thường chúng khó gần lắm.\""
+    },
+    {
+      "id": "node-1781101533265",
+      "title": "Bão tố chưa dứt hẳn",
+      "description": "Đang lúc vui vẻ, Vân Nương đột nhiên nhìn về phía chân trời, nụ cười trên môi hơi khựng lại. Bà thì thầm với Diệp Trần rằng thế giới bên ngoài sắp có biến động, và khu vườn này sẽ không thể mãi yên tĩnh. Diệp Trần chưa kịp hiểu ý bà, một luồng dư chấn nhẹ từ xa dội tới, báo hiệu sự bất ổn đang lan rộng.",
+      "characters": [
+        "Diệp Trần",
+        "Vân Nương"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "Núi Vô Tẫn"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Đang lúc tiếng cười nói còn chưa dứt, nụ cười trên môi Vân Nương bỗng khựng lại. Bà đặt bát trà xuống, ánh mắt nhìn xa xăm về phía chân trời phía Đông, nơi bầu trời dường như đang nhuốm một màu đỏ thẫm bất thường. \"Thế giới bên ngoài sắp có biến rồi,\" bà thì thầm, giọng nói trầm xuống, không còn vẻ đùa cợt. Diệp Trần đặt cái bát xuống, hơi nghiêng đầu: \"Biến động gì ạ? Chẳng phải trên núi vẫn yên bình sao?\" Vân Nương lắc đầu, đôi mắt bà thoáng hiện lên vẻ lo âu sâu sắc: \"Cửu Châu sắp loạn. Ở vùng đất Ma tộc phía xa, một vị Ma Tôn mới vừa xuất thế. Dư chấn của nó đã làm rung chuyển cả không gian này.\" Vừa dứt lời, một cơn rung chấn nhẹ từ dưới lòng đất truyền lên, khiến những lọ thuốc trên kệ gỗ khẽ va vào nhau lạch cạch. Những đóa thảo dược quý trong vườn bỗng rung lên bần bật như đang đón nhận một áp lực vô hình. Diệp Trần nheo mắt nhìn về phía chân trời, dù chưa hiểu hết sự nghiêm trọng, nhưng cảm giác về một cuộc sống nông phu lặng lẽ dường như đang dần khép lại. Anh siết chặt cán cuốc trong tay, ánh mắt vốn dịu dàng bỗng lóe lên một tia quyết đoán khó hiểu.",
+      "tone": "Kịch tính",
+      "x": 1650,
+      "y": 260
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1781101533260",
+      "to": "node-1781101533261"
+    },
+    {
+      "from": "node-1781101533261",
+      "to": "node-1781101533262"
+    },
+    {
+      "from": "node-1781101533262",
+      "to": "node-1781101533263"
+    },
+    {
+      "from": "node-1781101533263",
+      "to": "node-1781101533264"
+    },
+    {
+      "from": "node-1781101533264",
+      "to": "node-1781101533265"
+    }
+  ]
+}

@@ -12,14 +12,16 @@
         "Núi Vô Tẫn",
         "Khu vườn thảo dược"
       ],
-      "active_weapon": null,
-      "weapons_owned": [],
+      "active_weapon": "Cuốc",
+      "weapons_owned": [
+        "Cuốc"
+      ],
       "active_technique": "Trận pháp thanh tẩy thượng cổ",
       "techniques_owned": [
         "Trận pháp thanh tẩy thượng cổ"
       ],
       "current_cultivation": "Luyện Khí Kỳ",
-      "current_location": "Khu vườn thảo dược",
+      "current_location": "Núi Vô Tẫn",
       "status": "Đang an toàn"
     },
     {
@@ -47,12 +49,14 @@
         "Núi Vô Tẫn",
         "Khu vườn thảo dược"
       ],
-      "active_weapon": null,
-      "weapons_owned": [],
+      "active_weapon": "Quạt nan",
+      "weapons_owned": [
+        "Quạt nan"
+      ],
       "active_technique": null,
       "techniques_owned": [],
       "current_cultivation": "Tiên Tôn ẩn thế",
-      "current_location": "Khu vườn thảo dược",
+      "current_location": "Núi Vô Tẫn",
       "status": "Đang an toàn"
     },
     {
@@ -62,15 +66,17 @@
       "first_chapter": null,
       "appearance_context": null,
       "visited_locations": [
-        "Khu vườn thảo dược"
+        "Khu vườn thảo dược",
+        "Vườn của Vô Thiên Lão Nhân",
+        "Núi Vô Tẫn"
       ],
       "active_weapon": "",
       "weapons_owned": [],
       "active_technique": "",
       "techniques_owned": [],
       "current_cultivation": "Yêu Đan Kỳ (Tương đương Trúc Cơ)",
-      "current_location": "Khu vườn thảo dược",
-      "status": "Đang nguy hiểm"
+      "current_location": "Núi Vô Tẫn",
+      "status": "Đang an toàn"
     },
     {
       "name": "Lôi Phong Bằng  (Yêu thú đại bàng)",
@@ -80,19 +86,35 @@
       "appearance_context": null,
       "visited_locations": [
         "Núi Vô Tẫn",
-        "Khu vườn thảo dược"
+        "Khu vườn thảo dược",
+        "Bìa rừng"
       ],
       "active_weapon": "",
       "weapons_owned": [],
       "active_technique": "",
       "techniques_owned": [],
       "current_cultivation": "Yêu Vương (Bị phong ấn giả dạng thành chim ưng nhỏ).",
-      "current_location": "Khu vườn thảo dược",
+      "current_location": "Núi Vô Tẫn",
       "status": "Đang an toàn"
+    },
+    {
+      "name": "Vân Nương",
+      "role": "Người quen cũ của Vô Thiên Lão Nhân",
+      "description": "Một bà lão dáng người mảnh khảnh, vận y phục màu tro, chống gậy tre, gương mặt phúc hậu nhưng ánh mắt sáng ngời như chứa cả bầu trời sao.",
+      "first_chapter": 4,
+      "appearance_context": "Xuất hiện vào buổi sáng sớm tại vườn thảo dược trên núi Vô Tẫn khi Diệp Trần đang làm việc, khiến Vô Thiên Lão Nhân vô cùng bất ngờ và lo sợ.",
+      "visited_locations": [],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [],
+      "current_cultivation": "",
+      "current_location": "",
+      "status": "Mới xuất hiện"
     }
   ],
   "context": "Bối cảnh: Kỷ nguyên tu tiên vạn pháp phồn vinh nhưng \"Thiên Môn\" đã đóng chặt vạn năm, con đường phi thăng từ Phàm giới lên Tiên giới bị đoạn tuyệt hoàn toàn. Tu sĩ kẹt ở cảnh giới cao nhất chỉ có thể chờ thọ nguyên cạn kiệt.\n\nCốt truyện: Truyện mở đầu với Diệp Trần - một thanh niên trầm tính, quyết đoán nhưng cực kỳ tốt bụng và thông minh. Anh luôn tự nhận mình là một nông dân trồng thảo dược bình thường ở chân núi. Anh không hề biết vị sư phụ già lẩm cẩm thường dạy mình trồng cây, bốc thuốc thực chất là một vị Tiên Tôn thượng cổ. Diệp Trần sở hữu năng lực luyện dược, vẽ phù, bày trận ở mức độ \"nghịch thiên\", nhưng anh coi đó chỉ là kỹ năng sinh tồn cơ bản và hoàn toàn không ý thức được độ khủng khiếp của mình.\n\nBiến cố xảy ra khi Kỷ Minh Nguyệt - thiên kiêu đệ nhất của gia tộc kiếm tu lâu đời, sở hữu nhan sắc tuyệt mỹ và tính cách băng lãnh - bị kẻ thù ám toán trọng thương và rơi vào vườn thuốc của Diệp Trần. Diệp Trần dùng y thuật \"bình thường\" của mình cứu sống cô. Từ đây, hai người bắt đầu đồng hành.\n\nTrên hành trình đầy gian nan và hiểm ác của thế giới tu chân, sự thông minh, chu toàn của Diệp Trần cùng kiếm pháp sát phạt quả đoán của Minh Nguyệt giúp họ vượt qua mọi tử cục. Trải qua sinh tử, Minh Nguyệt lột bỏ lớp vỏ băng lãnh, trở nên hoạt bát, lanh lợi và vô cùng ôn nhu với Diệp Trần. Ngược lại, Diệp Trần luôn dành sự dịu dàng tuyệt đối để bảo vệ cô. Bằng tình yêu thuần khiết và lòng chung thủy tuyệt đối, họ cùng nhau tìm ra bí mật của Đoạn Tiên Lộ, phá vỡ gông cùm vạn năm để nối lại con đường Tiên - Phàm.\n\nGợi ý thêm về phương án triển khai(dành cho viết truyện):\nVấn đề ẩn tàng sức mạnh của Nam chính: Đừng viết theo mô-típ \"giả heo ăn thịt hổ\" cố tình giấu giếm, hãy viết theo hướng sự chênh lệch nhận thức (Cognitive Dissonance). Nghĩa là Nam chính thực sự nghĩ rằng \"vẽ cái bùa này chặn được 1 đòn của cao thủ là chuyện rất bình thường ai cũng làm được\", điều này sẽ tạo ra sự thú vị và ngỡ ngàng liên tục cho Nữ chính cũng như kẻ địch.\n\nTương tác tình cảm: Khai thác sự tương phản. Nữ chính ra ngoài là một nữ thần chiến tranh lạnh lùng chém giết, nhưng về nhà lại hoạt bát, nũng nịu đòi Nam chính nấu ăn hoặc pha thuốc cho mình. Nam chính ít nói nhưng hành động cực kỳ tinh tế, giải quyết toàn bộ hậu phương (giải độc, trận pháp bảo vệ, đan dược hồi phục) để Nữ chính yên tâm tung hoành.",
-  "style": "Tiên hiệp, Ngôn tình, Song Cường (Cả 2 đều mạnh), Trầm tĩnh, Lãng mạn chậm nhiệt (Slow-burn), Kịch tính. Chung tình",
+  "style": "Tiên hiệp, Ngôn tình, Song Cường (Cả 2 đều mạnh), Trầm tĩnh, Lãng mạn chậm nhiệt (Slow-burn), Kịch tính. Chung tình, Hài hước, Tếu táo, Giải trí",
   "tags": [
     "tiên hiệp",
     "kiếm tu",
@@ -102,7 +124,9 @@
     "thiên kiêu (nữ chính)",
     "1v1",
     "chung thủy",
-    "nghịch thiên."
+    "nghịch thiên",
+    "Hài Hước",
+    "Giải trí"
   ],
   "max_chapters": 200,
   "max_words_per_chapter": 900,
