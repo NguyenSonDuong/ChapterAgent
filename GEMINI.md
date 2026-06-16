@@ -1,23 +1,25 @@
-# Trợ lý Sáng tác Truyện dài kỳ (Serial Novel Agent) với LangGraph & Gemini
+# Trợ lý Sáng tác Truyện dài kỳ Toàn năng (Serial Novel Agent v2)
 
-Hệ thống trợ lý sáng tác truyện dài kỳ (chương hồi) sử dụng **LangGraph** để xây dựng quy trình sáng tác nhiều bước (multi-step workflow) kết hợp sự phản hồi của con người (Human-in-the-loop) và mô hình ngôn ngữ lớn **Google Gemini** nhằm đảm bảo chất lượng văn phong, tính liên tục và tính nhất quán logic của toàn bộ tác phẩm.
-
-Dự án hỗ trợ cả hai chế độ tương tác: chạy dòng lệnh truyền thống (**CLI**) và cung cấp dịch vụ giao tiếp qua **REST API & Socket.IO** thời gian thực để kết nối với ReactJS frontend.
+Hệ thống trợ lý sáng tác truyện chữ dài kỳ (Multi-chapter Serial Novel) sử dụng **LangGraph** để thiết lập quy trình sáng tác phân tầng (Hierarchical Text Generation), tối ưu hóa bộ nhớ ngữ cảnh và kiểm soát nhịp điệu truyện bằng các kỹ thuật văn học nâng cao, kết hợp mô hình ngôn ngữ lớn **Google Gemini**.
 
 ---
 
-## 📌 Mục đích dự án
+## 📌 Kiến trúc Cốt lõi & Kỹ thuật Tối ưu
 
-Khi viết một bộ truyện dài kỳ (ví dụ: tiểu thuyết mạng, truyện chữ nhiều chương), tác giả thường gặp phải các vấn đề lớn:
-1. **Thiếu nhất quán logic:** Quên mất chi tiết ở các chương trước (ví dụ: nhân vật ở chương 2 đã mất kiếm nhưng chương 5 lại rút kiếm chiến đấu; nhân vật đã đi xa nhưng chương sau bỗng xuất hiện trong thành mà không có dẫn dắt).
-2. **Quản lý cốt truyện phức tạp:** Khó theo dõi các mối nối, bí ẩn, hoặc nút thắt cốt truyện chưa được giải quyết (*unresolved threads*).
-3. **Mất kiểm soát văn phong:** AI viết truyện thường dễ bị lạc tông giọng (*style/tone*) hoặc viết quá chung chung, thiếu miêu tả nội tâm sâu sắc.
+Để khắc phục hiện tượng truyện bị viết vắn tắt, cụt ý và mang phong cách "tóm tắt kịch bản", hệ thống áp dụng 3 kỹ thuật nền tảng:
 
-Dự án này được thiết kế để giải quyết những thách thức trên bằng cách cung cấp một quy trình sáng tác khép kín:
-* **Phân tích ý tưởng chủ động:** Phân tích ý tưởng của tác giả, tự động hỏi lại nếu thiếu thông tin cốt lõi để hoàn thiện đề cương chi tiết cho chương.
-* **Biên tập & Chỉnh sửa tương tác:** Lưu bản nháp vào file tạm hoặc gửi qua Socket.IO để tác giả tự do chỉnh sửa và đưa phản hồi lặp đi lặp lại cho đến khi ưng ý.
-* **Kiểm duyệt logic nghiêm ngặt (Audit):** Đối chiếu bản viết với sổ cái toàn cục và trạng thái chương trước để đưa ra cảnh báo mâu thuẫn cốt truyện.
-* **Tự động hóa quản lý trạng thái:** Tự động trích xuất tóm tắt chương, cập nhật trạng thái nhân vật (vị trí, hành trang, sức khỏe), phát hiện nhân vật mới và cập nhật sổ cái câu chuyện.
+1. **Sáng tác phân tầng theo Phân cảnh (Scene-by-Scene Looping):**
+   * Không bắt LLM viết toàn bộ chương từ một danh sách các sự kiện lớn.
+   * Bản đồ sự kiện của chương (các Nodes trong Canvas) được phân rã thành một chuỗi các Phân cảnh (*Scenes*). Đồ thị LangGraph sẽ chạy một vòng lặp tuần tự qua từng phân cảnh.
+   * Phân cảnh N sẽ nhận ngữ cảnh trực tiếp từ *toàn bộ văn bản chi tiết* của phân cảnh N-1 liền trước để đảm bảo tính liên tục của mạch cảm xúc, lời thoại và nhịp điệu.
+
+2. **Chuyển đổi dữ liệu sang dạng "Sổ tay tác giả" (Story Bible Transformer):**
+   * Trước khi đưa dữ liệu bối cảnh (`meta.json`) và lịch sử truyện (`global_ledger.json`) vào prompt của Writer Agent, một Node trung gian sẽ lọc bỏ các cú pháp kỹ thuật dư thừa (JSON syntax, UUIDs, coordinates).
+   * Chuyển đổi thông tin thành định dạng văn bản văn học thuần túy (Narrative Prose / Gạch đầu dòng trực quan) để tối ưu hóa cơ chế chú ý (Attention Mechanism), ngăn ngừa hiện tượng loãng ngữ cảnh (*Lost in the Middle*).
+
+3. **Kiểm soát Cấu trúc và Nhịp độ (Structural Beats & Pacing Control):**
+   * Áp dụng nguyên lý **"Show, Don't Tell"** (Hãy thể hiện, đừng kể lể). Định hướng LLM phân bổ nội dung theo tỷ lệ cấu trúc: *Tả cảnh/Không khí -> Biểu cảm/Thái độ -> Đối thoại sinh động -> Hành động thúc đẩy -> Suy nghĩ nội tâm độc thoại*.
+   * Tích hợp ràng buộc **Cliffhanger (Kết thúc lửng lơ):** Ép buộc LLM không được giải quyết triệt để xung đột hay đưa ra kết luận đóng ở cuối phân cảnh/chương nhằm duy trì tính tò mò đặc trưng của tiểu thuyết dài kỳ.
 
 ---
 
@@ -69,18 +71,67 @@ Hệ thống hoạt động theo một đồ thị trạng thái có hướng v�
 
 ```mermaid
 graph TD
-    Start([Bắt đầu sáng tác chương mới]) --> Node1[Requirement Analyzer<br>Phân tích & Tương tác làm rõ ý tưởng]
-    Node1 --> Node2[Story Drafter<br>Viết bản nháp chương dạng Markdown]
-    Node2 --> Node3[Human Review<br>Lưu file temp_draft.md để tác giả duyệt]
-    Node3 --> Cond{Tác giả gõ 'Done'?}
-    Cond -- Không (Nhập ý kiến chỉnh sửa) --> Node3_1[Reviser<br>Chỉnh sửa bản nháp theo yêu cầu]
-    Node3_1 --> Node3
-    Cond -- Có ('Done') --> Node4[Auditor<br>Kiểm duyệt logic & tính nhất quán]
-    Node4 --> Node5[State & Ledger Updater<br>Trích xuất trạng thái, lưu file & cập nhật sổ cái]
-    Node5 --> End([Hoàn thành chương])
+     Start([Bắt đầu chương mới]) --> Node1[Story Bible Transformer<br>Chuyển đổi dữ liệu thô thành Văn bản văn học]
+    Node1 --> Node2[Requirement Analyzer<br>Phân tích & Làm rõ ý tưởng phân cảnh]
+    Node2 --> LoopInit{Khởi tạo vòng lặp Phân cảnh}
+    LoopInit --> Node3[Scene Drafter Loop<br>Sáng tác chi tiết từng Phân cảnh]
+    Node3 --> LoopCond{Còn phân cảnh tiếp theo?}
+    LoopCond -- Còn Phân cảnh N+1 --> Node3
+    LoopCond -- Hết phân cảnh --> Node4[Human Review & Reviser<br>Tác giả duyệt toàn bộ bản nháp chương]
+    Node4 --> Node5[Strict Auditor<br>Kiểm duyệt logic chênh lệch nhận thức]
+    Node5 --> Node6[Ledger & State Updater<br>Cập nhật trạng thái nhân vật & Sổ cái thế giới]
+    Node6 --> End([Hoàn thành chương])
 ```
 
 ---
+
+
+## Quy định chi tiết cho các Nodes chính (Dành cho AI Code Generation)
+1. src/utils/context.py (Story Bible Transformer)
+Nhiệm vụ: Hàm to_story_bible(meta: dict, ledger: dict) -> str trích xuất thông tin nhân vật, tu vi, pháp khí, địa điểm thành một cẩm nang ngắn gọn bằng văn bản thuần túy.
+
+Loại bỏ: Toàn bộ các dấu ngoặc JSON, UUID, tọa độ Canvas để tránh đánh lừa sự chú ý của mô hình.
+
+2. src/agent/nodes.py -> scene_drafter_node (Vòng lặp Phân cảnh)
+Cơ chế bộ nhớ cuốn chiếu: Trạng thái hệ thống (AgentState) phải lưu trữ một danh sách scene_drafts: List[str]. Khi viết phân cảnh N, prompt phải nhận:
+
+## Văn bản Sổ tay tác giả (Story Bible).
+
+Kịch bản chi tiết của phân cảnh N hiện tại.
+Toàn bộ văn bản truyện chi tiết của phân cảnh N-1 liền trước (nếu N > 1).
+Prompt thiết lập nhịp điệu văn học (Pacing Engine):
+Ép buộc triển khai theo mô hình "Show, Don't Tell":
+- 30% Thời lượng: Tả cảnh vật, không khí, nhiệt độ, áp lực không gian xung quanh để tạo chiều sâu.
+- 20% Thời lượng: Biểu cảm khuôn mặt, ánh mắt, ngôn ngữ cơ thể của các nhân vật trước sự kiện.
+- 30% Thời lượng: Hội thoại sinh động, mang đậm cá tính riêng (ví dụ: Sư phụ lười biếng, tếu táo; Nam chính điềm tĩnh, mộc mạc).
+- 20% Thời lượng: Hành động thực tế kết hợp suy nghĩ nội tâm độc thoại của nhân vật.
+
+RÀNG BUỘC PHONG CÁCH TRUYỆN DÀI KỲ (SERIAL PACING):
+- Tuyệt đối KHÔNG viết tóm tắt hành động nhảy cóc (Ví dụ KHÔNG ĐƯỢC VIẾT: "Sau một hồi chiến đấu, hắn đã thắng"). Phải miêu tả từng đường kiếm, từng nhịp thở.
+- Phân cảnh phải kết thúc ở trạng thái mở hoặc một câu thoại lấp lửng, tạo tiền đề chuyển tiếp mượt mà sang phân cảnh kế tiếp.
+src/agent/nodes.py -> auditor_node (Kiểm duyệt Logic Đặc thù)
+Ngoài kiểm duyệt mâu thuẫn vị trí hay trang bị, Auditor bắt buộc phải quét lỗi "Chênh lệch nhận thức" (Cognitive Dissonance) của Nam chính:
+
+Đảm bảo Nam chính thực sự nghĩ hành động nghịch thiên của mình chỉ là "mẹo vặt nông thôn" bình thường.
+
+Nếu trong bản thảo xuất hiện tình tiết Nam chính cố tình kiêu ngạo, tự đắc hoặc biết mình là cao nhân, Auditor phải đưa ra cảnh báo lỗi logic (ConflictWarning) ngay lập tức để chuyển sang luồng sửa đổi (reviser_node).
+
+4. src/agent/nodes.py -> state_ledger_updater_node (Đồng bộ Sổ cái Toàn cục)
+Mục tiêu: Cập nhật chính xác 6 mảng dữ liệu trong global_ledger.json mà không làm thay đổi cấu trúc cũ:
+
+- timeline: Thêm phần tử mới gồm chapter, title, summary, kèm mảng nodes (giữ nguyên cấu trúc chứa id, title, description, characters, resolved_thread, links, locations, weapons, techniques, x, y từ Canvas ban đầu - tuyệt đối loại bỏ thuộc tính content thô của truyện để tối ưu kích thước file) và mảng connections.
+
+- unresolved_threads: Trích xuất các nút thắt mới từ chương hiện tại bằng LLM ({ "thread": str, "chapter": int }). Bảo lưu các nút thắt cũ chưa được giải quyết và giữ nguyên số chương xuất hiện ban đầu của chúng.
+
+- resolved_threads: Di chuyển các nút thắt từ unresolved_threads sang mảng này khi chúng đã được xử lý xong trong chương mới, kèm theo resolution_note và số chương được giải quyết chapter_resolved.
+
+- locations: Quét văn bản chương để tìm địa điểm mới, lưu cấu trúc { "name": str, "chapter": int, "description": str }.
+
+- weapons: Quét văn bản chương để tìm binh khí/pháp khí mới, lưu cấu trúc { "name": str, "chapter": int, "description": str }.
+
+- techniques: Quét văn bản chương để tìm công pháp/chiêu thức mới, lưu cấu trúc { "name": str, "chapter": int, "description": str }.
+
+
 
 ## 🌐 Danh sách REST APIs & Sự kiện Socket.IO
 

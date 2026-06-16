@@ -10,12 +10,13 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 
 import src.core.config as config
-from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo, NodeContentMapping, ChapterNodeContentExtraction
+from src.models.story import StoryMeta, GlobalLedger, ChapterState, UnresolvedThread, ResolvedThread, LocationInfo, WeaponInfo, TechniqueInfo, NodeContentMapping, ChapterNodeContentExtraction, SuggestedNodeResolvedThread, SuggestedNodeLink
 from src.core.state import AgentState
 from src.utils.helpers import ensure_string, is_higher_cultivation
 from src.utils.llm import invoke_with_retry, check_cancellation
 from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import emit_event, emit_agent_log
+from src.utils.context import to_story_bible
 
 console = Console()
 
@@ -159,7 +160,51 @@ class WorldEntityExtraction(BaseModel):
     techniques: List[ExtractedTechnique] = Field(default_factory=list, description="Danh sách các công pháp mới xuất hiện trong chương.")
     character_updates: List[CharacterUpdate] = Field(default_factory=list, description="Cập nhật trạng thái cụ thể cho từng nhân vật tham gia chương này.")
 
+class ScenarioScene(BaseModel):
+    id: str = Field(description="ID của phân cảnh, ví dụ: scene-1, scene-2")
+    title: str = Field(description="Tiêu đề phân cảnh sự kiện")
+    description: str = Field(description="Mô tả chi tiết diễn biến phân cảnh")
+    characters: List[str] = Field(description="Danh sách nhân vật tham gia")
+    locations: List[str] = Field(description="Danh sách địa điểm")
+    weapons: List[str] = Field(description="Danh sách binh khí sử dụng")
+    techniques: List[str] = Field(description="Danh sách công pháp thi triển")
+    tone: str = Field(description="Văn phong yêu cầu cho phân cảnh này (hài hước, trang nghiêm, bi thương...)")
+    resolved_thread: Optional[SuggestedNodeResolvedThread] = Field(default=None, description="Giải quyết nút thắt nếu có")
+    links: Optional[List[SuggestedNodeLink]] = Field(default=None, description="Liên kết với chương trước nếu có")
+
+class ScenarioScenelist(BaseModel):
+    scenes: List[ScenarioScene] = Field(description="Danh sách các phân cảnh sự kiện theo thứ tự diễn ra trong chương")
+
 # --- LangGraph Node Functions ---
+
+def story_bible_transformer_node(state: AgentState) -> Dict[str, Any]:
+    """Node 1: Story Bible Transformer
+    Converts raw meta and ledger data into a formatted Story Bible string.
+    """
+    check_cancellation(state["story_uuid"])
+    console.print("\n[bold blue]=== [Node 1] Story Bible Transformer ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 1] Chuyển đổi dữ liệu sang dạng Sổ tay tác giả ===")
+    
+    session = session_manager.get_session(state["story_uuid"])
+    if session:
+        session.current_node = "story_bible_transformer"
+        emit_event("agent_status", {
+            "story_uuid": state["story_uuid"],
+            "chapter_num": state["chapter_num"],
+            "status": "analyzing_requirements",
+            "message": "Đang xây dựng Sổ tay tác giả..."
+        })
+        
+    meta = state["meta"]
+    ledger = state["ledger"]
+    
+    story_bible = to_story_bible(meta, ledger)
+    
+    # In ra một phần sổ tay tác giả để kiểm tra trực quan
+    console.print(Panel(story_bible[:1000] + "\n... [Cắt bớt để tiết kiệm hiển thị] ...", title="Sổ tay tác giả (Xem trước)", border_style="cyan"))
+    emit_agent_log(state["story_uuid"], "✓ Đã xây dựng Sổ tay tác giả thành công.")
+    
+    return {"story_bible": story_bible}
 
 def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     """Node 1: Requirement Analyzer
@@ -274,94 +319,196 @@ Hãy phân tích và trả về kết quả cấu trúc:
     console.print(Panel(result.analyzed_requirements, title=f"Yêu cầu Chương {chapter_num} đã được duyệt", border_style="green"))
     emit_agent_log(state["story_uuid"], f"Yêu cầu sáng tác Chương {chapter_num} đã được duyệt.")
     
+    # Phân rã yêu cầu thành kịch bản phân cảnh (scenes_to_write)
+    console.print("[bold cyan]Đang xây dựng sơ đồ phân cảnh chi tiết cho chương truyện (Scene Decomposition)...[/bold cyan]")
+    emit_agent_log(state["story_uuid"], "Đang phân rã cốt truyện thành danh sách phân cảnh kịch bản chi tiết...")
+    
+    decomp_prompt = f"""
+Hãy phân rã ý tưởng chương mới và bản yêu cầu chi tiết dưới đây thành một danh sách các phân cảnh (Scenes) kịch bản chi tiết theo trình tự kể truyện từ đầu đến cuối chương.
+
+BỐI CẢNH TRUYỆN (SỔ TAY TÁC GIẢ):
+{state.get("story_bible")}
+
+Ý TƯỞNG GỐC CỦA TÁC GIẢ:
+{format_user_idea(current_idea, state["story_uuid"])}
+
+YÊU CẦU CHI TIẾT ĐÃ ĐƯỢC PHÂN TÍCH:
+{result.analyzed_requirements}
+
+YÊU CẦU PHÂN RÃ:
+1. Chia chương truyện thành các phân cảnh nhỏ hơn (thường từ 3 đến 5 phân cảnh tùy độ dài chương).
+2. Sắp xếp các phân cảnh theo trình tự thời gian / mạch truyện tuyến tính chính xác nhất. Nếu ý tưởng gốc là sơ đồ sự kiện (Canvas), hãy bảo lưu các sự kiện (nodes) và sắp xếp chúng theo đúng luồng kết nối (connections) từ node đầu tiên đến node cuối cùng.
+3. Với mỗi phân cảnh, hãy điền:
+   - `id`: id duy nhất của phân cảnh (ví dụ: scene-1, scene-2...) hoặc giữ nguyên id node nếu nó là sơ đồ sự kiện.
+   - `title`: tiêu đề phân cảnh.
+   - `description`: diễn biến chi tiết xảy ra trong phân cảnh.
+   - `characters`: danh sách nhân vật tham gia (chọn từ danh sách nhân vật truyện).
+   - `locations`: danh sách địa điểm (chọn từ địa điểm truyện).
+   - `weapons`: danh sách binh khí/pháp khí sử dụng.
+   - `techniques`: danh sách công pháp thi triển.
+   - `tone`: văn phong yêu cầu (hài hước, trang nghiêm, bi thương...).
+   - `resolved_thread`: giải quyết nút thắt (nếu có, khớp với cấu trúc SuggestedNodeResolvedThread).
+   - `links`: liên kết chương cũ (nếu có, khớp với cấu trúc SuggestedNodeLink).
+"""
+    try:
+        scenes_result = invoke_with_retry(state, decomp_prompt, temperature=0.2, output_schema=ScenarioScenelist)
+        scenes_to_write = [scene.model_dump() for scene in scenes_result.scenes]
+        console.print(f"✓ Đã phân rã thành công thành [bold green]{len(scenes_to_write)} phân cảnh[/bold green] chi tiết.")
+        emit_agent_log(state["story_uuid"], f"✓ Đã phân rã thành công thành {len(scenes_to_write)} phân cảnh chi tiết.")
+    except Exception as e:
+        console.print(f"[bold red]Lỗi khi phân rã phân cảnh: {e}[/bold red]. Sử dụng fallback kịch bản 1 phân cảnh.")
+        emit_agent_log(state["story_uuid"], f"Lỗi phân rã phân cảnh: {e}", level="warning")
+        # Fallback thành 1 phân cảnh duy nhất chính là toàn bộ chương truyện
+        scenes_to_write = [{
+            "id": "scene-1",
+            "title": f"Toàn bộ diễn biến Chương {chapter_num}",
+            "description": result.analyzed_requirements,
+            "characters": [c.get("name", "") for c in state["meta"].get("characters", [])],
+            "locations": [],
+            "weapons": [],
+            "techniques": [],
+            "tone": "bình thường",
+            "resolved_thread": None,
+            "links": []
+        }]
+
     return {
         "analyzed_requirements": result.analyzed_requirements,
-        "user_idea": current_idea # Keep track of the full expanded idea
+        "user_idea": current_idea,
+        "scenes_to_write": scenes_to_write,
+        "current_scene_index": 0,
+        "scene_drafts": []
     }
 
 
-def story_drafter_node(state: AgentState) -> Dict[str, Any]:
-    """Node 2: Story Drafter
-    Generates the initial chapter draft based on context and analyzed requirements.
+def scene_drafter_node(state: AgentState) -> Dict[str, Any]:
+    """Node 3: Scene Drafter Loop
+    Drafts the current scene sequentially using rolling memory context.
     """
     check_cancellation(state["story_uuid"])
-    console.print("\n[bold blue]=== [Node 2] Story Drafter ===[/bold blue]")
-    emit_agent_log(state["story_uuid"], f"=== [Bước 2] Sáng tác Bản nháp Chương {state['chapter_num']} ===")
+    current_idx = state.get("current_scene_index", 0)
+    scenes = state.get("scenes_to_write", [])
     
-    session = session_manager.get_session(state["story_uuid"])
-    if session:
-        session.current_node = "story_drafter"
-        emit_event("agent_status", {
-            "story_uuid": state["story_uuid"],
-            "chapter_num": state["chapter_num"],
-            "status": "drafting",
-            "message": f"Đang sáng tác bản nháp cho Chương {state['chapter_num']}..."
-        })
-    console.print("Đang viết nháp chương... Vui lòng đợi trong giây lát.")
-    emit_agent_log(state["story_uuid"], "Đang viết nháp chương... Vui lòng đợi trong giây lát (có thể mất 30-60 giây)...")
-    
-    meta = state["meta"]
-    ledger = state["ledger"]
-    reqs = state["analyzed_requirements"]
+    if current_idx >= len(scenes):
+        return {}
+        
+    scene = scenes[current_idx]
+    story_uuid = state["story_uuid"]
     chapter_num = state["chapter_num"]
+    meta = state["meta"]
     
-    # Read previous chapter content to maintain flow style if possible
-    prev_chapter_context = ""
-    if chapter_num > 1:
-        prev_content_path = config.get_chapter_content_path(state["story_uuid"], chapter_num - 1)
+    console.print(f"\n[bold blue]=== [Node 3] Scene Drafter: Phân cảnh {current_idx + 1}/{len(scenes)} ===[/bold blue]")
+    emit_agent_log(story_uuid, f"=== [Bước 3] Sáng tác Phân cảnh {current_idx + 1}/{len(scenes)}: {scene.get('title')} ===")
+    
+    session = session_manager.get_session(story_uuid)
+    if session:
+        session.current_node = f"scene_drafter_{current_idx}"
+        emit_event("agent_status", {
+            "story_uuid": story_uuid,
+            "chapter_num": chapter_num,
+            "status": "drafting",
+            "message": f"Đang sáng tác phân cảnh {current_idx + 1}/{len(scenes)}: {scene.get('title')}..."
+        })
+        
+    # Chuẩn bị Rolling Memory (văn bản chi tiết của phân cảnh liền trước)
+    rolling_memory = ""
+    scene_drafts = state.get("scene_drafts", [])
+    if current_idx > 0 and len(scene_drafts) > 0:
+        prev_scene_title = scenes[current_idx - 1].get("title", "")
+        prev_scene_text = scene_drafts[-1]
+        rolling_memory = f"\n## VĂN BẢN CHI TIẾT CỦA PHÂN CẢNH LIỀN TRƯỚC ({prev_scene_title}) - ĐỂ KẾT NỐI MẠCH TRUYỆN:\n---\n{prev_scene_text}\n---\nHãy viết tiếp phân cảnh hiện tại một cách mượt mà từ đoạn kết của phân cảnh liền trước ở trên."
+    elif chapter_num > 1:
+        # Nếu là phân cảnh đầu tiên của chương X (X > 1), nạp phần cuối của chương trước
+        prev_content_path = config.get_chapter_content_path(story_uuid, chapter_num - 1)
         if prev_content_path.exists():
-            # Read last 1000 words to guide style
             content = prev_content_path.read_text(encoding="utf-8")
-            prev_chapter_context = f"\nPHẦN CUỐI CHƯƠNG TRƯỚC (Để viết nối tiếp mượt mà):\n...\n{content[-2000:]}\n"
+            rolling_memory = f"\n## PHẦN CUỐI CỦA CHƯƠNG TRƯỚC (Để viết nối tiếp mượt mà):\n---\n...\n{content[-2000:]}\n---\nHãy viết tiếp phân cảnh đầu tiên này một cách mượt mà từ đoạn kết của chương trước ở trên."
+
+    # Xây dựng các gợi ý liên kết cụ thể của node phân cảnh
+    scene_links_str = ""
+    if scene.get("links"):
+        scene_links_str = "\nLIÊN KẾT Ý TƯỞNG VỚI CÁC CHƯƠNG TRƯỚC:\n"
+        for link in scene.get("links", []):
+            linked_chap = link.get("chapter")
+            linked_nodes = link.get("nodes", [])
+            scene_links_str += f"- Liên kết với Chương {linked_chap}, sự kiện: {', '.join(linked_nodes)}\n"
+            # Thêm chi tiết nếu có
+            for node_id in linked_nodes:
+                try:
+                    nodes_path = config.get_chapter_nodes_path(story_uuid, int(linked_chap))
+                    if nodes_path.exists():
+                        linked_nodes_data = json.loads(nodes_path.read_text(encoding="utf-8"))
+                        for ln in linked_nodes_data.get("nodes", []):
+                            if ln.get("id") == node_id:
+                                node_content = ln.get("content") or ln.get("description") or "Không có mô tả"
+                                scene_links_str += f"  * Nội dung sự kiện [{node_id}] của Chương {linked_chap}: {node_content}\n"
+                except Exception:
+                    pass
+
+    # Tiêu đề chương nếu là phân cảnh đầu tiên
+    first_scene_header = ""
+    if current_idx == 0:
+        first_scene_header = f"Lưu ý: Vì đây là phân cảnh đầu tiên, dòng đầu tiên của văn bản trả về BẮT BUỘC phải là tiêu đề chương dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`. Các phân cảnh sau không được thêm tiêu đề chương này."
 
     prompt = f"""
-Bạn là một nhà văn mạng tài ba. Hãy viết bản nháp cho Chương {chapter_num} của bộ truyện dựa trên cấu hình truyện và yêu cầu chi tiết dưới đây.
+Bạn là một nhà văn mạng tài ba đang viết tiểu thuyết dài kỳ (serial novel). Hãy sáng tác phần tiếp theo của truyện tương ứng với Phân cảnh kịch bản chi tiết dưới đây.
 
-THÔNG TIN TRUYỆN:
-- Tên truyện: {meta.get('name')}
-- Tác giả cấu hình: Nhân vật: {json.dumps(meta.get('characters'), ensure_ascii=False)}, Bối cảnh: {meta.get('context')}, Phong cách hành văn: {meta.get('style')}
-- Ràng buộc: Tối đa {meta.get('max_words_per_chapter')} từ cho chương này.
+SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
+{state.get("story_bible")}
 
-TIẾN TRÌNH CỐT TRUYỆN HIỆN TẠI (LỊCH SỬ):
-{json.dumps(ledger.get('timeline'), ensure_ascii=False, indent=2)}
-Các nút thắt chưa giải quyết: {json.dumps(ledger.get('unresolved_threads'), ensure_ascii=False)}
-{prev_chapter_context}
+YÊU CẦU CHI TIẾT CỦA CHƯƠNG {chapter_num}:
+{state.get("analyzed_requirements")}
 
-SƠ ĐỒ SỰ KIỆN GỐC (Ý tưởng của tác giả):
-{format_user_idea(state.get("user_idea"), state.get("story_uuid"))}
+THÔNG TIN PHÂN CẢNH HIỆN TẠI CẦN VIẾT (Phân cảnh {current_idx + 1}/{len(scenes)}):
+- Tiêu đề phân cảnh: {scene.get('title')}
+- Mô tả diễn biến chi tiết: {scene.get('description')}
+- Nhân vật tham gia: {', '.join(scene.get('characters', []))}
+- Địa điểm xuất hiện: {', '.join(scene.get('locations', []))}
+- Binh khí sử dụng: {', '.join(scene.get('weapons', []))}
+- Công pháp thi triển: {', '.join(scene.get('techniques', []))}
+- Văn phong yêu cầu (Tone): {scene.get('tone', 'bình thường')}
+{scene_links_str}
+{rolling_memory}
 
-YÊU CẦU CHI TIẾT CHO CHƯƠNG {chapter_num}:
-{reqs}
-
-Yêu cầu viết truyện:
-1. Viết trực tiếp nội dung truyện bằng định dạng Markdown.
-2. Tiêu đề chương viết ở dòng đầu tiên dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`.
-3. Tập trung miêu tả sâu sắc về bối cảnh, cảm xúc, biểu cảm, hội thoại và hành động. Đảm bảo đúng phong cách: {meta.get('style')}.
-4. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, công pháp thi triển, và BẮT BUỘC TUÂN THỦ VĂN PHONG (tone) đã được chỉ định cho mỗi node (ví dụ: đoạn tương ứng node hài hước phải hóm hỉnh, đoạn tương ứng node bi thương/đau khổ phải bi thiết, cảm xúc tuyệt vọng, đoạn tương ứng node tình cảm phải sâu lắng, ấm áp...).
-5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
-   - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
-   - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).
-   - Hãy bắt đầu trực tiếp đi thẳng vào diễn biến tiếp nối chương trước, phát triển mạch truyện tự nhiên theo các node sự kiện.
-   - Đoạn kết chương phải là một kết cục mở hoặc một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để lôi cuốn độc giả đọc tiếp chương sau. Tránh tuyệt đối các câu văn mang tính chất "khép lại" chương hoặc tóm tắt lại những gì đã xảy ra.
-6. Không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
+YÊU CẦU HÀNH VĂN (Kỹ thuật Pacing Control & Show, Don't Tell):
+1. TUYỆT ĐỐI KHÔNG viết tóm tắt hành động nhảy cóc (Ví dụ: KHÔNG viết "Sau một hồi chiến đấu, hắn đã thắng"). Bạn phải tả từng đường kiếm, từng nhịp thở, cảm giác đau đớn, mệt mỏi, áp lực không gian xung quanh.
+2. Triển khai phân bổ nội dung theo tỷ lệ cấu trúc sau:
+   - 30% Thời lượng: Tả cảnh vật, không khí, nhiệt độ, áp lực không gian xung quanh để tạo chiều sâu (ví dụ: bụi mù bay lượn, gió rít lạnh lẽo, tàn tro rụng xuống...).
+   - 20% Thời lượng: Biểu cảm khuôn mặt, ánh mắt, ngôn ngữ cơ thể, phản ứng cơ lý vật lý của các nhân vật trước sự kiện.
+   - 30% Thời lượng: Hội thoại sinh động, mang đậm cá tính riêng của từng nhân vật (ví dụ: nhân vật sư phụ thì nói năng lười biếng, tếu táo; nam chính Diệp Trần thì điềm tĩnh, mộc mạc; kẻ phản diện thì khinh khỉnh).
+   - 20% Thời lượng: Hành động thực tế kết hợp suy nghĩ nội tâm độc thoại của nhân vật.
+3. RÀNG BUỘC KẾT THÚC LỬNG LƠ (CLIFFHANGER):
+   - Phân cảnh phải kết thúc ở một trạng thái mở, một bí ẩn chưa giải quyết, một nguy hiểm đang lơ lửng, hoặc một câu thoại lấp lửng để làm tiền đề chuyển tiếp mượt mà và gây tò mò cho phân cảnh tiếp theo. Tuyệt đối KHÔNG viết câu chốt đóng lại vấn đề hay tóm tắt bài học ở cuối phân cảnh.
+4. {first_scene_header}
+5. Trả về trực tiếp nội dung truyện thực tế bằng Markdown, không thêm bất kỳ lời bình luận hay giải thích nào khác của AI.
 """
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
-    draft_content = ensure_string(response.content)
-    emit_agent_log(state["story_uuid"], "Đã soạn thảo xong bản nháp ban đầu.")
-        
-    return {"draft_content": draft_content}
+    scene_draft = ensure_string(response.content)
+    
+    new_drafts = list(scene_drafts)
+    new_drafts.append(scene_draft)
+    
+    console.print(f"✓ Đã sáng tác xong Phân cảnh {current_idx + 1}: {scene.get('title')}")
+    emit_agent_log(story_uuid, f"✓ Đã sáng tác xong Phân cảnh {current_idx + 1}: {scene.get('title')}")
+    
+    return {
+        "scene_drafts": new_drafts,
+        "current_scene_index": current_idx + 1
+    }
 
 
 def human_review_node(state: AgentState) -> Dict[str, Any]:
-    """Node 3: Human Review (Interactive Breakpoint)
+    """Node 4: Human Review (Interactive Breakpoint)
     Saves draft to disk as temp_draft.md and asks user for feedback or 'Done'.
     """
     check_cancellation(state["story_uuid"])
-    console.print("\n[bold blue]=== [Node 3] Human Review ===[/bold blue]")
-    emit_agent_log(state["story_uuid"], f"=== [Bước 3] Tác giả duyệt Bản nháp Chương {state['chapter_num']} ===")
+    console.print("\n[bold blue]=== [Node 4] Human Review ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 4] Tác giả duyệt Bản nháp Chương {state['chapter_num']} ===")
     
-    draft_content = state["draft_content"]
+    draft_content = state.get("draft_content", "")
+    if not draft_content:
+        draft_content = "\n\n".join(state.get("scene_drafts", []))
     
     # Save the draft content to temp_draft.md
     temp_draft_path = config.get_temp_draft_path(state["story_uuid"])
@@ -407,16 +554,19 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
             "hoặc gõ [bold green]'Done'[/bold green] nếu đã ưng ý hoàn toàn"
         )
     
-    return {"revision_feedback": str(feedback).strip()}
+    return {
+        "revision_feedback": str(feedback).strip(),
+        "draft_content": draft_content
+    }
 
 
 def reviser_node(state: AgentState) -> Dict[str, Any]:
-    """Node 3.1: Reviser
+    """Node 4.1: Reviser
     Edits draft_content based on user feedback and metadata.
     """
     check_cancellation(state["story_uuid"])
-    console.print("\n[bold blue]=== [Node 3.1] Reviser ===[/bold blue]")
-    emit_agent_log(state["story_uuid"], f"=== [Bước 3.1] Sửa đổi Bản nháp theo Yêu cầu ===")
+    console.print("\n[bold blue]=== [Node 4.1] Reviser ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 4.1] Sửa đổi Bản nháp theo Yêu cầu ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -427,64 +577,72 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
             "status": "revising",
             "message": f"Đang sửa đổi bản nháp Chương {state['chapter_num']} theo ý kiến tác giả..."
         })
-    console.print("Đang tiến hành chỉnh sửa bản nháp theo yêu cầu của bạn...")
+    console.print("Đang tiến hành chỉnh sửa bản nháp theo yêu cầu...")
     emit_agent_log(state["story_uuid"], f"Đang tiến hành sửa đổi bản nháp theo phản hồi...")
     
     draft_content = state["draft_content"]
-    feedback = state["revision_feedback"]
+    feedback = state.get("revision_feedback", "")
     meta = state["meta"]
     chapter_num = state["chapter_num"]
     reqs = state.get("analyzed_requirements", "")
     original_user_idea = state.get("original_user_idea")
     
+    # Kết hợp các cảnh báo của Auditor nếu có lỗi mà người dùng chưa sửa
+    warnings_context = ""
+    warnings = state.get("warnings", [])
+    auditor_fb = state.get("auditor_feedback", "")
+    if warnings:
+        warnings_context = f"\nCẢNH BÁO LỖI LOGIC TỪ KIỂM DUYỆT VIÊN (AUDITOR):\n"
+        for w in warnings:
+            warnings_context += f"- Lỗi: {w.get('warning')} (Liên quan đến Chương {w.get('conflicting_chapter') or 'Bối cảnh'})\n"
+        if auditor_fb:
+            warnings_context += f"Nhận xét chi tiết từ Auditor: {auditor_fb}\n"
+            
     prompt = f"""
-Bạn là một biên tập viên xuất sắc. Nhiệm vụ của bạn là dựa vào bản nháp hiện tại của Chương {chapter_num} và yêu cầu chỉnh sửa của tác giả để viết lại bản nháp sao cho đáp ứng đúng yêu cầu đó mà không làm hỏng logic truyện.
+Bạn là một biên tập viên xuất sắc. Nhiệm vụ của bạn là dựa vào bản nháp hiện tại của Chương {chapter_num}, yêu cầu chỉnh sửa của tác giả và cảnh báo lỗi logic từ Auditor (nếu có) để viết lại bản nháp sao cho đáp ứng đúng yêu cầu đó và nhất quán cốt truyện.
 
-YÊU CẦU CỦA TÁC GIẢ:
-"{feedback}"
-
-THÔNG TIN TRUYỆN (Để giữ đúng văn phong, nhân vật, bối cảnh):
-- Tên truyện: {meta.get('name')}
-- Nhân vật: {json.dumps(meta.get('characters'), ensure_ascii=False)}
-- Phong cách hành văn: {meta.get('style')}
-- Bối cảnh: {meta.get('context')}
+SỔ TAY TÁC GIẢ (STORY BIBLE):
+{state.get("story_bible")}
 
 SƠ ĐỒ SỰ KIỆN GỐC (Ý tưởng của tác giả):
 {format_user_idea(original_user_idea, state["story_uuid"])}
 
-YÊU CẦU CHI TIẾT CHO CHƯƠNG {chapter_num}:
+YÊU CẦU CHI TIẾT ĐÃ PHÂN TÍCH:
 {reqs}
 
-BẢN NHÁP HIỆN TẠI:
+YÊU CẦU CHỈNH SỬA CỦA TÁC GIẢ:
+"{feedback}"
+{warnings_context}
+
+BẢN NHÁP HIỆN TẠI CỦA CHƯƠNG:
 ---
 {draft_content}
 ---
 
-Hãy viết lại bản nháp này. Đảm bảo:
-1. Sửa đổi đúng theo ý tác giả (thêm thắt chi tiết, sửa lời thoại, thay đổi nhịp điệu cốt truyện...).
-2. Đảm bảo diễn biến câu chuyện tuân thủ nghiêm ngặt tiến trình tuần tự của các sự kiện (nodes) trong SƠ ĐỒ SỰ KIỆN GỐC. Sự kiện của Node đầu tiên phải tương ứng với phần mở đầu/mở màn của chương, và sự kiện của Node cuối cùng phải tương ứng với phần kết thúc/khép lại của chương. Sử dụng chính xác các địa điểm xuất hiện, binh khí/pháp khí sử dụng, công pháp thi triển, và BẮT BUỘC TUÂN THỦ VĂN PHONG (tone) đã được chỉ định cho mỗi node (ví dụ: đoạn tương ứng node hài hước phải hóm hỉnh, đoạn tương ứng node bi thương/đau khổ phải bi thiết, cảm xúc tuyệt vọng, đoạn tương ứng node tình cảm phải sâu lắng, ấm áp...).
-3. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ: 
-   - Đây là truyện theo chương thuộc tiểu thuyết dài kỳ (serial novel) liên tục, KHÔNG phải là một bài văn hay một câu chuyện ngắn độc lập.
-   - KHÔNG viết chương truyện theo cấu trúc đóng (không có phần giới thiệu tóm tắt hoàn cảnh ở đầu, không có phần kết luận/tổng kết hay rút ra bài học cuộc sống ở cuối chương).
-   - Hãy bắt đầu trực tiếp đi thẳng vào diễn biến tiếp nối chương trước, phát triển mạch truyện tự nhiên theo các node sự kiện.
-   - Đoạn kết chương phải là một kết cục mở hoặc một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để lôi cuốn độc giả đọc tiếp chương sau. Tránh tuyệt đối các câu văn mang tính chất "khép lại" chương hoặc tóm tắt lại những gì đã xảy ra.
-4. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
-5. Chỉ trả về nội dung chương truyện mới, không kèm theo lời bình luận hay giải thích.
+Hãy viết lại bản thảo chương truyện. Đảm bảo:
+1. Sửa đổi đúng theo ý tác giả và giải quyết triệt để các cảnh báo lỗi logic được chỉ ra.
+2. Đảm bảo giữ nguyên phong cách hành văn: {meta.get('style')}.
+3. Giữ nguyên cấu trúc truyện dài kỳ: không thêm tóm tắt đầu chương, không thêm tổng kết cuối chương. Giữ nguyên kết thúc mở hoặc kết thúc lửng lơ ở cuối chương.
+4. Trả về trực tiếp nội dung chương mới bằng định dạng Markdown (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`), không kèm theo lời bình luận hay giải thích.
 """
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
     emit_agent_log(state["story_uuid"], "Đã sửa đổi xong bản nháp.")
-        
-    return {"draft_content": revised_content}
+    
+    return {
+        "draft_content": revised_content,
+        "warnings": [],
+        "auditor_feedback": ""
+    }
 
 
 def auditor_node(state: AgentState) -> Dict[str, Any]:
-    """Node 4: Auditor
+    """Node 5: Auditor
     Performs logic check against previous chapter's state and global ledger.
     """
     check_cancellation(state["story_uuid"])
-    console.print("\n[bold blue]=== [Node 4] Auditor ===[/bold blue]")
-    emit_agent_log(state["story_uuid"], f"=== [Bước 4] Kiểm duyệt Logic và Sự Nhất quán cốt truyện ===")
+    console.print("\n[bold blue]=== [Node 5] Auditor ===[/bold blue]")
+    emit_agent_log(state["story_uuid"], f"=== [Bước 5] Kiểm duyệt Logic và Sự Nhất quán cốt truyện ===")
     
     session = session_manager.get_session(state["story_uuid"])
     if session:
@@ -500,7 +658,6 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
     
     draft_content = state["draft_content"]
     ledger = state["ledger"]
-    meta = state["meta"]
     chapter_num = state["chapter_num"]
     
     # Read previous chapter state if exists
@@ -510,14 +667,14 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
         if prev_state_path.exists():
             prev_state_str = prev_state_path.read_text(encoding="utf-8")
 
-    original_user_idea = state.get("original_user_idea")
+    # Xây dựng Sổ tay tác giả dạng văn bản thuần
+    story_bible = state.get("story_bible", "")
 
     prompt = f"""
-Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu bản nháp cuối cùng của Chương {chapter_num} với thông tin lịch sử truyện, sổ cái toàn cục, và đặc biệt là trạng thái chương trước đó để tìm ra các lỗi logic tiềm ẩn.
+Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu bản nháp cuối cùng của Chương {chapter_num} với thông tin bối cảnh thế giới, nhân vật, sổ cái toàn cục, và trạng thái chương trước đó để tìm ra các lỗi logic tiềm ẩn.
 
-THÔNG TIN TRUYỆN:
-- Nhân vật: {json.dumps(meta.get('characters'), ensure_ascii=False)}
-- Bối cảnh chung: {meta.get('context')}
+SỔ TAY TÁC GIẢ (STORY BIBLE):
+{story_bible}
 
 SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
 {json.dumps(ledger, ensure_ascii=False, indent=2)}
@@ -675,22 +832,28 @@ Hãy điền đầy đủ:
         "summary": chap_state.summary
     }
     
-    if isinstance(original_user_idea, dict):
-        # Tách nội dung truyện hoàn thiện tương ứng với từng node sự kiện
-        try:
-            nodes_list = []
-            for n in original_user_idea.get("nodes", []):
-                nodes_list.append({
-                    "id": n.get("id"),
-                    "title": n.get("title"),
-                    "description": n.get("description")
-                })
-                
-            if nodes_list:
-                console.print("\n[bold cyan]Đang phân tách nội dung chương truyện theo từng sự kiện (node)...[/bold cyan]")
-                emit_agent_log(story_uuid, "Đang phân tách nội dung chương truyện theo từng sự kiện (node)...")
-                
-                mapping_prompt = f"""
+    canvas_data = original_user_idea if isinstance(original_user_idea, dict) else None
+    if not canvas_data:
+        canvas_data = {
+            "nodes": state.get("scenes_to_write", []),
+            "connections": []
+        }
+        
+    # Tách nội dung truyện hoàn thiện tương ứng với từng node sự kiện
+    try:
+        nodes_list = []
+        for n in canvas_data.get("nodes", []):
+            nodes_list.append({
+                "id": n.get("id"),
+                "title": n.get("title"),
+                "description": n.get("description")
+            })
+            
+        if nodes_list:
+            console.print("\n[bold cyan]Đang phân tách nội dung chương truyện theo từng sự kiện (node)...[/bold cyan]")
+            emit_agent_log(story_uuid, "Đang phân tách nội dung chương truyện theo từng sự kiện (node)...")
+            
+            mapping_prompt = f"""
 Hãy đọc nội dung Chương {chapter_num} dưới đây và phân tách/ánh xạ các đoạn văn (hoặc nội dung câu chữ thực tế) tương ứng với từng sự kiện (node) đã được lên kịch bản.
 
 DANH SÁCH CÁC SỰ KIỆN (NODES) KỊCH BẢN:
@@ -707,45 +870,45 @@ YÊU CẦU:
 3. Nếu một sự kiện không có nội dung trực tiếp tương ứng (hoặc bị gộp), hãy gán nội dung phù hợp nhất hoặc để trống.
 4. Trả về dưới cấu trúc dữ liệu JSON chứa mảng các đối tượng có trường "node_id" và "content" (nội dung câu chữ thực tế).
 """
-                mapping_result = invoke_with_retry(
-                    state, 
-                    mapping_prompt, 
-                    temperature=0.2, 
-                    output_schema=ChapterNodeContentExtraction
-                )
-                
-                # Cập nhật trường content vào các node của original_user_idea
-                mapping_dict = {m.node_id: m.content for m in mapping_result.mappings}
-                for n in original_user_idea.get("nodes", []):
-                    node_id = n.get("id")
-                    if node_id in mapping_dict:
-                        n["content"] = mapping_dict[node_id]
-                        console.print(f"  + Ánh xạ thành công nội dung cho sự kiện [{node_id}]: {n.get('title')}")
-                    else:
-                        n["content"] = None
-        except Exception as e:
-            console.print(f"[Warning] Lỗi khi phân tách nội dung theo node: {e}")
-            emit_agent_log(story_uuid, f"Lỗi phân tách nội dung theo node: {e}", level="warning")
+            mapping_result = invoke_with_retry(
+                state, 
+                mapping_prompt, 
+                temperature=0.2, 
+                output_schema=ChapterNodeContentExtraction
+            )
+            
+            # Cập nhật trường content vào các node của canvas_data
+            mapping_dict = {m.node_id: m.content for m in mapping_result.mappings}
+            for n in canvas_data.get("nodes", []):
+                node_id = n.get("id")
+                if node_id in mapping_dict:
+                    n["content"] = mapping_dict[node_id]
+                    console.print(f"  + Ánh xạ thành công nội dung cho sự kiện [{node_id}]: {n.get('title')}")
+                else:
+                    n["content"] = None
+    except Exception as e:
+        console.print(f"[Warning] Lỗi khi phân tách nội dung theo node: {e}")
+        emit_agent_log(story_uuid, f"Lỗi phân tách nội dung theo node: {e}", level="warning")
 
-        nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
-        try:
-            nodes_path.write_text(json.dumps(original_user_idea, ensure_ascii=False, indent=2), encoding="utf-8")
-            console.print(f"✓ Đã ghi sơ đồ chương truyện vào: [bold green]{nodes_path}[/bold green]")
-            emit_agent_log(story_uuid, f"✓ Đã lưu sơ đồ sự kiện chương vào file chap_{chapter_num}_nodes.json.")
-        except Exception as e:
-            console.print(f"[bold red]Lỗi ghi file sơ đồ chương: {e}[/bold red]")
-            emit_agent_log(story_uuid, f"Lỗi lưu sơ đồ chương: {e}", level="error")
-            
-        # Lược bỏ trường content khi lưu vào timeline sổ cái theo yêu cầu của tác giả
-        timeline_nodes = []
-        for n in original_user_idea.get("nodes", []):
-            n_copy = n.copy()
-            n_copy.pop("content", None)
-            timeline_nodes.append(n_copy)
-            
-        timeline_entry["nodes"] = timeline_nodes
-        timeline_entry["connections"] = original_user_idea.get("connections", [])
+    nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num)
+    try:
+        nodes_path.write_text(json.dumps(canvas_data, ensure_ascii=False, indent=2), encoding="utf-8")
+        console.print(f"✓ Đã ghi sơ đồ chương truyện vào: [bold green]{nodes_path}[/bold green]")
+        emit_agent_log(story_uuid, f"✓ Đã lưu sơ đồ sự kiện chương vào file chap_{chapter_num}_nodes.json.")
+    except Exception as e:
+        console.print(f"[bold red]Lỗi ghi file sơ đồ chương: {e}[/bold red]")
+        emit_agent_log(story_uuid, f"Lỗi lưu sơ đồ chương: {e}", level="error")
         
+    # Lược bỏ trường content khi lưu vào timeline sổ cái theo yêu cầu của tác giả
+    timeline_nodes = []
+    for n in canvas_data.get("nodes", []):
+        n_copy = n.copy()
+        n_copy.pop("content", None)
+        timeline_nodes.append(n_copy)
+        
+    timeline_entry["nodes"] = timeline_nodes
+    timeline_entry["connections"] = canvas_data.get("connections", [])
+    
     ledger_model.timeline.append(timeline_entry)
     
     # Initialize resolved_threads if it doesn't exist

@@ -1,0 +1,167 @@
+import json
+
+def to_story_bible(meta: dict, ledger: dict) -> str:
+    """
+    Chuyển đổi dữ liệu cấu trúc thành văn bản văn học thuần túy (không dấu ngoặc JSON, không UUID, không tọa độ x/y)
+    để LLM tập trung chú ý tốt nhất (Story Bible Transformer).
+    """
+    lines = []
+    lines.append("=== SỔ TAY TÁC GIẢ (STORY BIBLE) ===")
+    lines.append(f"Tên tác phẩm: {meta.get('name', 'Không rõ')}")
+    lines.append(f"Bối cảnh thế giới: {meta.get('context', 'Không rõ')}")
+    lines.append(f"Phong cách kể chuyện: {meta.get('style', 'Không rõ')}")
+    
+    # Thẻ tags
+    tags = meta.get("tags", [])
+    if tags:
+        lines.append(f"Nhãn phân loại: {', '.join(tags)}")
+        
+    # Hệ thống tu vi
+    stages = meta.get("cultivation_stages", [])
+    if stages:
+        lines.append("\nHỆ THỐNG CẤP ĐỘ TU VI TRONG THẾ GIỚI:")
+        for idx, stage in enumerate(stages):
+            if isinstance(stage, dict):
+                name = stage.get("name", "")
+                desc = stage.get("description", "")
+            else:
+                name = getattr(stage, "name", str(stage))
+                desc = getattr(stage, "description", "")
+            if desc:
+                lines.append(f"  - Cấp {idx + 1}: {name} ({desc})")
+            else:
+                lines.append(f"  - Cấp {idx + 1}: {name}")
+                
+    # Danh sách nhân vật
+    chars = meta.get("characters", [])
+    if chars:
+        lines.append("\nDANH SÁCH NHÂN VẬT VÀ TRẠNG THÁI HIỆN TẠI:")
+        for idx, char in enumerate(chars):
+            if isinstance(char, dict):
+                c_name = char.get("name", "Không rõ")
+                c_role = char.get("role", "Không rõ")
+                c_desc = char.get("description", "")
+                c_cult = char.get("current_cultivation") or "Không rõ"
+                c_loc = char.get("current_location") or "Không rõ"
+                c_weapon = char.get("active_weapon") or "Không có"
+                c_weapons_owned = char.get("weapons_owned", [])
+                c_tech = char.get("active_technique") or "Không có"
+                c_techs_owned = char.get("techniques_owned", [])
+                c_visited = char.get("visited_locations", [])
+                c_status = char.get("status") or "Mới xuất hiện"
+            else:
+                c_name = getattr(char, "name", "Không rõ")
+                c_role = getattr(char, "role", "Không rõ")
+                c_desc = getattr(char, "description", "")
+                c_cult = getattr(char, "current_cultivation", "Không rõ") or "Không rõ"
+                c_loc = getattr(char, "current_location", "Không rõ") or "Không rõ"
+                c_weapon = getattr(char, "active_weapon", "Không có") or "Không có"
+                c_weapons_owned = getattr(char, "weapons_owned", [])
+                c_tech = getattr(char, "active_technique", "Không có") or "Không có"
+                c_techs_owned = getattr(char, "techniques_owned", [])
+                c_visited = getattr(char, "visited_locations", [])
+                c_status = getattr(char, "status", "Mới xuất hiện") or "Mới xuất hiện"
+                
+            lines.append(f"\n  {idx + 1}. Nhân vật: {c_name}")
+            lines.append(f"     * Vai trò: {c_role}")
+            lines.append(f"     * Mô tả đặc điểm, tính cách: {c_desc}")
+            lines.append(f"     * Tu vi hiện tại: {c_cult}")
+            lines.append(f"     * Địa điểm hiện tại: {c_loc}")
+            lines.append(f"     * Trạng thái sức khỏe/tính mạng: {c_status}")
+            lines.append(f"     * Binh khí đang sử dụng: {c_weapon}")
+            if c_weapons_owned:
+                w_owned_str = ", ".join([str(w) for w in c_weapons_owned])
+                lines.append(f"     * Các binh khí sở hữu: {w_owned_str}")
+            lines.append(f"     * Chiêu thức/Công pháp đang dùng: {c_tech}")
+            if c_techs_owned:
+                t_owned_str = ", ".join([str(t) for t in c_techs_owned])
+                lines.append(f"     * Các công pháp đã học: {t_owned_str}")
+            if c_visited:
+                visited_str = ", ".join([str(l) for l in c_visited])
+                lines.append(f"     * Địa điểm đã đi qua: {visited_str}")
+
+    # Danh sách địa điểm trong thế giới
+    locs = ledger.get("locations", [])
+    if locs:
+        lines.append("\nDANH SÁCH CÁC ĐỊA ĐIỂM TRONG THẾ GIỚI:")
+        for loc in locs:
+            if isinstance(loc, dict):
+                name = loc.get("name", "")
+                desc = loc.get("description", "")
+            else:
+                name = getattr(loc, "name", str(loc))
+                desc = getattr(loc, "description", "")
+            lines.append(f"  - {name}: {desc}")
+
+    # Danh sách binh khí/pháp khí thế giới
+    weapons = ledger.get("weapons", [])
+    if weapons:
+        lines.append("\nDANH SÁCH PHÁP KHÍ / BINH KHÍ TRONG THẾ GIỚI:")
+        for w in weapons:
+            if isinstance(w, dict):
+                name = w.get("name", "")
+                desc = w.get("description", "")
+            else:
+                name = getattr(w, "name", str(w))
+                desc = getattr(w, "description", "")
+            lines.append(f"  - {name}: {desc}")
+
+    # Danh sách công pháp thế giới
+    techs = ledger.get("techniques", [])
+    if techs:
+        lines.append("\nDANH SÁCH CÔNG PHÁP VÀ CHIÊU THỨC TRONG THẾ GIỚI:")
+        for t in techs:
+            if isinstance(t, dict):
+                name = t.get("name", "")
+                desc = t.get("description", "")
+            else:
+                name = getattr(t, "name", str(t))
+                desc = getattr(t, "description", "")
+            lines.append(f"  - {name}: {desc}")
+
+    # Lịch sử sự kiện (timeline) - Tóm tắt các chương trước dạng thuần túy
+    timeline = ledger.get("timeline", [])
+    if timeline:
+        lines.append("\nTÓM TẮT DIỄN BIẾN CÁC CHƯƠNG TRƯỚC:")
+        for item in timeline:
+            lines.append(f"  - Chương {item.get('chapter', '?')}: {item.get('title', 'Không rõ tiêu đề')}")
+            lines.append(f"    Mô tả diễn biến chính: {item.get('summary', 'Không có mô tả.')}")
+            
+    # Các nút thắt chưa giải quyết
+    unresolved = ledger.get("unresolved_threads", [])
+    if unresolved:
+        lines.append("\nCÁC NÚT THẮT / BÍ ẨN CỐT TRUYỆN CHƯA GIẢI QUYẾT:")
+        for idx, ut in enumerate(unresolved):
+            if isinstance(ut, dict):
+                thread_text = ut.get("thread", "")
+                chap = ut.get("chapter")
+            else:
+                thread_text = getattr(ut, "thread", str(ut))
+                chap = getattr(ut, "chapter", None)
+            if chap:
+                lines.append(f"  - Nút thắt {idx + 1} (xuất hiện ở Chương {chap}): {thread_text}")
+            else:
+                lines.append(f"  - Nút thắt {idx + 1}: {thread_text}")
+
+    # Các nút thắt đã giải quyết
+    resolved = ledger.get("resolved_threads", [])
+    if resolved:
+        lines.append("\nCÁC NÚT THẮT CỐT TRUYỆN ĐÃ ĐƯỢC GIẢI QUYẾT:")
+        for idx, rt in enumerate(resolved):
+            if isinstance(rt, dict):
+                thread_text = rt.get("thread", "")
+                chap_intro = rt.get("chapter_introduced")
+                chap_res = rt.get("chapter_resolved")
+                note = rt.get("resolution_note", "")
+            else:
+                thread_text = getattr(rt, "thread", str(rt))
+                chap_intro = getattr(rt, "chapter_introduced", None)
+                chap_res = getattr(rt, "chapter_resolved", None)
+                note = getattr(rt, "resolution_note", "")
+            intro_str = f"xuất hiện ở Chương {chap_intro}, " if chap_intro else ""
+            res_str = f"được giải quyết ở Chương {chap_res}" if chap_res else "đã được giải quyết"
+            lines.append(f"  - {thread_text} ({intro_str}{res_str})")
+            if note:
+                lines.append(f"    Ghi chú cách giải quyết: {note}")
+
+    return "\n".join(lines)

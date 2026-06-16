@@ -8,7 +8,11 @@ class AgentState(TypedDict):
     model: str
     meta: Dict[str, Any]
     ledger: Dict[str, Any]
+    story_bible: str
     analyzed_requirements: str
+    scenes_to_write: List[Dict[str, Any]]
+    current_scene_index: int
+    scene_drafts: List[str]
     draft_content: str
     revision_feedback: str
     auditor_feedback: str

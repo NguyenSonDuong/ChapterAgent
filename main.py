@@ -253,14 +253,20 @@ def handle_write(args):
         "story_uuid": story_uuid,
         "chapter_num": next_chap_num,
         "user_idea": user_idea,
+        "original_user_idea": user_idea,
         "model": selected_model,
         "meta": meta_data,
         "ledger": ledger_data,
+        "story_bible": "",
         "analyzed_requirements": "",
+        "scenes_to_write": [],
+        "current_scene_index": 0,
+        "scene_drafts": [],
         "draft_content": "",
         "revision_feedback": "",
         "auditor_feedback": "",
         "warnings": [],
+        "conflict_resolutions": [],
         "is_done": False
     }
     
