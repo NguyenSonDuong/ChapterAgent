@@ -97,6 +97,20 @@ def handle_submit_review_feedback(data):
     else:
         emit('response_status', {'status': 'error', 'message': 'Session not found'})
 
+@socketio.on('submit_requirement_feedback')
+def handle_submit_requirement_feedback(data):
+    """Client provides requirement review feedback (or 'Done') for the chapter requirements."""
+    story_uuid = data.get('story_uuid')
+    feedback = data.get('feedback')
+    print(f"Received requirement review feedback for story {story_uuid}: {feedback}")
+    session = session_manager.get_session(story_uuid)
+    if session:
+        session.input_data = feedback
+        session.input_event.set()
+        emit('response_status', {'status': 'acknowledged', 'story_uuid': story_uuid})
+    else:
+        emit('response_status', {'status': 'error', 'message': 'Session not found'})
+
 @socketio.on('submit_conflict_resolutions')
 def handle_submit_conflict_resolutions(data):
     """Client provides selected conflicts and instructions to resolve them."""

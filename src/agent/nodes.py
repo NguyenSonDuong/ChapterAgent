@@ -316,7 +316,115 @@ Hãy phân tích và trả về kết quả cấu trúc:
             # No questions or maximum loops reached
             break
             
-    console.print(Panel(result.analyzed_requirements, title=f"Yêu cầu Chương {chapter_num} đã được duyệt", border_style="green"))
+    current_requirements = result.analyzed_requirements
+    
+    # Vòng lặp duyệt yêu cầu chương (Requirement Review Loop)
+    while True:
+        check_cancellation(state["story_uuid"])
+        
+        session = session_manager.get_session(state["story_uuid"])
+        if session:
+            emit_agent_log(state["story_uuid"], "Đang chờ tác giả duyệt yêu cầu chương...")
+            session.current_node = "requirement_review"
+            session.status = "waiting_requirement_review"
+            emit_event("requirement_review_needed", {
+                "story_uuid": state["story_uuid"],
+                "chapter_num": state["chapter_num"],
+                "analyzed_requirements": current_requirements
+            })
+            
+            # Chờ phản hồi duyệt yêu cầu từ client
+            session.input_event.clear()
+            success = session.input_event.wait(timeout=1200.0) # 20 phút
+            check_cancellation(state["story_uuid"])
+            
+            if not success:
+                console.print("[yellow]Hết thời gian chờ duyệt yêu cầu chương. Tự động hoàn thành...[/yellow]")
+                emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt yêu cầu chương. Tự động tiếp tục.", level="warning")
+                feedback = "Done"
+            else:
+                feedback = session.input_data
+                session.input_data = None
+                session.status = "running"
+                if feedback is None:
+                    feedback = "Done"
+        else:
+            # CLI Fallback
+            console.print(Panel(current_requirements, title=f"Duyệt yêu cầu Chương {chapter_num}", border_style="cyan"))
+            console.print("[bold magenta]Nhập yêu cầu chỉnh sửa[/bold magenta] (gõ 'Done' nếu đồng ý, hoặc nhập phản hồi):")
+            feedback = Prompt.ask("> ")
+            if not feedback.strip():
+                feedback = "Done"
+        
+        fb_str = str(feedback).strip()
+        if fb_str.lower() == 'done':
+            break
+            
+        # Parse feedback xem có dạng bôi đen hay không
+        feedback_data = None
+        if isinstance(feedback, dict):
+            feedback_data = feedback
+        elif isinstance(feedback, str):
+            try:
+                feedback_data = json.loads(feedback)
+            except Exception:
+                feedback_data = feedback
+                
+        if isinstance(feedback_data, dict) and "text_selected" in feedback_data and "comment" in feedback_data:
+            text_selected = feedback_data["text_selected"]
+            comment = feedback_data["comment"]
+            
+            emit_agent_log(state["story_uuid"], f"Tác giả yêu cầu sửa đổi yêu cầu tại đoạn: \"{text_selected}\" -> Chú thích: \"{comment}\"")
+            console.print(f"Đang hiệu chỉnh yêu cầu chương tại đoạn bôi đen...")
+            
+            refine_prompt = f"""
+Bạn là một chuyên gia kịch bản xuất sắc. Nhiệm vụ của bạn là chỉnh sửa bản yêu cầu viết chương chi tiết dưới đây dựa trên ý kiến đóng góp của tác giả về một đoạn văn cụ thể.
+
+BẢN YÊU CẦU HIỆN TẠI:
+---
+{current_requirements}
+---
+
+ĐOẠN VĂN ĐƯỢC CHỌN ĐỂ CHỈNH SỬA:
+"{text_selected}"
+
+Ý KIẾN ĐÓNG GÓP/BÌNH LUẬN CỦA TÁC GIẢ:
+"{comment}"
+
+Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm bảo:
+1. Chỉ sửa đổi/cập nhật thông tin xung quanh đoạn văn được chọn để đáp ứng đúng ý kiến đóng góp của tác giả.
+2. Giữ nguyên cấu trúc, phong cách và các thông tin khác của bản yêu cầu.
+3. Trả về trực tiếp bản yêu cầu chi tiết mới bằng tiếng Việt, không kèm theo bất kỳ lời bình luận, giải thích hay markdown code block nào khác.
+"""
+            refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
+            current_requirements = ensure_string(refine_response.content).strip()
+            emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
+        else:
+            comment_str = str(feedback_data)
+            emit_agent_log(state["story_uuid"], f"Tác giả gửi ý kiến đóng góp chung cho yêu cầu: \"{comment_str}\"")
+            console.print(f"Đang sửa đổi yêu cầu chương theo ý kiến đóng góp chung...")
+            
+            refine_prompt = f"""
+Bạn là một chuyên gia kịch bản xuất sắc. Nhiệm vụ của bạn là chỉnh sửa bản yêu cầu viết chương chi tiết dưới đây dựa trên ý kiến đóng góp chung của tác giả.
+
+BẢN YÊU CẦU HIỆN TẠI:
+---
+{current_requirements}
+---
+
+Ý KIẾN ĐÓNG GÓP CỦA TÁC GIẢ:
+"{comment_str}"
+
+Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm bảo:
+1. Chỉnh sửa bản yêu cầu để đáp ứng đúng ý kiến đóng góp của tác giả.
+2. Giữ nguyên cấu trúc, phong cách và các thông tin khác của bản yêu cầu.
+3. Trả về trực tiếp bản yêu cầu chi tiết mới bằng tiếng Việt, không kèm theo bất kỳ lời bình luận, giải thích hay markdown code block nào khác.
+"""
+            refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
+            current_requirements = ensure_string(refine_response.content).strip()
+            emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
+
+    console.print(Panel(current_requirements, title=f"Yêu cầu Chương {chapter_num} đã được duyệt cuối cùng", border_style="green"))
     emit_agent_log(state["story_uuid"], f"Yêu cầu sáng tác Chương {chapter_num} đã được duyệt.")
     
     # Phân rã yêu cầu thành kịch bản phân cảnh (scenes_to_write)
@@ -333,7 +441,7 @@ BỐI CẢNH TRUYỆN (SỔ TAY TÁC GIẢ):
 {format_user_idea(current_idea, state["story_uuid"])}
 
 YÊU CẦU CHI TIẾT ĐÃ ĐƯỢC PHÂN TÍCH:
-{result.analyzed_requirements}
+{current_requirements}
 
 YÊU CẦU PHÂN RÃ:
 1. Chia chương truyện thành các phân cảnh nhỏ hơn (thường từ 3 đến 5 phân cảnh tùy độ dài chương).
@@ -396,6 +504,7 @@ def scene_drafter_node(state: AgentState) -> Dict[str, Any]:
     story_uuid = state["story_uuid"]
     chapter_num = state["chapter_num"]
     meta = state["meta"]
+    ledger = state["ledger"]
     
     console.print(f"\n[bold blue]=== [Node 3] Scene Drafter: Phân cảnh {current_idx + 1}/{len(scenes)} ===[/bold blue]")
     emit_agent_log(story_uuid, f"=== [Bước 3] Sáng tác Phân cảnh {current_idx + 1}/{len(scenes)}: {scene.get('title')} ===")
@@ -409,6 +518,34 @@ def scene_drafter_node(state: AgentState) -> Dict[str, Any]:
             "status": "drafting",
             "message": f"Đang sáng tác phân cảnh {current_idx + 1}/{len(scenes)}: {scene.get('title')}..."
         })
+        
+    # Chuẩn bị Ràng buộc thực thể khắt khe (Strict Entity Constraints)
+    selected_characters = [c.strip().lower() for c in scene.get('characters', [])]
+    selected_locations = [l.strip().lower() for l in scene.get('locations', [])]
+    selected_weapons = [w.strip().lower() for w in scene.get('weapons', [])]
+    selected_techniques = [t.strip().lower() for t in scene.get('techniques', [])]
+    
+    # Tìm nhân vật không được chọn
+    all_existing_characters = [c.get("name", "") for c in meta.get("characters", [])]
+    unselected_characters = [c for c in all_existing_characters if c.strip().lower() not in selected_characters]
+    
+    # Tìm địa điểm không được chọn
+    all_existing_locations = [l.get("name", "") if isinstance(l, dict) else l for l in ledger.get("locations", [])]
+    unselected_locations = [l for l in all_existing_locations if l.strip().lower() not in selected_locations]
+    
+    # Tìm vũ khí không được chọn
+    all_existing_weapons = [w.get("name", "") if isinstance(w, dict) else w for w in ledger.get("weapons", [])]
+    unselected_weapons = [w for w in all_existing_weapons if w.strip().lower() not in selected_weapons]
+    
+    # Tìm công pháp không được chọn
+    all_existing_techniques = [t.get("name", "") if isinstance(t, dict) else t for t in ledger.get("techniques", [])]
+    unselected_techniques = [t for t in all_existing_techniques if t.strip().lower() not in selected_techniques]
+    
+    unselected_entities_text = f"""DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN TRONG PHÂN CẢNH NÀY (Bao gồm nhắc tên, hành động hoặc gián tiếp xuất hiện):
+- Nhân vật cấm xuất hiện: {', '.join(unselected_characters) if unselected_characters else 'Không có'}
+- Địa điểm cấm xuất hiện: {', '.join(unselected_locations) if unselected_locations else 'Không có'}
+- Binh khí/Pháp khí cấm xuất hiện: {', '.join(unselected_weapons) if unselected_weapons else 'Không có'}
+- Công pháp cấm xuất hiện: {', '.join(unselected_techniques) if unselected_techniques else 'Không có'}"""
         
     # Chuẩn bị Rolling Memory (văn bản chi tiết của phân cảnh liền trước)
     rolling_memory = ""
@@ -469,6 +606,12 @@ THÔNG TIN PHÂN CẢNH HIỆN TẠI CẦN VIẾT (Phân cảnh {current_idx + 1
 - Văn phong yêu cầu (Tone): {scene.get('tone', 'bình thường')}
 {scene_links_str}
 {rolling_memory}
+
+{unselected_entities_text}
+
+LUẬT RÀNG BUỘC THỰC THỂ CỰC KỲ KHẮT KHE (ENTITY CONSTRAINTS):
+1. Chỉ có những nhân vật, địa điểm, binh khí/pháp khí, công pháp được chọn cụ thể trong phần "THÔNG TIN PHÂN CẢNH HIỆN TẠI CẦN VIẾT" ở trên (hoặc các nhân vật, địa điểm, pháp khí, công pháp HOÀN TOÀN MỚI phát sinh trong phân cảnh này) mới được phép xuất hiện.
+2. TUYỆT ĐỐI KHÔNG để bất kỳ thực thể nào nằm trong "DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN" ở trên xuất hiện hay được nhắc tên dưới mọi hình thức (kể cả nhắc trong suy nghĩ, lời đối thoại gián tiếp hay so sánh). Đây là yêu cầu bắt buộc và tối quan trọng.
 
 YÊU CẦU HÀNH VĂN (Kỹ thuật Pacing Control & Show, Don't Tell):
 1. TUYỆT ĐỐI KHÔNG viết tóm tắt hành động nhảy cóc (Ví dụ: KHÔNG viết "Sau một hồi chiến đấu, hắn đã thắng"). Bạn phải tả từng đường kiếm, từng nhịp thở, cảm giác đau đớn, mệt mỏi, áp lực không gian xung quanh.
@@ -587,6 +730,16 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     reqs = state.get("analyzed_requirements", "")
     original_user_idea = state.get("original_user_idea")
     
+    # Phân tích feedback xem có phải dạng JSON của selection hay không
+    feedback_data = None
+    if isinstance(feedback, str):
+        try:
+            feedback_data = json.loads(feedback)
+        except Exception:
+            feedback_data = feedback
+    else:
+        feedback_data = feedback
+        
     # Kết hợp các cảnh báo của Auditor nếu có lỗi mà người dùng chưa sửa
     warnings_context = ""
     warnings = state.get("warnings", [])
@@ -597,8 +750,46 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
             warnings_context += f"- Lỗi: {w.get('warning')} (Liên quan đến Chương {w.get('conflicting_chapter') or 'Bối cảnh'})\n"
         if auditor_fb:
             warnings_context += f"Nhận xét chi tiết từ Auditor: {auditor_fb}\n"
-            
-    prompt = f"""
+
+    # Nếu feedback là dict chứa "text_selected" và "comment"
+    if isinstance(feedback_data, dict) and "text_selected" in feedback_data and "comment" in feedback_data:
+        text_selected = feedback_data["text_selected"]
+        comment = feedback_data["comment"]
+        
+        emit_agent_log(state["story_uuid"], f"Sửa đổi cục bộ tại đoạn bôi đen: \"{text_selected}\" -> Chú thích: \"{comment}\"")
+        console.print(f"Đang sửa đổi cục bộ bản nháp theo yêu cầu bôi đen...")
+        
+        prompt = f"""
+Bạn là một biên tập viên văn học xuất sắc. Nhiệm vụ của bạn là chỉnh sửa một đoạn văn cụ thể trong bản nháp chương truyện dưới đây theo yêu cầu của tác giả, giữ nguyên toàn bộ các phần khác của bản nháp.
+
+SỔ TAY TÁC GIẢ (STORY BIBLE):
+{state.get("story_bible")}
+
+BẢN NHÁP CHƯƠNG HIỆN TẠI:
+---
+{draft_content}
+---
+
+ĐOẠN VĂN ĐƯỢC TÁC GIẢ BÔI ĐEN ĐỂ SỬA ĐỔI:
+"{text_selected}"
+
+YÊU CẦU CHỈNH SỬA CHO ĐOẠN VĂN TRÊN:
+"{comment}"
+{warnings_context}
+
+Hãy chỉnh sửa lại chương truyện. Đảm bảo:
+1. Chỉ thay thế/chỉnh sửa nội dung của đoạn văn được bôi đen ở trên để đáp ứng đúng yêu cầu của tác giả và sửa lỗi logic nếu có.
+2. Mạch truyện trước và sau đoạn văn đó phải kết nối tự nhiên, mượt mà, đúng văn phong {meta.get('style')}.
+3. Tuyệt đối GIỮ NGUYÊN toàn bộ nội dung của các đoạn văn khác trong bản nháp chương hiện tại. Không tự ý viết thêm hay bớt các tình tiết khác không liên quan.
+4. Trả về trực tiếp toàn bộ nội dung chương truyện đã chỉnh sửa bằng định dạng Markdown (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`), không kèm theo bất kỳ lời bình luận hay giải thích nào của AI.
+"""
+    else:
+        comment_str = feedback_data.get("comment", str(feedback_data)) if isinstance(feedback_data, dict) else str(feedback_data)
+        
+        emit_agent_log(state["story_uuid"], f"Sửa đổi toàn bộ bản thảo theo đóng góp: \"{comment_str}\"")
+        console.print(f"Đang tiến hành chỉnh sửa toàn bộ bản thảo...")
+        
+        prompt = f"""
 Bạn là một biên tập viên xuất sắc. Nhiệm vụ của bạn là dựa vào bản nháp hiện tại của Chương {chapter_num}, yêu cầu chỉnh sửa của tác giả và cảnh báo lỗi logic từ Auditor (nếu có) để viết lại bản nháp sao cho đáp ứng đúng yêu cầu đó và nhất quán cốt truyện.
 
 SỔ TAY TÁC GIẢ (STORY BIBLE):
@@ -611,7 +802,7 @@ YÊU CẦU CHI TIẾT ĐÃ PHÂN TÍCH:
 {reqs}
 
 YÊU CẦU CHỈNH SỬA CỦA TÁC GIẢ:
-"{feedback}"
+"{comment_str}"
 {warnings_context}
 
 BẢN NHÁP HIỆN TẠI CỦA CHƯƠNG:
@@ -625,9 +816,10 @@ Hãy viết lại bản thảo chương truyện. Đảm bảo:
 3. Giữ nguyên cấu trúc truyện dài kỳ: không thêm tóm tắt đầu chương, không thêm tổng kết cuối chương. Giữ nguyên kết thúc mở hoặc kết thúc lửng lơ ở cuối chương.
 4. Trả về trực tiếp nội dung chương mới bằng định dạng Markdown (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`), không kèm theo lời bình luận hay giải thích.
 """
+    
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
-    emit_agent_log(state["story_uuid"], "Đã sửa đổi xong bản nháp.")
+    emit_agent_log(state["story_uuid"], "✓ Đã sửa đổi xong bản nháp.")
     
     return {
         "draft_content": revised_content,
@@ -659,6 +851,7 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
     draft_content = state["draft_content"]
     ledger = state["ledger"]
     chapter_num = state["chapter_num"]
+    original_user_idea = state.get("original_user_idea")
     
     # Read previous chapter state if exists
     prev_state_str = "Chưa có chương trước (Đây là chương 1)."

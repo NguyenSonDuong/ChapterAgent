@@ -239,8 +239,39 @@ export default function ChapterGenerator({
   const [model, setModel] = useState(defaultModel || 'gemini-2.5-flash');
   const [generating, setGenerating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [status, setStatus] = useState('idle'); // idle, running, etc.
   const [messages, setMessages] = useState([]);
+
+  // --- Annotation Selection States ---
+  const [selectionPopup, setSelectionPopup] = useState({
+    show: false,
+    x: 0,
+    y: 0,
+    text: '',
+    comment: '',
+    target: '' // 'requirement' or 'draft'
+  });
+  const [draftModalOpen, setDraftModalOpen] = useState(true);
+  const [currentDraftContent, setCurrentDraftContent] = useState('');
+  const [draftGeneralComment, setDraftGeneralComment] = useState('');
+
+  const handleTextSelection = (e, target) => {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (selectedText) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      setSelectionPopup({
+        show: true,
+        x: rect.left,
+        y: rect.bottom + 8,
+        text: selectedText,
+        comment: '',
+        target: target
+      });
+    }
+  };
 
   // --- Canvas Node Graph States ---
   const [nodes, setNodes] = useState([]);
@@ -388,9 +419,23 @@ export default function ChapterGenerator({
       }]);
     };
 
+    const onRequirementReviewNeeded = (data) => {
+      if (data.story_uuid !== storyUuid) return;
+      setStatus('waiting_requirement_review');
+      setMessages((prev) => [...prev, {
+        id: `req-review-${Date.now()}-${Math.random()}`,
+        sender: 'agent',
+        type: 'requirement_review',
+        analyzedRequirements: data.analyzed_requirements,
+        time: new Date().toLocaleTimeString()
+      }]);
+    };
+
     const onDraftReviewNeeded = (data) => {
       if (data.story_uuid !== storyUuid) return;
       setStatus('waiting_review');
+      setCurrentDraftContent(data.draft_content);
+      setDraftModalOpen(true);
       setMessages((prev) => [...prev, {
         id: `review-${Date.now()}-${Math.random()}`,
         sender: 'agent',
@@ -441,6 +486,7 @@ export default function ChapterGenerator({
     socket.on('agent_status', onAgentStatus);
     socket.on('agent_log', onAgentLog);
     socket.on('clarify_requirements', onClarifyRequirements);
+    socket.on('requirement_review_needed', onRequirementReviewNeeded);
     socket.on('draft_review_needed', onDraftReviewNeeded);
     socket.on('audit_warnings', onAuditWarnings);
     socket.on('conflict_review_needed', onConflictReviewNeeded);
@@ -450,6 +496,7 @@ export default function ChapterGenerator({
       socket.off('agent_status', onAgentStatus);
       socket.off('agent_log', onAgentLog);
       socket.off('clarify_requirements', onClarifyRequirements);
+      socket.off('requirement_review_needed', onRequirementReviewNeeded);
       socket.off('draft_review_needed', onDraftReviewNeeded);
       socket.off('audit_warnings', onAuditWarnings);
       socket.off('conflict_review_needed', onConflictReviewNeeded);
@@ -929,14 +976,44 @@ export default function ChapterGenerator({
     setStatus('running');
   };
 
-  const handleSendReview = (feedbackText) => {
+  const handleSendRequirementFeedback = (feedbackVal) => {
+    if (!socket) return;
+    
+    let displayMsg = '';
+    if (typeof feedbackVal === 'string' && feedbackVal.toLowerCase() === 'done') {
+      displayMsg = 'Đã phê duyệt bản yêu cầu chương (Done)!';
+    } else {
+      displayMsg = `Yêu cầu hiệu chỉnh yêu cầu chương tại đoạn bôi đen: "${feedbackVal.comment}"`;
+    }
+    
+    setMessages((prev) => [...prev, {
+      id: `user-req-feedback-${Date.now()}`,
+      sender: 'user',
+      type: 'text',
+      text: displayMsg,
+      time: new Date().toLocaleTimeString()
+    }]);
+    
+    socket.emit('submit_requirement_feedback', {
+      story_uuid: storyUuid,
+      feedback: typeof feedbackVal === 'string' ? feedbackVal : JSON.stringify(feedbackVal)
+    });
+    
+    setStatus('running');
+  };
+
+  const handleSendDraftFeedback = (feedbackVal) => {
     if (!socket) return;
 
-    let displayMsg = feedbackText;
-    if (feedbackText.toLowerCase() === 'done') {
-      displayMsg = 'Duyệt bản viết thông qua (Done)!';
+    let displayMsg = '';
+    if (typeof feedbackVal === 'string') {
+      if (feedbackVal.toLowerCase() === 'done') {
+        displayMsg = 'Duyệt bản viết thông qua (Done)!';
+      } else {
+        displayMsg = `Yêu cầu chỉnh sửa nháp chung: "${feedbackVal}"`;
+      }
     } else {
-      displayMsg = `Yêu cầu chỉnh sửa nháp: "${feedbackText}"`;
+      displayMsg = `Sửa cục bộ nháp tại đoạn bôi đen: "${feedbackVal.comment}"`;
     }
 
     setMessages((prev) => [...prev, {
@@ -949,7 +1026,7 @@ export default function ChapterGenerator({
 
     socket.emit('submit_review_feedback', {
       story_uuid: storyUuid,
-      feedback: feedbackText
+      feedback: typeof feedbackVal === 'string' ? feedbackVal : JSON.stringify(feedbackVal)
     });
 
     setStatus('running');
@@ -1040,6 +1117,7 @@ export default function ChapterGenerator({
   const renderMessage = (msg, index) => {
     const isLastOfItsType = (() => {
       if (msg.type === 'agent_question') return status === 'waiting_clarification' && index === messages.length - 1;
+      if (msg.type === 'requirement_review') return status === 'waiting_requirement_review' && index === messages.length - 1;
       if (msg.type === 'agent_review') return status === 'waiting_review' && index === messages.length - 1;
       if (msg.type === 'agent_conflict_review') return status === 'waiting_conflict_review' && index === messages.length - 1;
       if (msg.type === 'model_error') return status === 'waiting_model_change' && index === messages.length - 1;
@@ -1094,6 +1172,39 @@ export default function ChapterGenerator({
                 )}
               </div>
             )}
+
+            {msg.type === 'requirement_review' && (
+              <div className="widget-review" style={{ borderColor: 'var(--color-cyan)' }}>
+                <div className="widget-header text-cyan">
+                  <CheckCircle2 className="icon-xs" />
+                  <span>Yêu cầu Chương {storyLedger?.timeline?.length + 1 || 1} đã được duyệt (Đang chờ hiệu chỉnh)</span>
+                </div>
+                <p className="instruction-text text-muted" style={{ fontSize: '11px', marginBottom: '8px' }}>
+                  💡 <strong>Hướng dẫn:</strong> Bạn có thể bôi đen bất kỳ đoạn văn bản nào bên dưới để nhập bình luận chú thích sửa đổi cục bộ, hoặc nhấn "Hoàn thành" ở dưới để bắt đầu viết truyện.
+                </p>
+                <div 
+                  className="draft-preview-container" 
+                  onMouseUp={(e) => isLastOfItsType && handleTextSelection(e, 'requirement')}
+                  style={{ userSelect: isLastOfItsType ? 'text' : 'none' }}
+                >
+                  <div className="draft-content-scroll" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '13px', color: '#e2e8f0' }}>
+                    {msg.analyzedRequirements}
+                  </div>
+                </div>
+                {isLastOfItsType ? (
+                  <div className="widget-reply-area" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                    <button 
+                      onClick={() => handleSendRequirementFeedback('Done')} 
+                      className="btn-primary-sm btn-green"
+                    >
+                      <CheckCircle2 className="icon-xs" /> Hoàn thành duyệt yêu cầu (Done)
+                    </button>
+                  </div>
+                ) : (
+                  <p className="widget-historical-note">✓ Đã phê duyệt yêu cầu chương này.</p>
+                )}
+              </div>
+            )}
             
             {msg.type === 'agent_review' && (
               <div className="widget-review">
@@ -1108,11 +1219,28 @@ export default function ChapterGenerator({
                     ))}
                   </div>
                 </div>
-                {isLastOfItsType ? (
-                  <ReviewReplyForm onSubmit={handleSendReview} />
-                ) : (
-                  <p className="widget-historical-note">✓ Đã phê duyệt bản nháp này.</p>
-                )}
+                <div className="widget-reply-area" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
+                  <button 
+                    onClick={() => {
+                      setCurrentDraftContent(msg.draftContent);
+                      setDraftModalOpen(true);
+                    }} 
+                    className="btn-primary-sm btn-cyan"
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <Eye className="icon-xs" /> Mở popup duyệt & chú thích bôi đen
+                  </button>
+                  {isLastOfItsType ? (
+                    <button 
+                      onClick={() => handleSendDraftFeedback('Done')} 
+                      className="btn-primary-sm btn-green"
+                    >
+                      <CheckCircle2 className="icon-xs" /> Duyệt nhanh (Done)
+                    </button>
+                  ) : (
+                    <p className="widget-historical-note">✓ Đã phê duyệt bản nháp này.</p>
+                  )}
+                </div>
               </div>
             )}
             
@@ -2357,6 +2485,171 @@ export default function ChapterGenerator({
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Selection Tooltip Popup */}
+      {selectionPopup.show && (
+        <div 
+          className="selection-tooltip-popup glass fade-in"
+          style={{
+            position: 'fixed',
+            left: `${Math.min(window.innerWidth - 300, Math.max(10, selectionPopup.x))}px`,
+            top: `${Math.min(window.innerHeight - 200, Math.max(10, selectionPopup.y))}px`,
+            zIndex: 9999,
+            width: '280px',
+            padding: '12px',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid var(--color-cyan)',
+            borderRadius: '8px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(6, 182, 212, 0.3)'
+          }}
+        >
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <strong>Đã chọn:</strong> "{selectionPopup.text}"
+          </div>
+          <textarea
+            className="form-textarea-sm"
+            rows={2}
+            placeholder="Nhập ý kiến chỉnh sửa đoạn bôi đen..."
+            value={selectionPopup.comment}
+            onChange={e => setSelectionPopup({ ...selectionPopup, comment: e.target.value })}
+            style={{ width: '100%', marginBottom: '8px', fontSize: '12px', background: '#0a0f1d', border: '1px solid var(--border-glass)', color: '#fff' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <button 
+              onClick={() => setSelectionPopup({ ...selectionPopup, show: false })}
+              className="btn-secondary-sm"
+              style={{ fontSize: '11px', padding: '4px 8px' }}
+            >
+              Hủy
+            </button>
+            <button 
+              onClick={() => {
+                if (selectionPopup.target === 'requirement') {
+                  handleSendRequirementFeedback({
+                    text_selected: selectionPopup.text,
+                    comment: selectionPopup.comment
+                  });
+                } else if (selectionPopup.target === 'draft') {
+                  handleSendDraftFeedback({
+                    text_selected: selectionPopup.text,
+                    comment: selectionPopup.comment
+                  });
+                }
+                setSelectionPopup({ ...selectionPopup, show: false });
+              }}
+              disabled={!selectionPopup.comment.trim()}
+              className="btn-primary-sm btn-cyan"
+              style={{ fontSize: '11px', padding: '4px 8px' }}
+            >
+              Gửi
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Large Draft Review Modal */}
+      {status === 'waiting_review' && draftModalOpen && (
+        <div className="modal-overlay draft-review-modal-overlay" style={{ zIndex: 999 }}>
+          <div className="modal-card glass" style={{ maxWidth: '950px', width: '95%', height: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-header">
+              <div className="modal-title-container">
+                <Eye className="icon-sm text-cyan animate-pulse" />
+                <h3>Duyệt bản nháp chương truyện</h3>
+              </div>
+              <button 
+                onClick={() => setDraftModalOpen(false)} 
+                className="btn-close" 
+                type="button"
+                title="Đóng tạm thời (vẫn giữ trạng thái chờ duyệt)"
+              >
+                <X className="icon-sm" />
+              </button>
+            </div>
+            
+            <div className="modal-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px', gap: '12px' }}>
+              <p className="instruction-text text-muted" style={{ fontSize: '12px', margin: 0 }}>
+                💡 <strong>Hướng dẫn:</strong> Bạn có thể bôi đen bất kỳ đoạn văn nào trong văn bản dưới đây để nhập bình luận sửa đổi cục bộ tại vùng bôi đen đó, hoặc nhập bình luận chung cho toàn bộ ở cuối popup.
+              </p>
+              
+              {/* Draft text content with selection capability */}
+              <div 
+                className="draft-text-editor-container"
+                onMouseUp={(e) => handleTextSelection(e, 'draft')}
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  background: '#070a13',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  lineHeight: '1.8',
+                  fontSize: '14px',
+                  color: '#e2e8f0',
+                  userSelect: 'text'
+                }}
+              >
+                <div style={{ whiteSpace: 'pre-wrap' }}>
+                  {currentDraftContent}
+                </div>
+              </div>
+              
+              {/* General Comments area */}
+              <div className="draft-modal-comments-area" style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-glass)', paddingTop: '12px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Bình luận chung cho toàn bộ bản nháp:</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <textarea
+                    className="form-textarea-sm flex-1"
+                    rows={2}
+                    value={draftGeneralComment}
+                    onChange={e => setDraftGeneralComment(e.target.value)}
+                    placeholder="Nhập ý kiến đóng góp chung để AI sửa lại toàn bộ bản nháp..."
+                    style={{ background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', fontSize: '13px' }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (draftGeneralComment.trim()) {
+                        handleSendDraftFeedback(draftGeneralComment.trim());
+                        setDraftGeneralComment('');
+                        setDraftModalOpen(false);
+                      }
+                    }}
+                    disabled={!draftGeneralComment.trim()}
+                    className="btn-secondary btn-re-edit"
+                    style={{ padding: '0 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    Yêu cầu sửa lại
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border-glass)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span className="text-muted" style={{ fontSize: '11px' }}>
+                * Sau khi hoàn tất sửa đổi, hãy nhấn "Duyệt bản viết" để hoàn tất chương truyện.
+              </span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  onClick={() => setDraftModalOpen(false)} 
+                  className="btn-secondary"
+                  style={{ padding: '6px 16px', fontSize: '13px' }}
+                >
+                  Xem Chat
+                </button>
+                <button 
+                  onClick={() => {
+                    handleSendDraftFeedback('Done');
+                    setDraftModalOpen(false);
+                  }} 
+                  className="btn-primary btn-green"
+                  style={{ padding: '6px 20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <CheckCircle2 className="icon-xs" /> Duyệt bản viết (Done)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
