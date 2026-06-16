@@ -239,6 +239,7 @@ export default function ChapterGenerator({
   const [model, setModel] = useState(defaultModel || 'gemini-2.5-flash');
   const [generating, setGenerating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle, running, etc.
   const [messages, setMessages] = useState([]);
 
   // --- Annotation Selection States ---

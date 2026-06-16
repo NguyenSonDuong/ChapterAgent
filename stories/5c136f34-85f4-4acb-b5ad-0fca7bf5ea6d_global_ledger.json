@@ -1655,13 +1655,166 @@
           "to": "node-1781075406262"
         }
       ]
+    },
+    {
+      "chapter": 12,
+      "title": "Vết Chân Trong Màn Sương",
+      "summary": "Sở Mặc và Mộc Tuyết rời khỏi Táng Cốt Lâm với sự đồng điệu linh hồn mới đạt được, cùng sự hỗ trợ của linh thú Tiểu Bạch. Trong hành trình, họ chia sẻ về quá khứ đau thương của Mộc Tuyết và củng cố quyết tâm trả thù. Tuy nhiên, họ bị một yêu thú cấp cao truy đuổi và chặn đường khi gần đến Vọng Nguyệt Thành. Chương kết thúc với cảnh Sở Mặc vận dụng Bá Huyết Cuồng Đao Quyết, chủ động lao vào giao chiến với yêu thú để bảo vệ Mộc Tuyết.",
+      "nodes": [
+        {
+          "id": "node-1781623179589",
+          "title": "Khởi hành cùng Tiểu Bạch",
+          "description": "Sở Mặc và Mộc Tuyết chính thức rời khỏi bìa rừng Táng Cốt Lâm. Tiểu Bạch tỏ ra vô cùng thông minh khi liên tục dẫn đường, giúp họ tránh được những bãi lầy độc hại và các dấu vết yêu thú. Mộc Tuyết vừa đi vừa ôn lại tàn quyển, còn Sở Mặc cảnh giác quan sát xung quanh, cảm giác về luồng sức mạnh mới trong kinh mạch khiến bước chân họ trở nên nhẹ nhàng hơn hẳn.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết",
+            "Tiểu Bạch"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [
+            {
+              "chapter": 11,
+              "nodes": [
+                "node-1781075406262"
+              ]
+            }
+          ],
+          "locations": [
+            "Rìa rừng Táng Cốt Lâm"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "tone": "bình thường",
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781623179590",
+          "title": "Trận cười giữa hoang dã",
+          "description": "Trên đường đi, họ gặp một con dã thỏ to lớn khác thường. Sở Mặc định lao vào bắt nhưng bị trượt chân ngã sấp mặt vào bụi gai, khiến Mộc Tuyết cười nghiêng ngả. Sự hài hước của khoảnh khắc này giúp họ tạm quên đi thực tại khốc liệt. Tiểu Bạch nhân cơ hội đó lao lên vồ lấy con thỏ một cách điêu luyện, khiến Sở Mặc vừa xấu hổ vừa kinh ngạc trước khả năng của con cáo nhỏ.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết",
+            "Tiểu Bạch"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Đồng bằng hoang vu"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781623179591",
+          "title": "Đêm lạnh và những lời tâm tình",
+          "description": "Đêm thứ hai, họ trú ngụ trong một hang đá nhỏ ven đường. Mộc Tuyết khẽ run lên vì cái lạnh của đêm Cửu Châu, Sở Mặc không ngần ngại ôm nàng vào lòng để sưởi ấm. Trong ánh lửa bập bùng, họ chia sẻ những nỗi đau quá khứ và niềm tin vào tương lai. Những lời tâm sự bi thương về gia đình bị tàn sát khiến không khí chùng xuống, nhưng hơi ấm từ cái nắm tay của Sở Mặc đã hóa giải nỗi đau đó, biến nó thành động lực để họ cùng tiến về phía trước.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết",
+            "Tiểu Bạch"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Mộc Tuyết tâm sự về nỗi đau mất gia đình, Sở Mặc hứa sẽ cùng nàng tìm ra kẻ thủ ác và trả thù.",
+            "thread": "Sự tồn tại của thế lực yêu ma đã tàn sát ngôi làng của Mộc Tuyết."
+          },
+          "links": [],
+          "locations": [
+            "Hang đá ven đường"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "bi thương",
+          "x": 750,
+          "y": 200
+        },
+        {
+          "id": "node-1781623179592",
+          "title": "Dấu chân đen tối",
+          "description": "Sáng hôm sau, Tiểu Bạch bỗng nhiên gầm gừ dữ dội, lông dựng đứng nhìn về phía sau. Sở Mặc kiểm tra mặt đất và phát hiện những dấu chân yêu thú lớn đang bám sát theo hướng họ di chuyển. Sự kịch tính dâng cao khi họ nhận ra bầy yêu ma từ Táng Cốt Lâm vẫn chưa hề buông tha. Họ buộc phải tăng tốc độ di chuyển, không khí trở nên căng thẳng nghẹt thở.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết",
+            "Tiểu Bạch"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Sở Mặc nhận ra bị truy đuổi và quyết định tìm địa hình hiểm trở để cắt đuôi kẻ địch.",
+            "thread": "Mối đe dọa từ yêu ma trong Táng Cốt Lâm vẫn đang bám đuổi phía sau."
+          },
+          "links": [],
+          "locations": [
+            "Con đường dẫn về Vọng Nguyệt Thành"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [],
+          "tone": "kịch tính",
+          "x": 1050,
+          "y": 260
+        },
+        {
+          "id": "node-1781623179593",
+          "title": "Bóng đen che phủ thành trì",
+          "description": "Khi họ nhìn thấy bóng dáng Vọng Nguyệt Thành thấp thoáng ở phía xa, một luồng yêu khí cực mạnh bất ngờ ập đến từ phía sau, chặn đứng đường đi của họ. Một con yêu thú cấp cao xuất hiện, gầm thét như muốn xé nát hy vọng của hai người. Sở Mặc siết chặt thanh đao, nhìn Mộc Tuyết, cả hai hiểu rằng đây là cuộc chiến sinh tử cuối cùng trước khi chạm tới tự do.",
+          "characters": [
+            "Sở Mặc",
+            "Mộc Tuyết",
+            "Tiểu Bạch"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Cổng xa Vọng Nguyệt Thành"
+          ],
+          "weapons": [
+            "Thanh đao cùn"
+          ],
+          "techniques": [
+            "Bá Huyết Cuồng Đao Quyết"
+          ],
+          "tone": "kịch tính",
+          "x": 1350,
+          "y": 200
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781623179589",
+          "to": "node-1781623179590"
+        },
+        {
+          "from": "node-1781623179590",
+          "to": "node-1781623179591"
+        },
+        {
+          "from": "node-1781623179591",
+          "to": "node-1781623179592"
+        },
+        {
+          "from": "node-1781623179592",
+          "to": "node-1781623179593"
+        }
+      ]
     }
   ],
   "unresolved_threads": [
-    {
-      "thread": "Sự tồn tại của thế lực yêu ma đã tàn sát ngôi làng của Mộc Tuyết.",
-      "chapter": 2
-    },
     {
       "thread": "Tại sao lão giả lại muốn tìm đường đến Huyền Thiên Tông?",
       "chapter": 4
@@ -1707,12 +1860,20 @@
       "chapter": 11
     },
     {
-      "thread": "Mối đe dọa từ yêu ma trong Táng Cốt Lâm vẫn đang bám đuổi phía sau.",
+      "thread": "Bí ẩn về sức mạnh mới trong kinh mạch của Sở Mặc và Mộc Tuyết cần được khám phá thêm.",
       "chapter": 11
     },
     {
-      "thread": "Bí ẩn về sức mạnh mới trong kinh mạch của Sở Mặc và Mộc Tuyết cần được khám phá thêm.",
-      "chapter": 11
+      "thread": "Danh tính và mục đích thực sự của con yêu thú cấp cao đang chặn đường họ là gì?",
+      "chapter": 12
+    },
+    {
+      "thread": "Liệu Sở Mặc có thể chiến thắng yêu thú cấp cao này với thanh đao cùn và sức mạnh hiện tại?",
+      "chapter": 12
+    },
+    {
+      "thread": "Điều gì đang chờ đợi họ tại Vọng Nguyệt Thành nếu họ vượt qua được cửa ải này?",
+      "chapter": 12
     }
   ],
   "resolved_threads": [
@@ -1805,6 +1966,18 @@
       "chapter_introduced": 5,
       "chapter_resolved": 11,
       "resolution_note": "Cả hai đã sẵn sàng về mặt tinh thần và thể chất để tiến về phía thành trì phàm nhân, bắt đầu hành trình nghịch thiên một cách chủ động hơn."
+    },
+    {
+      "thread": "Sự tồn tại của thế lực yêu ma đã tàn sát ngôi làng của Mộc Tuyết.",
+      "chapter_introduced": 2,
+      "chapter_resolved": 12,
+      "resolution_note": "Mộc Tuyết tâm sự về nỗi đau mất gia đình, Sở Mặc hứa sẽ cùng nàng tìm ra kẻ thủ ác và trả thù."
+    },
+    {
+      "thread": "Mối đe dọa từ yêu ma trong Táng Cốt Lâm vẫn đang bám đuổi phía sau.",
+      "chapter_introduced": 11,
+      "chapter_resolved": 12,
+      "resolution_note": "Sở Mặc nhận ra bị truy đuổi và quyết định tìm địa hình hiểm trở để cắt đuôi kẻ địch."
     }
   ],
   "locations": [
