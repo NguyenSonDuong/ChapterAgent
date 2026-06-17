@@ -668,16 +668,32 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     except Exception as e:
         console.print(f"[bold red]Không thể ghi file nháp tạm: {e}[/bold red]")
         
+    verification_mode = state.get("verification_mode", "")
+    scene_drafts = state.get("scene_drafts", [])
+    scenes = state.get("scenes_to_write", [])
+    warnings = state.get("warnings", [])
+        
     session = session_manager.get_session(state["story_uuid"])
     if session:
         emit_agent_log(state["story_uuid"], "Đang chờ ý kiến phản hồi hoặc phê duyệt bản nháp...")
         session.current_node = "human_review"
         session.status = "waiting_review"
-        emit_event("draft_review_needed", {
+        
+        payload = {
             "story_uuid": state["story_uuid"],
             "chapter_num": state["chapter_num"],
             "draft_content": draft_content
-        })
+        }
+        if verification_mode == "node_by_node":
+            payload.update({
+                "verification_mode": "node_by_node",
+                "scene_drafts": scene_drafts,
+                "scenes": [s.dict() if hasattr(s, "dict") else s for s in scenes],
+                "warnings": warnings
+            })
+            
+        emit_event("draft_review_needed", payload)
+        
         # Block until review feedback is submitted
         session.input_event.clear()
         success = session.input_event.wait(timeout=600.0) # 10 minutes timeout
@@ -694,20 +710,70 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
                 feedback = "Done"
             emit_agent_log(state["story_uuid"], f"Nhận được phản hồi của tác giả: \"{feedback}\"")
     else:
+        # CLI fallback
         console.print("\n[bold cyan]================================================================================[/bold cyan]")
         console.print(f"[bold green][Thông báo][/bold green] Bản nháp Chương {state['chapter_num']} đã được cập nhật thành công.")
         console.print(f"Nội dung hiện tại đã được lưu tạm vào file: [bold yellow]{temp_draft_path.absolute()}[/bold yellow]")
-        console.print("Bạn hãy mở file này bằng Text Editor (VS Code, Notepad...) để đọc và đánh giá.")
-        console.print("[bold cyan]================================================================================[/bold cyan]\n")
         
-        feedback = Prompt.ask(
-            "[bold magenta]Nhập yêu cầu chỉnh sửa của bạn[/bold magenta] (ví dụ: 'Viết đoạn cuối kịch tính hơn', 'Thêm thoại cho nhân vật A'),\n"
-            "hoặc gõ [bold green]'Done'[/bold green] nếu đã ưng ý hoàn toàn"
-        )
-    
+        if verification_mode == "node_by_node":
+            console.print("\n[bold yellow]--- CHẾ ĐỘ XÁC THỰC TỪNG NODE ---[/bold yellow]")
+            for idx, scene in enumerate(scenes):
+                node_id = scene.get("id") if isinstance(scene, dict) else scene.id
+                title = scene.get("title") if isinstance(scene, dict) else scene.title
+                draft = scene_drafts[idx] if idx < len(scene_drafts) else "Chưa được viết."
+                node_warnings = [w for w in warnings if w.get("node_id") == node_id]
+                
+                console.print(f"\n[bold green]Sự kiện {idx + 1}: {title} (ID: {node_id})[/bold green]")
+                console.print(f"--- Nội dung nháp: ---\n{draft}\n---------------------")
+                if node_warnings:
+                    console.print(f"[bold red]⚠️ Cảnh báo lỗi logic:[/bold red]")
+                    for w in node_warnings:
+                        console.print(f"  - {w.get('warning')}")
+            
+            console.print("\n[bold cyan]Lệnh CLI khả dụng trong chế độ Node-by-Node:[/bold cyan]")
+            console.print("- Sửa node cụ thể: Nhập [bold yellow]node_id: ý kiến đóng góp[/bold yellow] (ví dụ: `node-1: Viết chi tiết thêm`)")
+            console.print("- Xác thực lại tất cả node: Nhập [bold yellow]verify[/bold yellow]")
+            console.print("- Xuất bản chương truyện: Nhập [bold green]publish[/bold green] hoặc [bold green]Done[/bold green]")
+            
+            feedback_raw = Prompt.ask("[bold magenta]Nhập lựa chọn của bạn[/bold magenta]").strip()
+            feedback_raw_lower = feedback_raw.lower()
+            if feedback_raw_lower in ['done', 'publish']:
+                feedback = json.dumps({"action": "publish"})
+            elif feedback_raw_lower == 'verify':
+                feedback = json.dumps({"action": "verify_nodes"})
+            elif ":" in feedback_raw:
+                node_id, comment = feedback_raw.split(":", 1)
+                feedback = json.dumps({
+                    "action": "revise_node",
+                    "node_id": node_id.strip(),
+                    "comment": comment.strip()
+                })
+            else:
+                feedback = feedback_raw
+        else:
+            console.print("Bạn hãy mở file này bằng Text Editor (VS Code, Notepad...) để đọc và đánh giá.")
+            console.print("[bold cyan]================================================================================[/bold cyan]\n")
+            
+            feedback = Prompt.ask(
+                "[bold magenta]Nhập yêu cầu chỉnh sửa của bạn[/bold magenta] (ví dụ: 'Viết đoạn cuối kịch tính hơn', 'Thêm thoại cho nhân vật A'),\n"
+                "hoặc gõ [bold green]'Done'[/bold green] nếu đã ưng ý hoàn toàn"
+            )
+            
+    verification_mode_update = verification_mode
+    if isinstance(feedback, str):
+        try:
+            fb_data = json.loads(feedback)
+            if isinstance(fb_data, dict):
+                action = fb_data.get("action")
+                if action == "verify_nodes":
+                    verification_mode_update = "node_by_node"
+        except Exception:
+            pass
+            
     return {
         "revision_feedback": str(feedback).strip(),
-        "draft_content": draft_content
+        "draft_content": draft_content,
+        "verification_mode": verification_mode_update
     }
 
 
@@ -737,6 +803,7 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     chapter_num = state["chapter_num"]
     reqs = state.get("analyzed_requirements", "")
     original_user_idea = state.get("original_user_idea")
+    ledger = state["ledger"]
     
     # Phân tích feedback xem có phải dạng JSON của selection hay không
     feedback_data = None
@@ -748,9 +815,137 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
     else:
         feedback_data = feedback
         
+    verification_mode = state.get("verification_mode")
+    warnings = state.get("warnings", [])
+    
+    if verification_mode == "node_by_node":
+        if isinstance(feedback_data, dict) and feedback_data.get("action") == "revise_node":
+            node_id = feedback_data.get("node_id")
+            comment = feedback_data.get("comment") or feedback_data.get("feedback") or ""
+            
+            scenes = state.get("scenes_to_write", [])
+            scene_drafts = state.get("scene_drafts", [])
+            
+            node_idx = -1
+            for idx, s in enumerate(scenes):
+                s_id = s.get("id") if isinstance(s, dict) else s.id
+                if s_id == node_id:
+                    node_idx = idx
+                    break
+                    
+            if node_idx != -1 and node_idx < len(scene_drafts):
+                scene = scenes[node_idx]
+                node_title = scene.get("title") if isinstance(scene, dict) else scene.title
+                node_desc = scene.get("description") if isinstance(scene, dict) else scene.description
+                node_characters = scene.get("characters", []) if isinstance(scene, dict) else scene.characters
+                node_locations = scene.get("locations", []) if isinstance(scene, dict) else scene.locations
+                node_weapons = scene.get("weapons", []) if isinstance(scene, dict) else scene.weapons
+                node_techniques = scene.get("techniques", []) if isinstance(scene, dict) else scene.techniques
+                node_draft = scene_drafts[node_idx]
+                
+                prev_scenes_context = ""
+                if node_idx > 0:
+                    for p_idx in range(node_idx):
+                        p_scene = scenes[p_idx]
+                        p_scene_id = p_scene.get('id') if isinstance(p_scene, dict) else p_scene.id
+                        p_scene_title = p_scene.get('title') if isinstance(p_scene, dict) else p_scene.title
+                        p_draft = scene_drafts[p_idx]
+                        prev_scenes_context += f"--- Sự kiện [{p_scene_id}]: {p_scene_title} ---\n{p_draft}\n\n"
+                if not prev_scenes_context:
+                    prev_scenes_context = "Đây là sự kiện đầu tiên trong chương."
+                    
+                selected_characters = [c.strip().lower() for c in node_characters]
+                selected_locations = [l.strip().lower() for l in node_locations]
+                selected_weapons = [w.strip().lower() for w in node_weapons]
+                selected_techniques = [t.strip().lower() for t in node_techniques]
+                
+                all_existing_characters = [c.get("name", "") for c in meta.get("characters", [])]
+                unselected_characters = [c for c in all_existing_characters if c.strip().lower() not in selected_characters]
+                
+                all_existing_locations = [l.get("name", "") if isinstance(l, dict) else l for l in ledger.get("locations", [])]
+                unselected_locations = [l for l in all_existing_locations if l.strip().lower() not in selected_locations]
+                
+                all_existing_weapons = [w.get("name", "") if isinstance(w, dict) else w for w in ledger.get("weapons", [])]
+                unselected_weapons = [w for w in all_existing_weapons if w.strip().lower() not in selected_weapons]
+                
+                all_existing_techniques = [t.get("name", "") if isinstance(t, dict) else t for t in ledger.get("techniques", [])]
+                unselected_techniques = [t for t in all_existing_techniques if t.strip().lower() not in selected_techniques]
+                
+                unselected_entities_text = f"""DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN TRONG PHÂN CẢNH NÀY:
+- Nhân vật cấm: {', '.join(unselected_characters) if unselected_characters else 'Không có'}
+- Địa điểm cấm: {', '.join(unselected_locations) if unselected_locations else 'Không có'}
+- Binh khí cấm: {', '.join(unselected_weapons) if unselected_weapons else 'Không có'}
+- Công pháp cấm: {', '.join(unselected_techniques) if unselected_techniques else 'Không có'}"""
+
+                story_bible = state.get("story_bible", "")
+                
+                node_warnings_list = [w.get("warning") for w in warnings if w.get("node_id") == node_id]
+                node_warnings_context = ""
+                if node_warnings_list:
+                    node_warnings_context = "\nCẢNH BÁO LỖI LOGIC ĐƯỢC PHÁT HIỆN TỪ AUDITOR CHO NODE NÀY:\n" + "\n".join([f"- {w}" for w in node_warnings_list])
+                
+                emit_agent_log(state["story_uuid"], f"Chỉnh sửa nội dung cho Sự kiện [{node_id}]: {node_title}")
+                console.print(f"Đang tiến hành sửa đổi Sự kiện [{node_id}] theo yêu cầu...")
+                
+                prompt = f"""
+Bạn là một nhà văn mạng tài ba đang viết tiểu thuyết dài kỳ (serial novel) kiêm biên tập viên văn học xuất sắc. Nhiệm vụ của bạn là sửa đổi bản thảo của một Sự kiện (Node) cụ thể trong Chương {chapter_num} để khắc phục lỗi logic hoặc đáp ứng ý kiến đóng góp của tác giả.
+
+SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
+{story_bible}
+
+YÊU CẦU CHI TIẾT CỦA CHƯƠNG {chapter_num}:
+{reqs}
+
+DIỄN BIẾN CÁC SỰ KIỆN TRƯỚC ĐÓ TRONG CHƯƠNG (Để đảm bảo tính liên tục):
+{prev_scenes_context}
+
+SỰ KIỆN ĐANG SỬA ĐỔI:
+- ID sự kiện: {node_id}
+- Tiêu đề: {node_title}
+- Mô tả diễn biến dự kiến: {node_desc}
+- Nhân vật tham gia: {', '.join(node_characters)}
+- Địa điểm: {', '.join(node_locations)}
+- Binh khí: {', '.join(node_weapons)}
+- Công pháp: {', '.join(node_techniques)}
+
+BẢN THẢO HIỆN TẠI CỦA SỰ KIỆN NÀY:
+---
+{node_draft}
+---
+
+Ý KIẾN ĐÓNG GÓP / HƯỚNG DẪN SỬA ĐỔI CỦA TÁC GIẢ:
+"{comment}"
+{node_warnings_context}
+
+{unselected_entities_text}
+
+LUẬT RÀNG BUỘC THỰC THỂ CỰC KỲ KHẮT KHE (ENTITY CONSTRAINTS):
+1. Chỉ có những nhân vật, địa điểm, binh khí/pháp khí, công pháp được chọn cụ thể trong phần "SỰ KIỆN ĐANG SỬA ĐỔI" ở trên (hoặc các nhân vật, địa điểm, pháp khí, công pháp HOÀN TOÀN MỚI phát sinh trong phân cảnh này) mới được phép xuất hiện.
+2. TUYỆT ĐỐI KHÔNG để bất kỳ thực thể nào nằm trong "DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN" ở trên xuất hiện hay được nhắc tên dưới mọi hình thức (kể cả nhắc trong suy nghĩ, lời đối thoại gián tiếp hay so sánh).
+
+YÊU CẦU HÀNH VĂN:
+1. Sửa đổi bản thảo của sự kiện này để đáp ứng đúng ý kiến đóng góp của tác giả.
+2. Giữ nguyên định dạng, phong cách hành văn và tính liên tục mạch truyện.
+3. Trả về trực tiếp nội dung truyện thực tế đã sửa đổi bằng Markdown, không thêm bất kỳ lời bình luận hay giải thích nào khác của AI.
+"""
+                response = invoke_with_retry(state, prompt, temperature=0.7)
+                revised_node_content = ensure_string(response.content)
+                
+                new_drafts = list(scene_drafts)
+                new_drafts[node_idx] = revised_node_content
+                
+                draft_content = "\n\n".join(new_drafts)
+                emit_agent_log(state["story_uuid"], f"✓ Đã sửa đổi xong nội dung Sự kiện [{node_id}].")
+                
+                return {
+                    "scene_drafts": new_drafts,
+                    "draft_content": draft_content,
+                    "warnings": [],
+                    "auditor_feedback": ""
+                }
+                
     # Kết hợp các cảnh báo của Auditor nếu có lỗi mà người dùng chưa sửa
     warnings_context = ""
-    warnings = state.get("warnings", [])
     auditor_fb = state.get("auditor_feedback", "")
     if warnings:
         warnings_context = f"\nCẢNH BÁO LỖI LOGIC TỪ KIỂM DUYỆT VIÊN (AUDITOR):\n"
@@ -870,8 +1065,104 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
 
     # Xây dựng Sổ tay tác giả dạng văn bản thuần
     story_bible = state.get("story_bible", "")
+    verification_mode = state.get("verification_mode", "")
+    
+    if verification_mode == "node_by_node":
+        scenes = state.get("scenes_to_write", [])
+        scene_drafts = state.get("scene_drafts", [])
+        warnings_dict = []
+        feedbacks = []
+        
+        for idx, scene in enumerate(scenes):
+            node_id = scene.get("id") if isinstance(scene, dict) else scene.id
+            node_title = scene.get("title") if isinstance(scene, dict) else scene.title
+            node_desc = scene.get("description") if isinstance(scene, dict) else scene.description
+            node_characters = scene.get("characters", []) if isinstance(scene, dict) else scene.characters
+            node_locations = scene.get("locations", []) if isinstance(scene, dict) else scene.locations
+            node_weapons = scene.get("weapons", []) if isinstance(scene, dict) else scene.weapons
+            node_techniques = scene.get("techniques", []) if isinstance(scene, dict) else scene.techniques
+            
+            node_draft = scene_drafts[idx] if idx < len(scene_drafts) else ""
+            if not node_draft:
+                continue
+                
+            prev_scenes_context = ""
+            if idx > 0:
+                for p_idx in range(idx):
+                    p_scene = scenes[p_idx]
+                    p_scene_id = p_scene.get('id') if isinstance(p_scene, dict) else p_scene.id
+                    p_scene_title = p_scene.get('title') if isinstance(p_scene, dict) else p_scene.title
+                    p_draft = scene_drafts[p_idx]
+                    prev_scenes_context += f"--- Sự kiện [{p_scene_id}]: {p_scene_title} ---\n{p_draft}\n\n"
+            if not prev_scenes_context:
+                prev_scenes_context = "Đây là sự kiện đầu tiên trong chương."
+                
+            console.print(f"Đang kiểm duyệt Sự kiện {idx + 1}/{len(scenes)}: {node_title}...")
+            emit_agent_log(state["story_uuid"], f"Đang kiểm duyệt Sự kiện {idx + 1}/{len(scenes)}: {node_title}...")
+            
+            prompt = f"""
+Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu nội dung bản thảo của một Sự kiện (Node) cụ thể trong Chương {chapter_num} với thông tin bối cảnh thế giới, nhân vật, sổ cái toàn cục, trạng thái chương trước, và diễn biến của các Sự kiện trước đó để tìm ra các lỗi logic tiềm ẩn.
 
-    prompt = f"""
+SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
+{story_bible}
+
+SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
+{to_ledger_markdown(ledger)}
+
+TRẠNG THÁI CHƯƠNG TRƯỚC:
+{prev_state_str}
+
+DIỄN BIẾN CÁC SỰ KIỆN TRƯỚC ĐÓ TRONG CHƯƠNG:
+{prev_scenes_context}
+
+SỰ KIỆN ĐANG KIỂM DUYỆT:
+- ID sự kiện: {node_id}
+- Tiêu đề: {node_title}
+- Mô tả diễn biến dự kiến: {node_desc}
+- Nhân vật tham gia: {', '.join(node_characters)}
+- Địa điểm: {', '.join(node_locations)}
+- Binh khí: {', '.join(node_weapons)}
+- Công pháp: {', '.join(node_techniques)}
+
+BẢN THẢO HIỆN TẠI CỦA SỰ KIỆN NÀY:
+---
+{node_draft}
+---
+
+Hãy phân tích kỹ Sự kiện này và chỉ ra các lỗi mâu thuẫn logic như:
+1. Có nhân vật, địa điểm, pháp khí, hoặc công pháp nào xuất hiện ngoài những thứ được chỉ định trong phần "SỰ KIỆN ĐANG KIỂM DUYỆT" mà không có sự giải thích hợp lý (không phải thực thể mới tạo ra)?
+2. Diễn biến hoặc hành động của nhân vật mâu thuẫn với bối cảnh tu vi, binh khí sở hữu, hoặc trạng thái từ chương trước và các sự kiện trước đó hay không?
+3. Có lỗi logic nào về địa lý hay quan hệ nhân vật không?
+
+Hãy quét kỹ lỗi "Chênh lệch nhận thức" (Cognitive Dissonance) của Nam chính:
+- Đảm bảo Nam chính thực sự nghĩ hành động nghịch thiên của mình chỉ là "mẹo vặt nông thôn" bình thường.
+- Nếu trong bản thảo xuất hiện tình tiết Nam chính cố tình kiêu ngạo, tự đắc hoặc biết mình là cao nhân, hãy cảnh báo lỗi logic (ConflictWarning) ngay lập tức.
+
+Trả về kết quả có cấu trúc:
+1. `warnings`: Danh sách các đối tượng mâu thuẫn logic phát hiện được. Mỗi đối tượng gồm:
+   - `warning`: Câu cảnh báo lỗi cụ thể, ngắn gọn (ví dụ: "Nhân vật A sử dụng kiếm đã mất ở chương 2").
+   - `conflicting_chapter`: Số chương gây mâu thuẫn trực tiếp nếu phát hiện được.
+   Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
+2. `auditor_feedback`: Đánh giá chi tiết của kiểm duyệt viên cho riêng Sự kiện này.
+"""
+            result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
+            
+            for w in result.warnings:
+                warnings_dict.append({
+                    "node_id": node_id,
+                    "node_title": node_title,
+                    "warning": w.warning,
+                    "conflicting_chapter": w.conflicting_chapter
+                })
+            
+            if result.auditor_feedback:
+                feedbacks.append(f"[{node_title}]: {result.auditor_feedback}")
+                
+        auditor_feedback_str = "\n".join(feedbacks)
+        auditor_feedback_summary = f"Đã hoàn thành kiểm duyệt {len(scenes)} sự kiện.\n" + auditor_feedback_str
+        
+    else:
+        prompt = f"""
 Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu bản nháp cuối cùng của Chương {chapter_num} với thông tin bối cảnh thế giới, nhân vật, sổ cái toàn cục, và trạng thái chương trước đó để tìm ra các lỗi logic tiềm ẩn.
 
 SỔ TAY TÁC GIẢ (STORY BIBLE):
@@ -898,6 +1189,10 @@ Hãy phân tích kỹ chương mới và chỉ ra các lỗi mâu thuẫn cốt 
 - Quan hệ nhân vật thay đổi đột ngột không có tình tiết dẫn dắt.
 - Nhân vật đã chết hoặc bị trọng thương bỗng nhiên khỏe mạnh bình thường.
 
+Hãy quét kỹ lỗi "Chênh lệch nhận thức" (Cognitive Dissonance) của Nam chính:
+- Đảm bảo Nam chính thực sự nghĩ hành động nghịch thiên của mình chỉ là "mẹo vặt nông thôn" bình thường.
+- Nếu trong bản thảo xuất hiện tình tiết Nam chính cố tình kiêu ngạo, tự đắc hoặc biết mình là cao nhân, hãy cảnh báo lỗi logic (ConflictWarning) ngay lập tức.
+
 Trả về kết quả có cấu trúc:
 1. `warnings`: Danh sách các đối tượng mâu thuẫn logic phát hiện được. Mỗi đối tượng gồm:
    - `warning`: Câu cảnh báo lỗi cụ thể, ngắn gọn (ví dụ: "Nhân vật A sử dụng kiếm đã mất ở chương 2").
@@ -905,19 +1200,21 @@ Trả về kết quả có cấu trúc:
    Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
 2. `auditor_feedback`: Đánh giá tổng quan về chất lượng logic chương mới này.
 """
-    result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
-    
-    warnings_dict = [
-        {"warning": w.warning, "conflicting_chapter": w.conflicting_chapter} 
-        for w in result.warnings
-    ]
+        result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
+        
+        warnings_dict = [
+            {"warning": w.warning, "conflicting_chapter": w.conflicting_chapter} 
+            for w in result.warnings
+        ]
+        auditor_feedback_summary = result.auditor_feedback
         
     if warnings_dict:
         console.print("\n[bold red][CẢNH BÁO LOGIC PHÁT HIỆN TỪ AUDITOR]:[/bold red]")
         for w in warnings_dict:
+            node_info = f" (Node: {w.get('node_title')})" if w.get("node_id") else ""
             source_chap = f"Chương {w['conflicting_chapter']}" if w.get("conflicting_chapter") else "Bối cảnh"
-            console.print(f" ⚠️  [{source_chap}] {w['warning']}", style="yellow")
-            emit_agent_log(state["story_uuid"], f"⚠️ Cảnh báo mâu thuẫn ({source_chap}): {w['warning']}", level="warning")
+            console.print(f" ⚠️  [{source_chap}]{node_info} {w['warning']}", style="yellow")
+            emit_agent_log(state["story_uuid"], f"⚠️ Cảnh báo mâu thuẫn ({source_chap}){node_info}: {w['warning']}", level="warning")
         
         session = session_manager.get_session(state["story_uuid"])
         if session:
@@ -925,18 +1222,18 @@ Trả về kết quả có cấu trúc:
                 "story_uuid": state["story_uuid"],
                 "chapter_num": state["chapter_num"],
                 "warnings": warnings_dict,
-                "feedback": result.auditor_feedback
+                "feedback": auditor_feedback_summary
             })
     else:
         console.print("\n[bold green]✓ Kiểm duyệt logic thành công: Không phát hiện lỗi nhất quán cốt truyện.[/bold green]")
         emit_agent_log(state["story_uuid"], "✓ Kiểm duyệt logic thành công: Không phát hiện lỗi mâu thuẫn cốt truyện.")
         
-    console.print(Panel(result.auditor_feedback, title="Đánh giá từ Auditor", border_style="cyan"))
-    emit_agent_log(state["story_uuid"], f"Đánh giá từ Auditor: \"{result.auditor_feedback}\"")
+    console.print(Panel(auditor_feedback_summary, title="Đánh giá từ Auditor", border_style="cyan"))
+    emit_agent_log(state["story_uuid"], f"Đánh giá từ Auditor: \"{auditor_feedback_summary}\"")
     
     return {
         "warnings": warnings_dict,
-        "auditor_feedback": result.auditor_feedback
+        "auditor_feedback": auditor_feedback_summary
     }
 
 

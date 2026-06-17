@@ -35,18 +35,33 @@ def route_after_scene_drafter(state: AgentState) -> str:
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Human Review
 def route_after_human_review(state: AgentState) -> str:
     feedback = state.get("revision_feedback", "")
-    # Nếu người dùng gõ Done, đi tiếp tới Auditor
-    if feedback.strip().lower() == "done":
+    fb_clean = feedback.strip().lower()
+    
+    if fb_clean == "done":
         return "auditor"
-    # Ngược lại, nếu có phản hồi chỉnh sửa, quay về Reviser
-    else:
-        return "reviser"
+        
+    # Check if feedback is a JSON command
+    try:
+        import json
+        fb_data = json.loads(feedback)
+        action = fb_data.get("action")
+        if action == "verify_nodes":
+            return "auditor"
+        elif action == "publish":
+            return "updater"
+        elif action == "revise_node":
+            return "reviser"
+    except Exception:
+        pass
+        
+    return "reviser"
 
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Auditor
 def route_after_auditor(state: AgentState) -> str:
     warnings = state.get("warnings", [])
-    # Nếu phát hiện lỗi logic từ Auditor, quay về Reviser để sửa đổi bản thảo
     if warnings:
+        if state.get("verification_mode") == "node_by_node":
+            return "human_review"
         return "reviser"
     else:
         return "updater"
@@ -66,7 +81,8 @@ workflow.add_conditional_edges(
     route_after_human_review,
     {
         "auditor": "auditor",
-        "reviser": "reviser"
+        "reviser": "reviser",
+        "updater": "updater"
     }
 )
 
@@ -75,7 +91,8 @@ workflow.add_conditional_edges(
     route_after_auditor,
     {
         "reviser": "reviser",
-        "updater": "updater"
+        "updater": "updater",
+        "human_review": "human_review"
     }
 )
 

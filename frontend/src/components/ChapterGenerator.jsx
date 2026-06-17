@@ -254,6 +254,11 @@ export default function ChapterGenerator({
   const [draftModalOpen, setDraftModalOpen] = useState(true);
   const [currentDraftContent, setCurrentDraftContent] = useState('');
   const [draftGeneralComment, setDraftGeneralComment] = useState('');
+  const [verificationMode, setVerificationMode] = useState('');
+  const [sceneDrafts, setSceneDrafts] = useState([]);
+  const [reviewScenes, setReviewScenes] = useState([]);
+  const [nodeWarnings, setNodeWarnings] = useState([]);
+  const [nodeComments, setNodeComments] = useState({});
 
   const handleTextSelection = (e, target) => {
     const selection = window.getSelection();
@@ -436,12 +441,20 @@ export default function ChapterGenerator({
       if (data.story_uuid !== storyUuid) return;
       setStatus('waiting_review');
       setCurrentDraftContent(data.draft_content);
+      setVerificationMode(data.verification_mode || 'master');
+      setSceneDrafts(data.scene_drafts || []);
+      setReviewScenes(data.scenes || []);
+      setNodeWarnings(data.warnings || []);
       setDraftModalOpen(true);
       setMessages((prev) => [...prev, {
         id: `review-${Date.now()}-${Math.random()}`,
         sender: 'agent',
         type: 'agent_review',
         draftContent: data.draft_content,
+        verificationMode: data.verification_mode || 'master',
+        sceneDrafts: data.scene_drafts || [],
+        scenes: data.scenes || [],
+        warnings: data.warnings || [],
         time: new Date().toLocaleTimeString()
       }]);
     };
@@ -2558,7 +2571,7 @@ export default function ChapterGenerator({
             <div className="modal-header">
               <div className="modal-title-container">
                 <Eye className="icon-sm text-cyan animate-pulse" />
-                <h3>Duyệt bản nháp chương truyện</h3>
+                <h3>{verificationMode === 'node_by_node' ? 'Xác thực & duyệt từng Sự kiện' : 'Duyệt bản nháp chương truyện'}</h3>
               </div>
               <button 
                 onClick={() => setDraftModalOpen(false)} 
@@ -2570,87 +2583,237 @@ export default function ChapterGenerator({
               </button>
             </div>
             
-            <div className="modal-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px', gap: '12px' }}>
-              <p className="instruction-text text-muted" style={{ fontSize: '12px', margin: 0 }}>
-                💡 <strong>Hướng dẫn:</strong> Bạn có thể bôi đen bất kỳ đoạn văn nào trong văn bản dưới đây để nhập bình luận sửa đổi cục bộ tại vùng bôi đen đó, hoặc nhập bình luận chung cho toàn bộ ở cuối popup.
-              </p>
-              
-              {/* Draft text content with selection capability */}
-              <div 
-                className="draft-text-editor-container"
-                onMouseUp={(e) => handleTextSelection(e, 'draft')}
-                style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  background: '#070a13',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  lineHeight: '1.8',
-                  fontSize: '14px',
-                  color: '#e2e8f0',
-                  userSelect: 'text'
-                }}
-              >
-                <div style={{ whiteSpace: 'pre-wrap' }}>
-                  {currentDraftContent}
+            {verificationMode === 'node_by_node' ? (
+              <div className="modal-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px', gap: '12px' }}>
+                <p className="instruction-text text-muted" style={{ fontSize: '12px', margin: 0 }}>
+                  💡 <strong>Chế độ Xác thực từng Node:</strong> Dưới đây là nội dung chi tiết được tạo ra cho từng sự kiện. Nếu phát hiện sự kiện nào sai logic hoặc cần thay đổi, bạn hãy nhập ý kiến phản hồi bên dưới sự kiện đó để AI viết lại riêng sự kiện đó.
+                </p>
+                
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingRight: '4px' }}>
+                  {reviewScenes.map((scene, idx) => {
+                    const nodeWarningsList = nodeWarnings.filter(w => w.node_id === scene.id);
+                    const hasWarnings = nodeWarningsList.length > 0;
+                    return (
+                      <div 
+                        key={scene.id} 
+                        style={{
+                          background: '#0a0d16',
+                          border: hasWarnings ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--border-glass)',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px'
+                        }}
+                      >
+                        {/* Scene Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 'bold', color: hasWarnings ? '#f87171' : '#22d3ee' }}>
+                            Sự kiện {idx + 1}: {scene.title} (ID: {scene.id})
+                          </span>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            {scene.characters && scene.characters.map(c => (
+                              <span key={c} style={{ fontSize: '10px', background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>
+                                {c}
+                              </span>
+                            ))}
+                            {scene.locations && scene.locations.map(l => (
+                              <span key={l} style={{ fontSize: '10px', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>
+                                {l}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Scene Description (Planned) */}
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '6px 10px', borderRadius: '4px', borderLeft: '3px solid #6b7280' }}>
+                          <strong>Kịch bản gốc:</strong> {scene.description}
+                        </div>
+
+                        {/* Node Draft Content */}
+                        <div style={{ fontSize: '13px', color: '#e2e8f0', lineHeight: '1.7', whiteSpace: 'pre-wrap', background: '#05070c', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          {sceneDrafts[idx] || 'Chưa viết.'}
+                        </div>
+
+                        {/* Scene Warnings (if any) */}
+                        {hasWarnings && (
+                          <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444', fontSize: '12px', fontWeight: 'bold' }}>
+                              <AlertTriangle style={{ width: '14px', height: '14px' }} /> Phát hiện lỗi logic từ Auditor:
+                            </div>
+                            {nodeWarningsList.map((w, wIdx) => (
+                              <div key={wIdx} style={{ fontSize: '12px', color: '#fca5a5', paddingLeft: '20px' }}>
+                                - {w.warning}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Scene comment/revision submission */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                          <textarea
+                            className="form-textarea-sm flex-1"
+                            rows={1}
+                            value={nodeComments[scene.id] || ''}
+                            onChange={e => setNodeComments(prev => ({ ...prev, [scene.id]: e.target.value }))}
+                            placeholder={`Góp ý chỉnh sửa cho Sự kiện [${scene.title}]...`}
+                            style={{ background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', fontSize: '12px', padding: '6px 10px', height: '32px', resize: 'none' }}
+                          />
+                          <button
+                            onClick={() => {
+                              const comment = nodeComments[scene.id];
+                              if (comment && comment.trim()) {
+                                handleSendDraftFeedback({
+                                  action: 'revise_node',
+                                  node_id: scene.id,
+                                  comment: comment.trim()
+                                });
+                                setNodeComments(prev => ({ ...prev, [scene.id]: '' }));
+                                setDraftModalOpen(false);
+                              }
+                            }}
+                            disabled={!(nodeComments[scene.id] || '').trim()}
+                            className="btn-primary-sm btn-cyan"
+                            style={{ padding: '0 12px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <Edit className="icon-xs" /> Sửa Sự kiện
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              
-              {/* General Comments area */}
-              <div className="draft-modal-comments-area" style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-glass)', paddingTop: '12px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Bình luận chung cho toàn bộ bản nháp:</label>
+            ) : (
+              <div className="modal-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px', gap: '12px' }}>
+                <p className="instruction-text text-muted" style={{ fontSize: '12px', margin: 0 }}>
+                  💡 <strong>Hướng dẫn:</strong> Bạn có thể bôi đen bất kỳ đoạn văn nào trong văn bản dưới đây để nhập bình luận sửa đổi cục bộ tại vùng bôi đen đó, hoặc nhập bình luận chung cho toàn bộ ở cuối popup.
+                </p>
+                
+                {/* Draft text content with selection capability */}
+                <div 
+                  className="draft-text-editor-container"
+                  onMouseUp={(e) => handleTextSelection(e, 'draft')}
+                  style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    background: '#070a13',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    lineHeight: '1.8',
+                    fontSize: '14px',
+                    color: '#e2e8f0',
+                    userSelect: 'text'
+                  }}
+                >
+                  <div style={{ whiteSpace: 'pre-wrap' }}>
+                    {currentDraftContent}
+                  </div>
+                </div>
+                
+                {/* General Comments area */}
+                <div className="draft-modal-comments-area" style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-glass)', paddingTop: '12px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Bình luận chung cho toàn bộ bản nháp:</label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <textarea
+                      className="form-textarea-sm flex-1"
+                      rows={2}
+                      value={draftGeneralComment}
+                      onChange={e => setDraftGeneralComment(e.target.value)}
+                      placeholder="Nhập ý kiến đóng góp chung để AI sửa lại toàn bộ bản nháp..."
+                      style={{ background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', fontSize: '13px' }}
+                    />
+                    <button
+                      onClick={() => {
+                        if (draftGeneralComment.trim()) {
+                          handleSendDraftFeedback(draftGeneralComment.trim());
+                          setDraftGeneralComment('');
+                          setDraftModalOpen(false);
+                        }
+                      }}
+                      disabled={!draftGeneralComment.trim()}
+                      className="btn-secondary btn-re-edit"
+                      style={{ padding: '0 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      Yêu cầu sửa lại
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {verificationMode === 'node_by_node' ? (
+              <div className="modal-footer" style={{ borderTop: '1px solid var(--border-glass)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="text-muted" style={{ fontSize: '11px' }}>
+                  * Nhấp "Xác thực lại" để kiểm tra lại toàn bộ sự kiện, hoặc "Xuất bản" để lưu chương truyện.
+                </span>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <textarea
-                    className="form-textarea-sm flex-1"
-                    rows={2}
-                    value={draftGeneralComment}
-                    onChange={e => setDraftGeneralComment(e.target.value)}
-                    placeholder="Nhập ý kiến đóng góp chung để AI sửa lại toàn bộ bản nháp..."
-                    style={{ background: '#10141f', border: '1px solid var(--border-glass)', color: '#fff', fontSize: '13px' }}
-                  />
-                  <button
-                    onClick={() => {
-                      if (draftGeneralComment.trim()) {
-                        handleSendDraftFeedback(draftGeneralComment.trim());
-                        setDraftGeneralComment('');
-                        setDraftModalOpen(false);
-                      }
-                    }}
-                    disabled={!draftGeneralComment.trim()}
-                    className="btn-secondary btn-re-edit"
-                    style={{ padding: '0 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  <button 
+                    onClick={() => setDraftModalOpen(false)} 
+                    className="btn-secondary"
+                    style={{ padding: '6px 16px', fontSize: '13px' }}
                   >
-                    Yêu cầu sửa lại
+                    Xem Chat
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleSendDraftFeedback({ action: 'verify_nodes' });
+                      setDraftModalOpen(false);
+                    }} 
+                    className="btn-secondary"
+                    style={{ padding: '6px 16px', fontSize: '13px', color: '#22d3ee', borderColor: 'rgba(34,211,238,0.3)', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <Sparkles className="icon-xs text-cyan animate-pulse" /> Xác thực lại
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleSendDraftFeedback({ action: 'publish' });
+                      setDraftModalOpen(false);
+                    }} 
+                    className="btn-primary btn-green"
+                    style={{ padding: '6px 20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <CheckCircle2 className="icon-xs" /> Xuất bản chương truyện
                   </button>
                 </div>
               </div>
-            </div>
-            
-            <div className="modal-footer" style={{ borderTop: '1px solid var(--border-glass)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span className="text-muted" style={{ fontSize: '11px' }}>
-                * Sau khi hoàn tất sửa đổi, hãy nhấn "Duyệt bản viết" để hoàn tất chương truyện.
-              </span>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button 
-                  onClick={() => setDraftModalOpen(false)} 
-                  className="btn-secondary"
-                  style={{ padding: '6px 16px', fontSize: '13px' }}
-                >
-                  Xem Chat
-                </button>
-                <button 
-                  onClick={() => {
-                    handleSendDraftFeedback('Done');
-                    setDraftModalOpen(false);
-                  }} 
-                  className="btn-primary btn-green"
-                  style={{ padding: '6px 20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                >
-                  <CheckCircle2 className="icon-xs" /> Duyệt bản viết (Done)
-                </button>
+            ) : (
+              <div className="modal-footer" style={{ borderTop: '1px solid var(--border-glass)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="text-muted" style={{ fontSize: '11px' }}>
+                  * Sau khi hoàn tất sửa đổi, hãy nhấn "Duyệt bản viết" để hoàn tất chương truyện.
+                </span>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    onClick={() => setDraftModalOpen(false)} 
+                    className="btn-secondary"
+                    style={{ padding: '6px 16px', fontSize: '13px' }}
+                  >
+                    Xem Chat
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleSendDraftFeedback({ action: 'verify_nodes' });
+                      setDraftModalOpen(false);
+                    }} 
+                    className="btn-secondary"
+                    style={{ padding: '6px 16px', fontSize: '13px', color: '#22d3ee', borderColor: 'rgba(34,211,238,0.3)', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <Sparkles className="icon-xs text-cyan animate-pulse" /> Xác thực từng Node
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleSendDraftFeedback('Done');
+                      setDraftModalOpen(false);
+                    }} 
+                    className="btn-primary btn-green"
+                    style={{ padding: '6px 20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <CheckCircle2 className="icon-xs" /> Duyệt bản viết (Done)
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

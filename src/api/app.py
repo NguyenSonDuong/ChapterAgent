@@ -1821,6 +1821,7 @@ def generate_chapter(story_uuid):
             "auditor_feedback": "",
             "warnings": [],
             "conflict_resolutions": [],
+            "verification_mode": "",
             "is_done": False
         }
         

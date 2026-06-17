@@ -267,6 +267,7 @@ def handle_write(args):
         "auditor_feedback": "",
         "warnings": [],
         "conflict_resolutions": [],
+        "verification_mode": "",
         "is_done": False
     }
     

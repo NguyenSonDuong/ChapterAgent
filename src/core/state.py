@@ -18,4 +18,5 @@ class AgentState(TypedDict):
     auditor_feedback: str
     warnings: List[Dict[str, Any]]
     conflict_resolutions: List[Dict[str, Any]]
+    verification_mode: str
     is_done: bool
