@@ -16,7 +16,15 @@ from src.utils.helpers import ensure_string, is_higher_cultivation
 from src.utils.llm import invoke_with_retry, check_cancellation
 from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import emit_event, emit_agent_log
-from src.utils.context import to_story_bible
+from src.utils.context import (
+    to_story_bible,
+    to_meta_markdown,
+    to_ledger_markdown,
+    to_unresolved_threads_markdown,
+    to_nodes_list_markdown,
+    to_characters_markdown,
+    to_simple_list_markdown,
+)
 
 console = Console()
 
@@ -235,8 +243,8 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     chapter_num = state["chapter_num"]
     
     # Format global ledger and meta context for LLM
-    ledger_str = json.dumps(ledger, ensure_ascii=False, indent=2)
-    meta_str = json.dumps(meta, ensure_ascii=False, indent=2)
+    ledger_str = to_ledger_markdown(ledger)
+    meta_str = to_meta_markdown(meta)
     
     # Read previous chapter state if exists
     prev_state_str = "Chưa có chương trước (Đây là chương 1)."
@@ -870,7 +878,7 @@ SỔ TAY TÁC GIẢ (STORY BIBLE):
 {story_bible}
 
 SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-{json.dumps(ledger, ensure_ascii=False, indent=2)}
+{to_ledger_markdown(ledger)}
 
 TRẠNG THÁI CHƯƠNG TRƯỚC:
 {prev_state_str}
@@ -1050,7 +1058,7 @@ Hãy điền đầy đủ:
 Hãy đọc nội dung Chương {chapter_num} dưới đây và phân tách/ánh xạ các đoạn văn (hoặc nội dung câu chữ thực tế) tương ứng với từng sự kiện (node) đã được lên kịch bản.
 
 DANH SÁCH CÁC SỰ KIỆN (NODES) KỊCH BẢN:
-{json.dumps(nodes_list, ensure_ascii=False, indent=2)}
+{to_nodes_list_markdown(nodes_list)}
 
 NỘI DUNG CHƯƠNG {chapter_num}:
 ---
@@ -1142,18 +1150,18 @@ YÊU CẦU:
                             ))
 
     # 2. Update unresolved threads using LLM
-    # Prepare old unresolved list under json format
-    old_threads_json = json.dumps([ut.model_dump() for ut in ledger_model.unresolved_threads], ensure_ascii=False)
+    # Prepare old unresolved list under Markdown format
+    old_threads_markdown = to_unresolved_threads_markdown([ut.model_dump() for ut in ledger_model.unresolved_threads])
 
     refine_prompt = f"""
 Dựa trên danh sách các nút thắt chưa giải quyết cũ (mỗi nút thắt có nội dung "thread" và chương xuất hiện "chapter"):
-{old_threads_json}
+{old_threads_markdown}
 
 Các nút thắt vừa được giải quyết trong chương {chapter_num} mới này:
-{json.dumps(chap_state.threads_resolved, ensure_ascii=False)}
+{to_simple_list_markdown(chap_state.threads_resolved)}
 
 Các nút thắt mới được giới thiệu trong chương {chapter_num} này:
-{json.dumps(chap_state.threads_introduced, ensure_ascii=False)}
+{to_simple_list_markdown(chap_state.threads_introduced)}
 
 Hãy cập nhật danh sách các nút thắt chưa giải quyết:
 1. Loại bỏ những nút thắt cũ đã được giải quyết ở chương này hoặc không còn phù hợp.
@@ -1486,7 +1494,7 @@ Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây 
 
 THÔNG TIN TRUYỆN:
 - Tên truyện: {meta_data.get('name')}
-- Danh sách các nhân vật ĐÃ CÓ từ trước: {json.dumps(existing_names, ensure_ascii=False)}
+- Danh sách các nhân vật ĐÃ CÓ từ trước: {", ".join(existing_names)}
 
 NỘI DUNG CHƯƠNG {chapter_num}:
 ---
@@ -1721,7 +1729,7 @@ DANH SÁCH MÂU THUẪN LOGIC CẦN GIẢI QUYẾT:
 
 THÔNG TIN TRUYỆN THAM KHẢO:
 - Tên truyện: {meta.get('name')}
-- Nhân vật: {json.dumps(meta.get('characters'), ensure_ascii=False)}
+- Nhân vật: {to_characters_markdown(meta.get('characters'))}
 - Phong cách hành văn: {meta.get('style')}
 - Bối cảnh: {meta.get('context')}
 

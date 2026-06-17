@@ -1,22 +1,19 @@
 import json
 
-def to_story_bible(meta: dict, ledger: dict) -> str:
-    """
-    Chuyển đổi dữ liệu cấu trúc thành văn bản văn học thuần túy (không dấu ngoặc JSON, không UUID, không tọa độ x/y)
-    để LLM tập trung chú ý tốt nhất (Story Bible Transformer).
-    """
+def to_meta_markdown(meta: dict) -> str:
+    """Chuyển đổi dữ liệu meta nhân vật và bối cảnh sang định dạng văn bản Markdown."""
+    if not meta:
+        return "Không có thông tin bối cảnh."
+    
     lines = []
-    lines.append("=== SỔ TAY TÁC GIẢ (STORY BIBLE) ===")
     lines.append(f"Tên tác phẩm: {meta.get('name', 'Không rõ')}")
     lines.append(f"Bối cảnh thế giới: {meta.get('context', 'Không rõ')}")
     lines.append(f"Phong cách kể chuyện: {meta.get('style', 'Không rõ')}")
     
-    # Thẻ tags
     tags = meta.get("tags", [])
     if tags:
         lines.append(f"Nhãn phân loại: {', '.join(tags)}")
         
-    # Hệ thống tu vi
     stages = meta.get("cultivation_stages", [])
     if stages:
         lines.append("\nHỆ THỐNG CẤP ĐỘ TU VI TRONG THẾ GIỚI:")
@@ -32,7 +29,6 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
             else:
                 lines.append(f"  - Cấp {idx + 1}: {name}")
                 
-    # Danh sách nhân vật
     chars = meta.get("characters", [])
     if chars:
         lines.append("\nDANH SÁCH NHÂN VẬT VÀ TRẠNG THÁI HIỆN TẠI:")
@@ -79,11 +75,20 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
             if c_visited:
                 visited_str = ", ".join([str(l) for l in c_visited])
                 lines.append(f"     * Địa điểm đã đi qua: {visited_str}")
+                
+    return "\n".join(lines)
 
-    # Danh sách địa điểm trong thế giới
+
+def to_ledger_markdown(ledger: dict) -> str:
+    """Chuyển đổi dữ liệu sổ cái (ledger) cốt truyện sang định dạng văn bản Markdown."""
+    if not ledger:
+        return "Không có thông tin sổ cái cốt truyện."
+        
+    lines = []
+    
     locs = ledger.get("locations", [])
     if locs:
-        lines.append("\nDANH SÁCH CÁC ĐỊA ĐIỂM TRONG THẾ GIỚI:")
+        lines.append("DANH SÁCH CÁC ĐỊA ĐIỂM TRONG THẾ GIỚI:")
         for loc in locs:
             if isinstance(loc, dict):
                 name = loc.get("name", "")
@@ -92,8 +97,7 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
                 name = getattr(loc, "name", str(loc))
                 desc = getattr(loc, "description", "")
             lines.append(f"  - {name}: {desc}")
-
-    # Danh sách binh khí/pháp khí thế giới
+            
     weapons = ledger.get("weapons", [])
     if weapons:
         lines.append("\nDANH SÁCH PHÁP KHÍ / BINH KHÍ TRONG THẾ GIỚI:")
@@ -105,8 +109,7 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
                 name = getattr(w, "name", str(w))
                 desc = getattr(w, "description", "")
             lines.append(f"  - {name}: {desc}")
-
-    # Danh sách công pháp thế giới
+            
     techs = ledger.get("techniques", [])
     if techs:
         lines.append("\nDANH SÁCH CÔNG PHÁP VÀ CHIÊU THỨC TRONG THẾ GIỚI:")
@@ -118,16 +121,12 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
                 name = getattr(t, "name", str(t))
                 desc = getattr(t, "description", "")
             lines.append(f"  - {name}: {desc}")
-
-    # Lịch sử sự kiện (timeline) - Tóm tắt các chương trước dạng thuần túy
+            
     timeline = ledger.get("timeline", [])
     if timeline:
         lines.append("\nTÓM TẮT DIỄN BIẾN CÁC CHƯƠNG TRƯỚC:")
-        for item in timeline:
-            lines.append(f"  - Chương {item.get('chapter', '?')}: {item.get('title', 'Không rõ tiêu đề')}")
-            lines.append(f"    Mô tả diễn biến chính: {item.get('summary', 'Không có mô tả.')}")
+        lines.append(to_timeline_markdown(timeline))
             
-    # Các nút thắt chưa giải quyết
     unresolved = ledger.get("unresolved_threads", [])
     if unresolved:
         lines.append("\nCÁC NÚT THẮT / BÍ ẨN CỐT TRUYỆN CHƯA GIẢI QUYẾT:")
@@ -142,8 +141,7 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
                 lines.append(f"  - Nút thắt {idx + 1} (xuất hiện ở Chương {chap}): {thread_text}")
             else:
                 lines.append(f"  - Nút thắt {idx + 1}: {thread_text}")
-
-    # Các nút thắt đã giải quyết
+                
     resolved = ledger.get("resolved_threads", [])
     if resolved:
         lines.append("\nCÁC NÚT THẮT CỐT TRUYỆN ĐÃ ĐƯỢC GIẢI QUYẾT:")
@@ -163,5 +161,106 @@ def to_story_bible(meta: dict, ledger: dict) -> str:
             lines.append(f"  - {thread_text} ({intro_str}{res_str})")
             if note:
                 lines.append(f"    Ghi chú cách giải quyết: {note}")
+                
+    return "\n".join(lines)
 
+
+def to_story_bible(meta: dict, ledger: dict) -> str:
+    """
+    Chuyển đổi dữ liệu cấu trúc thành văn bản văn học thuần túy (không dấu ngoặc JSON, không UUID, không tọa độ x/y)
+    để LLM tập trung chú ý tốt nhất (Story Bible Transformer).
+    """
+    lines = []
+    lines.append("=== SỔ TAY TÁC GIẢ (STORY BIBLE) ===")
+    lines.append(to_meta_markdown(meta))
+    lines.append(to_ledger_markdown(ledger))
+    return "\n".join(lines)
+
+
+def to_unresolved_threads_markdown(threads: list) -> str:
+    """Chuyển đổi danh sách nút thắt chưa giải quyết sang định dạng Markdown."""
+    if not threads:
+        return "Không có nút thắt nào chưa giải quyết."
+    lines = []
+    for idx, ut in enumerate(threads):
+        if isinstance(ut, dict):
+            thread_text = ut.get("thread", "")
+            chap = ut.get("chapter")
+        else:
+            thread_text = getattr(ut, "thread", str(ut))
+            chap = getattr(ut, "chapter", None)
+        if chap:
+            lines.append(f"  - Nút thắt {idx + 1} (xuất hiện ở Chương {chap}): {thread_text}")
+        else:
+            lines.append(f"  - Nút thắt {idx + 1}: {thread_text}")
+    return "\n".join(lines)
+
+
+def to_nodes_list_markdown(nodes_list: list) -> str:
+    """Chuyển đổi kịch bản sự kiện (nodes) dạng list sang Markdown."""
+    if not nodes_list:
+        return "Không có sự kiện nào."
+    lines = []
+    for idx, n in enumerate(nodes_list):
+        title = n.get("title") or n.get("title", "Không tiêu đề")
+        desc = n.get("description") or n.get("description", "Không mô tả")
+        node_id = n.get("id", "")
+        lines.append(f"  - Sự kiện [{node_id}]: {title}")
+        lines.append(f"    Mô tả diễn biến: {desc}")
+    return "\n".join(lines)
+
+
+def to_characters_markdown(characters: list) -> str:
+    """Chuyển đổi danh sách nhân vật sang Markdown rút gọn."""
+    if not characters:
+        return "Không có nhân vật nào."
+    lines = []
+    for idx, c in enumerate(characters):
+        if isinstance(c, dict):
+            name = c.get("name", "Không rõ")
+            role = c.get("role", "Không rõ")
+            desc = c.get("description", "")
+            cult = c.get("current_cultivation")
+            loc = c.get("current_location")
+            status = c.get("status")
+        else:
+            name = getattr(c, "name", "Không rõ")
+            role = getattr(c, "role", "Không rõ")
+            desc = getattr(c, "description", "")
+            cult = getattr(c, "current_cultivation", None)
+            loc = getattr(c, "current_location", None)
+            status = getattr(c, "status", None)
+            
+        details = []
+        if role:
+            details.append(f"vai trò: {role}")
+        if cult:
+            details.append(f"tu vi: {cult}")
+        if loc:
+            details.append(f"địa điểm hiện tại: {loc}")
+        if status:
+            details.append(f"trạng thái: {status}")
+        if desc:
+            details.append(f"mô tả: {desc}")
+            
+        details_str = f" ({', '.join(details)})" if details else ""
+        lines.append(f"  - {name}{details_str}")
+    return "\n".join(lines)
+
+
+def to_simple_list_markdown(items: list) -> str:
+    """Chuyển đổi list thô sang gạch đầu dòng Markdown."""
+    if not items:
+        return "Không có"
+    return "\n".join([f"  - {item}" for item in items])
+
+
+def to_timeline_markdown(timeline: list) -> str:
+    """Chuyển đổi danh sách lịch sử chương truyện (timeline) sang định dạng Markdown."""
+    if not timeline:
+        return "Không có lịch sử chương trước."
+    lines = []
+    for item in timeline:
+        lines.append(f"  - Chương {item.get('chapter', '?')}: {item.get('title', 'Không rõ tiêu đề')}")
+        lines.append(f"    Mô tả diễn biến chính: {item.get('summary', 'Không có mô tả.')}")
     return "\n".join(lines)

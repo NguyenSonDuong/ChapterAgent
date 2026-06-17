@@ -24,6 +24,11 @@ from src.agent.graph import app as graph_app
 from src.core.state import AgentState
 from src.utils.session_manager import session_manager, SessionCancelledError
 from src.utils.socket_emitter import set_socketio, emit_event
+from src.utils.context import (
+    to_timeline_markdown,
+    to_unresolved_threads_markdown,
+    to_nodes_list_markdown,
+)
 
 def parse_request_cultivation_stages(raw_stages):
     parsed = []
@@ -1114,8 +1119,10 @@ THÔNG TIN TÁC PHẨM:
 - Phong cách hành văn: {meta_data.get('style')}
 
 SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-- Lịch sử cốt truyện: {json.dumps(ledger_data.get('timeline', []), ensure_ascii=False)}
-- Các nút thắt chưa giải quyết: {json.dumps(ledger_data.get('unresolved_threads', []), ensure_ascii=False)}
+- Lịch sử cốt truyện:
+{to_timeline_markdown(ledger_data.get('timeline', []))}
+- Các nút thắt chưa giải quyết:
+{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
 
 BỐI CẢNH SỰ KIỆN CHƯƠNG TRƯỚC / CHƯƠNG LIÊN KẾT ĐỂ TẠO SỰ LIỀN MẠCH:
 {prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ."}
@@ -1285,7 +1292,8 @@ THÔNG TIN TÁC PHẨM:
 - Phong cách hành văn: {meta_data.get('style')}
 
 SỔ CÁI TOÀN CỤC (GLOBAL LEDGER) THAM KHẢO:
-- Các nút thắt chưa giải quyết: {json.dumps(ledger_data.get('unresolved_threads', []), ensure_ascii=False)}
+- Các nút thắt chưa giải quyết:
+{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
 
 CÁC THÔNG SỐ ĐẦU VÀO CỦA SỰ KIỆN NÀY (BẮT BUỘC PHẢI DỰA VÀO ĐỂ TẠO NỘI DUNG):
 - Nhân vật tham gia: {', '.join(characters) if characters else 'Không chỉ định'}
@@ -1492,7 +1500,7 @@ def align_chapter_nodes(story_uuid, chapter_num):
 Hãy đọc nội dung Chương {chapter_num} dưới đây và phân tách/ánh xạ các đoạn văn (hoặc nội dung câu chữ thực tế) tương ứng với từng sự kiện (node) đã được lên kịch bản.
 
 DANH SÁCH CÁC SỰ KIỆN (NODES) KỊCH BẢN:
-{json.dumps(nodes_info, ensure_ascii=False, indent=2)}
+{to_nodes_list_markdown(nodes_info)}
 
 NỘI DUNG CHƯƠNG {chapter_num}:
 ---
