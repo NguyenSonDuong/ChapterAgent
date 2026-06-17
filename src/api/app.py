@@ -1139,7 +1139,10 @@ YÊU CẦU CHO CHƯƠNG {chapter_num}:
 
 HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
 1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) with node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
-2. Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí vào các node sao cho tự nhiên nhất.
+2. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, TRẬN PHÁP, ĐỊA ĐIỂM...):
+   - Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí đã được chỉ định ở trên vào các node sao cho tự nhiên nhất.
+   - Chỉ cho phép các thực thể đã được chỉ định cụ thể ở yêu cầu đầu vào phía trên (Nhân vật sẽ xuất hiện, Địa điểm nhân vật tới, Công pháp sẽ sử dụng, Binh khí/Pháp khí sử dụng) HOẶC các thực thể hoàn toàn mới được tự động tạo thêm xuất hiện trong các node.
+   - Tuyệt đối CẤM cho xuất hiện hay nhắc tên bất kỳ thực thể cũ nào khác có sẵn trong tác phẩm mà không được chỉ định trong yêu cầu đầu vào ở trên.
 3. Nếu có giải quyết nút thắt, hãy chọn đúng nút thắt đó và mô tả cách giải quyết chi tiết trong trường `resolved_thread.resolution_note`.
 4. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
 5. Đề xuất một Văn Phong (tone) cụ thể và phù hợp cho mỗi node tại trường `tone` (ví dụ: "hài hước", "bi thương", "đau khổ tuyệt vọng", "tình cảm", "kịch tính", "bình thường").
@@ -1310,7 +1313,9 @@ BỐI CẢNH CỦA CÁC SỰ KIỆN LIÊN KẾT TRONG CÙNG CHƯƠNG (BẮT BU�
 YÊU CẦU:
 1. Tạo tiêu đề (title) ngắn gọn, súc tích (dưới 10 từ).
 2. Tạo mô tả kịch bản (description) chi tiết diễn biến (khoảng 50-150 từ), viết mạch lạc và hấp dẫn, kết nối hợp lý với bối cảnh sự kiện trước/sau (nếu có).
-3. Sử dụng đúng các nhân vật, địa điểm, công pháp, binh khí đầu vào đã được chỉ định.
+3. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, TRẬN PHÁP, ĐỊA ĐIỂM...):
+   - Chỉ được phép xuất hiện hoặc nhắc đến các thực thể đã được CHỈ ĐỊNH rõ ràng trong danh sách đầu vào ở trên (Nhân vật tham gia, Địa điểm diễn ra, Công pháp thi triển, Binh khí sử dụng) HOẶC những thực thể hoàn toàn mới được tự động tạo thêm trong sự kiện này.
+   - Tuyệt đối CẤM xuất hiện, nhắc tên hoặc cho tham gia bất kỳ thực thể cũ nào khác có trong tác phẩm (nhân vật cũ, địa điểm cũ, vũ khí cũ, công pháp cũ, trận pháp cũ...) nếu chúng không nằm trong danh sách đầu vào ở trên. Không tự ý thêm thắt các thực thể cũ ngoài danh sách.
 4. KHÔNG tạo mô tả kịch bản mang tính chất "kết bài", tổng kết hay khép lại câu chuyện (như 'kết thúc hành trình...', 'khép lại chương này...'). Nếu đây là sự kiện cuối cùng của chương, hãy tập trung tạo sự kiện chuyển tiếp lấp lửng (cliffhanger) hoặc một chi tiết kết mở để dẫn dắt tiếp tục sang chương sau.
 5. Hãy đảm bảo Tiêu đề (title) và Mô tả kịch bản (description) được gợi ý phải thể hiện đúng Văn phong yêu cầu (ví dụ: hài hước, bi thương, đau khổ tuyệt vọng, tình cảm...).
 6. Trả về đúng định dạng có cấu trúc chứa title và description.
