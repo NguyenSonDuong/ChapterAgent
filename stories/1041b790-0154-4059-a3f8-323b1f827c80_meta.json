@@ -1,0 +1,124 @@
+{
+  "uuid": "1041b790-0154-4059-a3f8-323b1f827c80",
+  "name": "Phàm Nhân Của Ta Quá Cường Đại",
+  "characters": [
+    {
+      "name": "Lục Trường An",
+      "role": "Nam chính",
+      "description": "Ngoại hình: Thân hình cao ráo, tuấn lãng, mang khí chất thanh tao, thoát tục như trích tiên nhưng ăn mặc vô cùng giản dị như một tiều phu sương gió. Tính cách: Hiền lành, có chút ngốc nghếch trong chuyện tu tiên, luôn tự ti về bản thân nhưng cực kỳ chu đáo, ấm áp và có trách nhiệm. Khi bảo vệ nữ chính thì trở nên vô cùng kiên định. Sức mạnh: Không có linh căn hay tu vi theo hệ thống thông thường, nhưng sở hữu năng lực \"Đại Đạo Phàm Trần\" do sư phụ truyền dạy. Đạt đến đỉnh phong tối cao ở 4 lĩnh vực: Dược sư (bốc thuốc trị bách bệnh, độc tố), Trận pháp sư (xếp đá thành thần trận), Phù sư (vẽ bùa nhóm bếp diệt thế) và Thần toán sư (bấm ngón tay biết trước thiên cơ). Tuy nhiên, anh luôn nghĩ mình chỉ biết vài mẹo vặt phàm trần để sinh tồn.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Vô Linh Khúc"
+      ],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": null,
+      "techniques_owned": [],
+      "current_cultivation": "Phàm nhân (Không có linh căn)",
+      "current_location": "Vô Linh Khúc",
+      "status": "Đang nguy hiểm"
+    },
+    {
+      "name": "Thẩm Dao",
+      "role": "Nữ chính",
+      "description": "Ngoại hình: Dung nhan khuynh quốc khuynh thành, lạnh lùng, cao sang nhưng mang dáng vẻ gầy yếu, u sầu do biến cố diệt môn. Trên người luôn mang theo một thanh ngọc kiếm bị gãy. Tính cách: Kiên cường, quyết đoán, thông minh và có phần lý trí. Mang trong mình huyết hải thâm thù sâu sắc. Trước mặt người ngoài thì lạnh lùng như băng sơn, nhưng trước mặt nam chính lại vô cùng dịu dàng, biết ơn và có chút \"bất lực\" vì sự ngốc nghếch của anh. Sức mạnh: Sở hữu Băng Linh Căn thiên phú cao cấp. Sau khi được nam chính dùng \"thuốc cảm\" cứu sống, kinh mạch được tẩy tủy, thiên phú tiến hóa vượt bậc, tốc độ tu luyện cực nhanh nhằm mục đích báo thù và bảo vệ người yêu \"phàm nhân\" của mình.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Vô Linh Khúc"
+      ],
+      "active_weapon": "Ngọc kiếm bị gãy",
+      "weapons_owned": [
+        "Ngọc kiếm bị gãy"
+      ],
+      "active_technique": null,
+      "techniques_owned": [],
+      "current_cultivation": "Luyện Khi tầng 3 (Do đan điền bị trọng thương khi trốn chạy)",
+      "current_location": "Vô Linh Khúc",
+      "status": "Nguy hiểm tính mạng"
+    },
+    {
+      "name": "Huyền Cơ Lão Nhân (Hoặc: Lão đầu cổ quái)",
+      "role": "Sư phụ nam chính",
+      "description": "Ngoại hình: Lão già gầy gò, râu tóc bạc phơ nhưng đôi mắt tinh anh, thích mặc quần áo rách rưới, tay cầm bình rượu nát. Tính cách: Cổ quái, thích đùa giỡn, vô tâm nhưng tầm nhìn xa trông rộng. Vì sợ nam chính kiêu ngạo nên cố tình lừa anh rằng những thần thông đỉnh cấp chỉ là \"mẹo vặt của phàm nhân\". Sức mạnh: Từng đứng đầu giới tu tiên ở cả 4 lĩnh vực Đan, Trận, Phù, Toán. Đã truyền thụ hết y bát cho Lục Trường An rồi giả vờ bỏ đi chu du thiên hạ để mặc anh tự sinh tự diệt.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [],
+      "active_weapon": "",
+      "weapons_owned": [],
+      "active_technique": "",
+      "techniques_owned": [],
+      "current_cultivation": "Vượt ngoài thiên đạo",
+      "current_location": "",
+      "status": "Mới xuất hiện"
+    },
+    {
+      "name": "Khương Huyết Ma",
+      "role": "Phản diện Phụ",
+      "description": "Ngoại hình: Khuôn mặt hung tợn, có vết sẹo dài, mặc huyết bào, quanh thân bao phủ bởi sát khí màu đỏ máu. Tính cách: Tàn nhẫn, kiêu ngạo, hám lợi và độc ác. Là kẻ trực tiếp dẫn đầu toán sát thủ truy sát Thẩm Dao vào rừng Vô Linh Khúc. Sức mạnh: Sử dụng Huyết Sát Công Pháp, có khả năng hút máu tăng cường tu vi, là nỗi khiếp sợ của các tu sĩ nhỏ lẻ. Tuy nhiên, tên này sẽ là \"nạn nhân đầu tiên\" chứng kiến sự kinh hoàng của nam chính khi dám bước chân vào khu vườn của anh.",
+      "first_chapter": null,
+      "appearance_context": null,
+      "visited_locations": [
+        "Vô Linh Khúc"
+      ],
+      "active_weapon": null,
+      "weapons_owned": [],
+      "active_technique": "Huyết Sát Công Pháp",
+      "techniques_owned": [
+        "Huyết Sát Công Pháp"
+      ],
+      "current_cultivation": "Kim Đan Kỳ tầng 5",
+      "current_location": "Vô Linh Khúc",
+      "status": "Mới xuất hiện"
+    }
+  ],
+  "context": "Thế giới Tu Tiên sùng bái linh căn và tu vi mạnh mẽ. Tại vùng rìa hoang vu có một khu rừng sương mù quanh năm bao phủ mang tên Vô Linh Khúc. Nơi đây có Lục Trường An – một thanh niên không có linh căn, từ nhỏ được một vị lão đầu kỳ quái nhận nuôi và dạy dỗ. Vị sư phụ này thực chất là một đại năng tu sĩ có tu vi cao nhất thiên hạ, nhưng tính tình cổ quái. Ông dạy cho Lục Trường An những bí truyền chí cao vô thượng về Dược đạo, Trận pháp, Phù văn và Thiên cơ toán thuật dưới danh nghĩa... \"kỹ năng sinh tồn của phàm nhân\". Dạy xong, lão già vô tâm liền phủi tay chu du thiên hạ, để mặc anh tự sinh tự diệt.\n\nVì vậy, Lục Trường An luôn đinh ninh mình là kẻ phàm trần vô dụng, chỉ biết vài ngón nghề vặt vãnh: vẽ bùa để nhóm bếp, bốc thuốc trị cảm mạo, xếp đá quanh nhà chống trộm và bấm ngón tay tính thời tiết. Anh không hề biết, bùa nhóm bếp của mình là Tiên Phù diệt thế, đá chống trộm là Hộ Đạo Đại Trận cấp Thần, và quẻ bói thời tiết lại chuẩn xác hơn cả Thiên Cơ Đài.\n\nBiến cố xảy ra khi Thẩm Dao, đại tiểu thư của một gia tộc bị diệt môn, mang trọng thương và sự truy sát của kẻ thù chạy trốn vào Vô Linh Khúc rồi ngất lịm trước cửa nhà anh.\n\nLục Trường An vì lòng nhân hậu và tình yêu sét đánh đã dùng những \"mẹo vặt\" sư phụ dạy để cứu sống và bảo vệ cô. Thẩm Dao tỉnh lại, chứng kiến những biểu hiện nghịch thiên của ân nhân nhưng anh lại luôn miệng than thở: \"Sư phụ ta nói ta không có linh căn, chỉ là phàm nhân yếu ớt, nàng đừng chê cười\". Thẩm Dao vừa cảm động vừa kính phục, quyết tâm dốc sức tu luyện để trả thù và bảo vệ người con trai phàm trần ấm áp này. Câu chuyện là hành trình Lục Trường An dùng sự cường đại vô thức (được kế thừa từ người sư phụ bá đạo) để hộ tống Thẩm Dao du ngoạn thiên hạ, dẹp tan mọi thế lực, viết nên một tình yêu thuần khiết, độc nhất vô nhị.\nTình huống hài hước: Mỗi lần nam chính tung chiêu, anh ta sẽ lẩm nhẩm: \"Sư phụ bảo gặp hổ báo thì phải ném cái bùa này để dọa nó chạy\" -> Kết quả: Đạo bùa đánh tan xác một vị Ma đầu cấp Nguyên Anh.\n\nSự thật về Sư phụ: Sau này khi nữ chính gặp các đại lão trong tu tiên giới, họ nghe danh những món đồ nam chính dùng liền nhận ra ngay bảo vật của vị \"Đại năng tối cao\" đã biến mất nghìn năm trước, khiến hiểu lầm ngày càng sâu sắc và thú vị hơn.",
+  "style": "Hài hước, Tình cảm - Trung thủy, Kịch tính, Vô địch văn (Ẩn tính), Ngọt sủng",
+  "tags": [
+    "Tiên hiệp",
+    "Tu tiên",
+    "Tình cảm",
+    "Trung thủy",
+    "Hài hước",
+    "Sảng văn",
+    "Vô địch lưu."
+  ],
+  "max_chapters": 400,
+  "max_words_per_chapter": 800,
+  "model": "gemini-3.1-flash-lite",
+  "cultivation_stages": [
+    {
+      "name": "Luyện Khí",
+      "description": "Giai đoạn tích lũy linh khí vào cơ thể."
+    },
+    {
+      "name": "Trúc Cơ",
+      "description": "Xây dựng nền móng tu tiên vững chắc."
+    },
+    {
+      "name": "Kim Đan",
+      "description": "Nguyên anh ngưng tụ linh khí thành thực thể Kim Đan."
+    },
+    {
+      "name": "Nguyên Anh",
+      "description": "Hóa hình linh hồn thành Nguyên Anh."
+    },
+    {
+      "name": "Hóa Thần",
+      "description": "Linh hồn giao hòa cùng trời đất."
+    },
+    {
+      "name": "Luyện Hư",
+      "description": "Phản phác quy chân, dung hợp thân thể vào hư không."
+    },
+    {
+      "name": "Hợp Thể",
+      "description": "Thần và Thể hợp nhất, tu vi đạt đến đỉnh cao của giới diện."
+    },
+    {
+      "name": "Độ Kiếp",
+      "description": "Chống chọi với Thiên kiếp để chuẩn bị phi thăng."
+    }
+  ]
+}

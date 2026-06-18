@@ -1,0 +1,151 @@
+{
+  "timeline": [
+    {
+      "chapter": 1,
+      "title": "Kẻ phàm trần giữa rừng sương mù",
+      "summary": "Lục Trường An, một người phàm không có linh căn sống ẩn dật trong rừng sâu, vô tình sở hữu những vật dụng sinh hoạt thực chất là các pháp bảo và trận pháp thượng thừa do sư phụ để lại. Cuộc sống yên bình của anh bị xáo trộn khi một thiếu nữ bị thương nặng rơi xuống từ vết nứt không gian ngay trước sân nhà, kéo theo sự xuất hiện của Khương Huyết Ma, một kẻ tu hành tà đạo đang truy sát nàng.",
+      "nodes": [
+        {
+          "id": "node-1781702880506",
+          "title": "Hồi ức mười năm trước: Ngày sư phụ 'vứt bỏ' đồ đệ",
+          "description": "Lục Trường An hồi tưởng về ngày Huyền Cơ Lão Nhân phất tay rời đi, để lại một đống sách vở và lời dặn dò đầy 'tâm huyết' về việc làm phàm nhân. Anh vẫn tin rằng sư phụ bỏ đi vì mình không có linh căn, hoàn toàn không hay biết đó là màn kịch của một đại năng tu sĩ.",
+          "characters": [
+            "Lục Trường An",
+            "Huyền Cơ Lão Nhân"
+          ],
+          "resolved_thread": {
+            "resolution_note": "Thiết lập tiền đề tâm lý nhân vật, khẳng định sự hiểu lầm về thân phận phàm nhân, tạo đà cho sự xuất hiện của biến cố định mệnh.",
+            "thread": "Nút thắt 1: Bắt đầu cuộc phiêu lưu của nhân vật."
+          },
+          "links": [
+            {
+              "chapter": 0,
+              "nodes": []
+            }
+          ],
+          "locations": [
+            "Vô Linh Khúc"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1781702880507",
+          "title": "Cuộc sống phàm trần đầy 'bất ổn'",
+          "description": "Lục Trường An thực hiện các công việc hàng ngày: vẽ bùa để nhóm bếp nấu cơm, xếp mấy viên đá cuội quanh sân để chống trộm, bấm quẻ dự báo thời tiết. Mỗi hành động của anh đều vô tình làm rung chuyển linh khí vùng phụ cận nhưng anh vẫn hồn nhiên lẩm bẩm chửi yêu sư phụ vì dạy toàn 'mẹo vặt' không ra gì.",
+          "characters": [
+            "Lục Trường An"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "Vô Linh Khúc"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "hài hước",
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1781702880508",
+          "title": "Vị khách rơi xuống từ hư không",
+          "description": "Trong khi Lục Trường An đang bận rộn nhóm lửa bằng lá bùa 'chống ẩm' tại căn nhà nhỏ ở Vô Linh Khúc, bầu trời phía trên bỗng nhiên nứt toác một đường rạch dài. Một bóng đen đầy máu từ trên cao rơi thẳng xuống khoảng sân trước cửa nhà anh. Lục Trường An hoảng hốt chạy ra, kinh ngạc nhìn người con gái xinh đẹp nhưng mang đầy vết thương chí mạng đang thoi thóp. Anh vội vã đỡ lấy cô, trong lòng thầm trách sư phụ ngày trước dạy toàn những phương thuốc 'vớ vẩn' không biết có cứu nổi người bị thương nặng thế này không. Đúng lúc đó, sát khí từ những kẻ truy đuổi bắt đầu bao phủ lấy khu rừng, khiến không gian xung quanh trở nên lạnh lẽo và đầy kịch tính.",
+          "characters": [
+            "Lục Trường An"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "Vô Linh Khúc"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "kịch tính",
+          "x": 750,
+          "y": 200
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1781702880506",
+          "to": "node-1781702880507"
+        },
+        {
+          "from": "node-1781702880507",
+          "to": "node-1781702880508"
+        }
+      ]
+    }
+  ],
+  "unresolved_threads": [
+    {
+      "thread": "Bắt đầu cuộc phiêu lưu của nhân vật.",
+      "chapter": null
+    },
+    {
+      "thread": "Danh tính thực sự và nguồn gốc của thiếu nữ bí ẩn là ai?",
+      "chapter": 1
+    },
+    {
+      "thread": "Tại sao Khương Huyết Ma lại truy sát thiếu nữ và tầm quan trọng của nàng là gì?",
+      "chapter": 1
+    },
+    {
+      "thread": "Liệu Lục Trường An có vô tình kích hoạt các trận pháp hoặc phù văn để đánh bại Khương Huyết Ma hay không?",
+      "chapter": 1
+    },
+    {
+      "thread": "Bí ẩn về người sư phụ đã để lại những 'mẹo vặt' sinh tồn cho Lục Trường An.",
+      "chapter": 1
+    }
+  ],
+  "resolved_threads": [
+    {
+      "thread": "Nút thắt 1: Bắt đầu cuộc phiêu lưu của nhân vật.",
+      "chapter_introduced": null,
+      "chapter_resolved": 1,
+      "resolution_note": "Thiết lập tiền đề tâm lý nhân vật, khẳng định sự hiểu lầm về thân phận phàm nhân, tạo đà cho sự xuất hiện của biến cố định mệnh."
+    }
+  ],
+  "locations": [
+    {
+      "name": "Vô Linh Khúc",
+      "chapter": 1,
+      "description": "Khu vực rừng sương mù vĩnh cửu, nơi có căn nhà gỗ của Lục Trường An."
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Ngọc kiếm bị gãy",
+      "chapter": 1,
+      "description": "Thanh kiếm của thiếu nữ bí ẩn, hiện đã bị gãy lìa."
+    }
+  ],
+  "techniques": [
+    {
+      "name": "Bùa nhóm bếp",
+      "chapter": 1,
+      "description": "Những tờ giấy vẽ phù văn cổ xưa mà Lục Trường An tưởng là mẹo vặt để nhóm lửa."
+    },
+    {
+      "name": "Hộ Đạo Đại Trận cấp Thần",
+      "chapter": 1,
+      "description": "Trận pháp ẩn giấu dưới hình thức những viên đá cuội xếp quanh sân nhà Lục Trường An."
+    },
+    {
+      "name": "Huyết Sát Công Pháp",
+      "chapter": 1,
+      "description": "Công pháp tà ác của Khương Huyết Ma, tạo ra sát khí màu đỏ máu và hình đầu lâu oán khí."
+    }
+  ]
+}
