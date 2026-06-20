@@ -169,12 +169,14 @@ export default function App() {
     }
   };
 
-  const handleGenerationComplete = (newChapterNum) => {
+  const handleGenerationComplete = (newChapterNum, stayOnTab = false) => {
     // Refresh story details after generation finishes
     setTimeout(() => {
       fetchStoryDetails(selectedStoryId);
       setActiveChapterNum(newChapterNum);
-      setActiveTab('reader'); // Go directly to read tab to show the new chapter
+      if (!stayOnTab) {
+        setActiveTab('reader'); // Go directly to read tab to show the new chapter
+      }
     }, 1000);
   };
 

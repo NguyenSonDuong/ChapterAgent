@@ -8,7 +8,49 @@ import json
 import re
 from typing import Any
 
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.panel import Panel
+
+import src.core.config as config
+from src.models.story import StoryMeta
+from src.core.state import AgentState
+from src.utils.session_manager import session_manager, SessionCancelledError
+from src.utils.socket_emitter import emit_event, emit_agent_log
+
+console = Console()
+
+def add_format_instructions_to_prompt(prompt, output_schema):
+    if not output_schema:
+        return prompt
+        
+    from langchain_core.output_parsers import PydanticOutputParser
+    parser = PydanticOutputParser(pydantic_object=output_schema)
+    format_instructions = parser.get_format_instructions()
+    
+    vietnamese_note = "\n\nQUAN TRỌNG: Bạn BẮT BUỘC phải trả về kết quả dưới định dạng JSON tuân thủ chính xác schema dưới đây. Đảm bảo tất cả các trường (fields) bắt buộc đều phải có mặt và đúng kiểu dữ liệu.\n"
+    instructions = vietnamese_note + format_instructions
+    
+    if isinstance(prompt, str):
+        return prompt + "\n\n" + instructions
+    elif isinstance(prompt, list):
+        from langchain_core.messages import HumanMessage
+        new_prompt = list(prompt)
+        new_prompt.append(HumanMessage(content=instructions))
+        return new_prompt
+    elif hasattr(prompt, "to_messages"):
+        messages = prompt.to_messages()
+        from langchain_core.messages import HumanMessage
+        messages.append(HumanMessage(content=instructions))
+        return messages
+    else:
+        try:
+            return str(prompt) + "\n\n" + instructions
+        except Exception:
+            return prompt
+
 class SafePydanticParser(BaseOutputParser):
+
     pydantic_schema: Any
     
     def parse(self, text: str) -> Any:
@@ -24,17 +66,6 @@ class SafePydanticParser(BaseOutputParser):
         
         return self.pydantic_schema.model_validate(data)
 
-from rich.console import Console
-from rich.prompt import Prompt
-from rich.panel import Panel
-
-import src.core.config as config
-from src.models.story import StoryMeta
-from src.core.state import AgentState
-from src.utils.session_manager import session_manager, SessionCancelledError
-from src.utils.socket_emitter import emit_event, emit_agent_log
-
-console = Console()
 
 def check_cancellation(story_uuid: str):
     if not story_uuid:
@@ -47,14 +78,23 @@ def get_llm(model_name: str = "Chapter", temperature: float = 0.7):
     if not model_name:
         model_name = "Chapter"
         
-    if model_name == "Chapter":
+    is_gemini = model_name and (model_name.startswith("gemini-") or model_name.startswith("gemma-"))
+
+    open_api_key = os.getenv("OPEAI_API_KEY")
+    open_api_base = os.getenv("OPEAI_API_BASE")
+
+    if not open_api_key or not open_api_base:
+        raise ValueError("OPEAI_API_KEY/OPEAI_API_BASE environment variable not set. Please check your .env file.")
+
+    if not is_gemini:
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
-            model="Chapter",
+            model=model_name,
             temperature=temperature,
-            openai_api_key="sk-7a94d94b493e898d-inj9ns-808bcc24",
-            openai_api_base="http://localhost:20128/v1"
+            openai_api_key=open_api_key,
+            openai_api_base=open_api_base
         )
+
         
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -149,7 +189,8 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
         try:
             llm = get_llm(model_name, temperature)
             if output_schema:
-                if model_name == "Chapter":
+                is_gemini = model_name and (model_name.startswith("gemini-") or model_name.startswith("gemma-"))
+                if not is_gemini:
                     runnable = llm | StrOutputParser() | SafePydanticParser(pydantic_schema=output_schema)
                 else:
                     runnable = llm.with_structured_output(output_schema)
@@ -168,7 +209,12 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
             
         if code == 0:
             try:
-                return runnable.invoke(prompt)
+                active_prompt = prompt
+                is_gemini = model_name and (model_name.startswith("gemini-") or model_name.startswith("gemma-"))
+                if not is_gemini and output_schema:
+                    active_prompt = add_format_instructions_to_prompt(prompt, output_schema)
+                return runnable.invoke(active_prompt)
+
             except Exception as e:
                 code = classify_exception(e)
                 e_msg = str(e)

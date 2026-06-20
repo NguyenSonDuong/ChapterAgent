@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Dict, Any
+from typing import TypedDict, List, Dict, Any, Optional
 
 class AgentState(TypedDict):
     story_uuid: str
@@ -20,3 +20,6 @@ class AgentState(TypedDict):
     conflict_resolutions: List[Dict[str, Any]]
     verification_mode: str
     is_done: bool
+    auto_mode: Optional[bool]
+    max_chapters: Optional[int]
+    target_words: Optional[int]

@@ -34,6 +34,9 @@ def route_after_scene_drafter(state: AgentState) -> str:
 
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Human Review
 def route_after_human_review(state: AgentState) -> str:
+    if state.get("auto_mode"):
+        return "auditor"
+
     feedback = state.get("revision_feedback", "")
     fb_clean = feedback.strip().lower()
     
@@ -58,6 +61,9 @@ def route_after_human_review(state: AgentState) -> str:
 
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Auditor
 def route_after_auditor(state: AgentState) -> str:
+    if state.get("auto_mode"):
+        return "updater"
+
     warnings = state.get("warnings", [])
     if warnings:
         if state.get("verification_mode") == "node_by_node":

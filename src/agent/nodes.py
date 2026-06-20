@@ -242,6 +242,7 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     ledger = state["ledger"]
     meta = state["meta"]
     chapter_num = state["chapter_num"]
+    max_chapters = state.get("max_chapters") or meta.get("max_chapters", 10)
     
     # Format global ledger and meta context for LLM
     ledger_str = to_ledger_markdown(ledger)
@@ -257,6 +258,8 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     loop_count = 0
     max_loops = 3
     current_idea = format_user_idea(user_idea, state["story_uuid"])
+    if chapter_num >= max_chapters:
+        current_idea += "\n[LƯU Ý QUAN TRỌNG]: Đây là CHƯƠNG CUỐI CÙNG của bộ truyện. Hãy thiết lập các yêu cầu chi tiết để giải quyết tất cả các nút thắt chính còn sót lại trong Sổ cái toàn cục và viết một cái kết trọn vẹn, ý nghĩa cho câu chuyện. Tuyệt đối không tạo kết thúc lửng lơ (cliffhanger) ở cuối chương này."
     
     while loop_count < max_loops:
         prompt = load_prompt("requirement_analyzer.md") \
@@ -268,7 +271,7 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
         result = invoke_with_retry(state, prompt, temperature=0.7, output_schema=RequirementAnalysisResult)
             
         # If there are missing info questions, ask user
-        if result.missing_info_questions and loop_count < max_loops - 1:
+        if result.missing_info_questions and loop_count < max_loops - 1 and not state.get("auto_mode"):
             session = session_manager.get_session(state["story_uuid"])
             if session:
                 emit_agent_log(state["story_uuid"], "Phát hiện thiếu thông tin cốt truyện. Đang gửi câu hỏi làm rõ đến giao diện...", level="warning")
@@ -313,82 +316,86 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     current_requirements = result.analyzed_requirements
     
     # Vòng lặp duyệt yêu cầu chương (Requirement Review Loop)
-    while True:
-        check_cancellation(state["story_uuid"])
-        
-        session = session_manager.get_session(state["story_uuid"])
-        if session:
-            emit_agent_log(state["story_uuid"], "Đang chờ tác giả duyệt yêu cầu chương...")
-            session.current_node = "requirement_review"
-            session.status = "waiting_requirement_review"
-            emit_event("requirement_review_needed", {
-                "story_uuid": state["story_uuid"],
-                "chapter_num": state["chapter_num"],
-                "analyzed_requirements": current_requirements
-            })
-            
-            # Chờ phản hồi duyệt yêu cầu từ client
-            session.input_event.clear()
-            success = session.input_event.wait(timeout=1200.0) # 20 phút
+    if state.get("auto_mode"):
+        console.print("[Info] Auto mode enabled. Skipping requirement review loop.")
+        emit_agent_log(state["story_uuid"], "Tự động phê duyệt yêu cầu chương (Auto Mode).")
+    else:
+        while True:
             check_cancellation(state["story_uuid"])
             
-            if not success:
-                console.print("[yellow]Hết thời gian chờ duyệt yêu cầu chương. Tự động hoàn thành...[/yellow]")
-                emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt yêu cầu chương. Tự động tiếp tục.", level="warning")
-                feedback = "Done"
-            else:
-                feedback = session.input_data
-                session.input_data = None
-                session.status = "running"
-                if feedback is None:
-                    feedback = "Done"
-        else:
-            # CLI Fallback
-            console.print(Panel(current_requirements, title=f"Duyệt yêu cầu Chương {chapter_num}", border_style="cyan"))
-            console.print("[bold magenta]Nhập yêu cầu chỉnh sửa[/bold magenta] (gõ 'Done' nếu đồng ý, hoặc nhập phản hồi):")
-            feedback = Prompt.ask("> ")
-            if not feedback.strip():
-                feedback = "Done"
-        
-        fb_str = str(feedback).strip()
-        if fb_str.lower() == 'done':
-            break
-            
-        # Parse feedback xem có dạng bôi đen hay không
-        feedback_data = None
-        if isinstance(feedback, dict):
-            feedback_data = feedback
-        elif isinstance(feedback, str):
-            try:
-                feedback_data = json.loads(feedback)
-            except Exception:
-                feedback_data = feedback
+            session = session_manager.get_session(state["story_uuid"])
+            if session:
+                emit_agent_log(state["story_uuid"], "Đang chờ tác giả duyệt yêu cầu chương...")
+                session.current_node = "requirement_review"
+                session.status = "waiting_requirement_review"
+                emit_event("requirement_review_needed", {
+                    "story_uuid": state["story_uuid"],
+                    "chapter_num": state["chapter_num"],
+                    "analyzed_requirements": current_requirements
+                })
                 
-        if isinstance(feedback_data, dict) and "text_selected" in feedback_data and "comment" in feedback_data:
-            text_selected = feedback_data["text_selected"]
-            comment = feedback_data["comment"]
+                # Chờ phản hồi duyệt yêu cầu từ client
+                session.input_event.clear()
+                success = session.input_event.wait(timeout=1200.0) # 20 phút
+                check_cancellation(state["story_uuid"])
+                
+                if not success:
+                    console.print("[yellow]Hết thời gian chờ duyệt yêu cầu chương. Tự động hoàn thành...[/yellow]")
+                    emit_agent_log(state["story_uuid"], "Hết thời gian chờ duyệt yêu cầu chương. Tự động tiếp tục.", level="warning")
+                    feedback = "Done"
+                else:
+                    feedback = session.input_data
+                    session.input_data = None
+                    session.status = "running"
+                    if feedback is None:
+                        feedback = "Done"
+            else:
+                # CLI Fallback
+                console.print(Panel(current_requirements, title=f"Duyệt yêu cầu Chương {chapter_num}", border_style="cyan"))
+                console.print("[bold magenta]Nhập yêu cầu chỉnh sửa[/bold magenta] (gõ 'Done' nếu đồng ý, hoặc nhập phản hồi):")
+                feedback = Prompt.ask("> ")
+                if not feedback.strip():
+                    feedback = "Done"
             
-            emit_agent_log(state["story_uuid"], f"Tác giả yêu cầu sửa đổi yêu cầu tại đoạn: \"{text_selected}\" -> Chú thích: \"{comment}\"")
-            console.print(f"Đang hiệu chỉnh yêu cầu chương tại đoạn bôi đen...")
-            
-            refine_prompt = load_prompt("requirement_refine_selection.md") \
-                .replace("{current_requirements}", current_requirements) \
-                .replace("{text_selected}", text_selected) \
-                .replace("{comment}", comment)
-            refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
-            current_requirements = ensure_string(refine_response.content).strip()
-            emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
-        else:
-            comment_str = str(feedback_data)
-            emit_agent_log(state["story_uuid"], f"Tác giả gửi ý kiến đóng góp chung cho yêu cầu: \"{comment_str}\"")
-            console.print(f"Đang sửa đổi yêu cầu chương theo ý kiến đóng góp chung...")
-            
-            refine_prompt = load_prompt("requirement_refine_comment.md") \
-                .replace("{current_requirements}", current_requirements) \
-                .replace("{comment_str}", comment_str)
-            refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
-            current_requirements = ensure_string(refine_response.content).strip()
-            emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
+            fb_str = str(feedback).strip()
+            if fb_str.lower() == 'done':
+                break
+                
+            # Parse feedback xem có dạng bôi đen hay không
+            feedback_data = None
+            if isinstance(feedback, dict):
+                feedback_data = feedback
+            elif isinstance(feedback, str):
+                try:
+                    feedback_data = json.loads(feedback)
+                except Exception:
+                    feedback_data = feedback
+                    
+            if isinstance(feedback_data, dict) and "text_selected" in feedback_data and "comment" in feedback_data:
+                text_selected = feedback_data["text_selected"]
+                comment = feedback_data["comment"]
+                
+                emit_agent_log(state["story_uuid"], f"Tác giả yêu cầu sửa đổi yêu cầu tại đoạn: \"{text_selected}\" -> Chú thích: \"{comment}\"")
+                console.print(f"Đang hiệu chỉnh yêu cầu chương tại đoạn bôi đen...")
+                
+                refine_prompt = load_prompt("requirement_refine_selection.md") \
+                    .replace("{current_requirements}", current_requirements) \
+                    .replace("{text_selected}", text_selected) \
+                    .replace("{comment}", comment)
+                refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
+                current_requirements = ensure_string(refine_response.content).strip()
+                emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
+            else:
+                comment_str = str(feedback_data)
+                emit_agent_log(state["story_uuid"], f"Tác giả gửi ý kiến đóng góp chung cho yêu cầu: \"{comment_str}\"")
+                console.print(f"Đang sửa đổi yêu cầu chương theo ý kiến đóng góp chung...")
+                
+                refine_prompt = load_prompt("requirement_refine_comment.md") \
+                    .replace("{current_requirements}", current_requirements) \
+                    .replace("{comment_str}", comment_str)
+                refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
+                current_requirements = ensure_string(refine_response.content).strip()
+                emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
 
     console.print(Panel(current_requirements, title=f"Yêu cầu Chương {chapter_num} đã được duyệt cuối cùng", border_style="green"))
     emit_agent_log(state["story_uuid"], f"Yêu cầu sáng tác Chương {chapter_num} đã được duyệt.")
@@ -547,6 +554,20 @@ def scene_drafter_node(state: AgentState) -> Dict[str, Any]:
         .replace("{rolling_memory}", rolling_memory) \
         .replace("{unselected_entities_text}", unselected_entities_text) \
         .replace("{first_scene_header}", first_scene_header)
+        
+    target_words = state.get("target_words") or meta.get("max_words_per_chapter", 2000)
+    max_chapters = state.get("max_chapters") or meta.get("max_chapters", 10)
+    words_per_scene = max(400, target_words // len(scenes)) if len(scenes) > 0 else 1000
+    
+    pacing_instructions = f"\n- YÊU CẦU ĐỘ DÀI: Viết phân cảnh này thật dài, chi tiết, mục tiêu đạt khoảng {words_per_scene} từ để góp phần đảm bảo chương này đạt tổng số từ yêu cầu (khoảng {target_words} từ)."
+    
+    if chapter_num >= max_chapters:
+        if current_idx == len(scenes) - 1:
+            pacing_instructions += f"\n- LƯU Ý ĐẶC BIỆT: Đây là CHƯƠNG CUỐI CÙNG và PHÂN CẢNH CUỐI CÙNG của bộ truyện. Bạn BẮT BUỘC phải viết một kết cục trọn vẹn, ý nghĩa, giải quyết các sự kiện chính và TUYỆT ĐỐI KHÔNG sử dụng kết thúc lửng lơ (cliffhanger). Kết thúc truyện ngay tại đây."
+        else:
+            pacing_instructions += f"\n- LƯU Ý ĐẶC BIỆT: Đây là CHƯƠNG CUỐI CÙNG của bộ truyện. Hãy dẫn dắt các diễn biến một cách kịch tính để chuẩn bị đi đến kết cục của truyện ở phân cảnh sau."
+
+    prompt += f"\n\nHƯỚNG DẪN BỔ SUNG:\n{pacing_instructions}"
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
     scene_draft = ensure_string(response.content)
@@ -586,6 +607,15 @@ def human_review_node(state: AgentState) -> Dict[str, Any]:
     scene_drafts = state.get("scene_drafts", [])
     scenes = state.get("scenes_to_write", [])
     warnings = state.get("warnings", [])
+        
+    if state.get("auto_mode"):
+        console.print("[Info] Auto mode enabled. Bypassing human review.")
+        emit_agent_log(state["story_uuid"], "Tự động phê duyệt bản thảo (Auto Mode).")
+        return {
+            "revision_feedback": "Done",
+            "draft_content": draft_content,
+            "verification_mode": verification_mode
+        }
         
     session = session_manager.get_session(state["story_uuid"])
     if session:

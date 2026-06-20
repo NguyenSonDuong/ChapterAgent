@@ -10,7 +10,7 @@ export default function ProgressBar({ status }) {
   // Step 5: Hoàn tất (updating, completed)
   
   const steps = [
-    { label: 'Phân tích Yêu cầu', key: 'analysis', statuses: ['analyzing_requirements', 'waiting_clarification'] },
+    { label: 'Phân tích Yêu cầu', key: 'analysis', statuses: ['analyzing_requirements', 'waiting_clarification', 'suggesting_nodes'] },
     { label: 'Soạn thảo Bản nháp', key: 'drafting', statuses: ['drafting'] },
     { label: 'Tác giả phê duyệt', key: 'review', statuses: ['waiting_review', 'revising'] },
     { label: 'Kiểm duyệt Logic', key: 'auditing', statuses: ['auditing', 'waiting_conflict_review'] },

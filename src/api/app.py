@@ -1745,6 +1745,140 @@ HƯỚNG DẪN VIẾT:
         return jsonify({'error': f'Failed to call LLM: {str(e)}'}), 500
 
 
+def auto_suggest_chapter_nodes(story_uuid, chapter_num, meta_data, ledger_data):
+    """Automatically generate event nodes for a chapter during auto-mode generation."""
+    model_name = meta_data.get('model', 'gemini-2.5-flash')
+    
+    # Get all characters
+    characters = [c.get('name') for c in meta_data.get('characters', []) if c.get('name')]
+    
+    # Get all locations, weapons, techniques from ledger
+    locations = [l.get('name') if isinstance(l, dict) else l for l in ledger_data.get('locations', [])]
+    weapons = [w.get('name') if isinstance(w, dict) else w for w in ledger_data.get('weapons', [])]
+    techniques = [t.get('name') if isinstance(t, dict) else t for t in ledger_data.get('techniques', [])]
+    
+    # Build prev nodes context
+    prev_nodes_ctx = ""
+    if chapter_num > 1:
+        prev_nodes_path = config.get_chapter_nodes_path(story_uuid, chapter_num - 1)
+        if prev_nodes_path.exists():
+            try:
+                prev_nodes_data = json.loads(prev_nodes_path.read_text(encoding="utf-8"))
+                prev_nodes_ctx += f"\nSơ đồ sự kiện chương trước (Chương {chapter_num - 1}):\n"
+                for node in prev_nodes_data.get("nodes", []):
+                    node_text = node.get("content") or node.get("description") or ""
+                    prev_nodes_ctx += f"- Node ID: `{node['id']}` | Tiêu đề: \"{node['title']}\" | Nội dung/Mô tả: {node_text}\n"
+            except Exception:
+                pass
+
+    prompt = f"""
+Bạn là một chuyên gia xây dựng kịch bản và sơ đồ sự kiện cho tiểu thuyết dài kỳ. Nhiệm vụ của bạn là thiết lập danh sách 3 node sự kiện tuần tự nối tiếp nhau cho Chương {chapter_num} của câu chuyện dưới đây.
+
+THÔNG TIN TÁC PHẨM:
+- Tên truyện: {meta_data.get('name')}
+- Bối cảnh chính: {meta_data.get('context')}
+- Phong cách hành văn: {meta_data.get('style')}
+
+SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
+- Lịch sử cốt truyện:
+{to_timeline_markdown(ledger_data.get('timeline', []))}
+- Các nút thắt chưa giải quyết:
+{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
+
+BỐI CẢNH SỰ KIỆN CHƯƠNG TRƯỚC:
+{prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ."}
+
+YÊU CẦU CHO CHƯƠNG {chapter_num}:
+- Tạo chính xác 3 node sự kiện được nối kết tuần tự.
+- Hãy khéo léo lựa chọn và phân bổ các nhân vật: {', '.join(characters) if characters else 'Không chỉ định'}
+- Lựa chọn các địa điểm phù hợp: {', '.join(locations) if locations else 'Không chỉ định'}
+- Lựa chọn các công pháp phù hợp: {', '.join(techniques) if techniques else 'Không chỉ định'}
+- Lựa chọn binh khí/pháp khí phù hợp: {', '.join(weapons) if weapons else 'Không chỉ định'}
+- Hãy cố gắng giải quyết một hoặc vài nút thắt chưa giải quyết ở trên nếu hợp lý, mô tả cách giải quyết trong resolution_note.
+
+HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
+1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) với node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
+2. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, ĐỊA ĐIỂM...):
+   - Chỉ cho phép các thực thể đã biết ở trên HOẶC các thực thể hoàn toàn mới được tạo ra xuất hiện trong các node.
+   - Tuyệt đối CẤM cho xuất hiện hay nhắc tên bất kỳ thực thể cũ nào khác có sẵn trong tác phẩm mà không có ở trên.
+3. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
+4. Đề xuất một Văn Phong (tone) cụ thể và phù hợp cho mỗi node (ví dụ: "hài hước", "bi thương", "đau khổ tuyệt vọng", "tình cảm", "kịch tính", "bình thường").
+5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
+   - Sơ đồ các node sự kiện KHÔNG được thiết kế theo cấu trúc đóng của một bài văn độc lập. Node đầu tiên phải bắt đầu nối tiếp diễn biến trước đó.
+   - Node cuối cùng của chương phải mở ra một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để chuẩn bị cho chương tiếp theo, tuyệt đối tránh kết thúc đóng.
+   - LƯU Ý ĐẶC BIỆT: Nếu Chương {chapter_num} này là chương cuối cùng của bộ truyện (dựa theo max_chapters), hãy thiết kế các node sao cho giải quyết toàn bộ các mâu thuẫn chính và kết thúc câu chuyện trọn vẹn, không tạo cliffhanger ở node cuối cùng nữa.
+"""
+    from src.utils.llm import invoke_with_retry
+    state = {
+        "story_uuid": story_uuid,
+        "model": model_name
+    }
+    
+    suggested_data = invoke_with_retry(
+        state, 
+        prompt, 
+        temperature=0.7, 
+        output_schema=models.SuggestedChapterNodes
+    )
+    
+    import time
+    timestamp = int(time.time() * 1000)
+    
+    node_id_map = {}
+    transformed_nodes = []
+    
+    for idx, node in enumerate(suggested_data.nodes):
+        new_id = f"node-{timestamp + idx}"
+        node_id_map[node.id] = new_id
+        
+        res_thread = {
+            "thread": "",
+            "resolution_note": ""
+        }
+        if node.resolved_thread and node.resolved_thread.thread.strip():
+            res_thread = {
+                "thread": node.resolved_thread.thread.strip(),
+                "resolution_note": node.resolved_thread.resolution_note.strip()
+            }
+            
+        links = []
+        if node.links:
+            for l in node.links:
+                links.append({
+                    "chapter": l.chapter,
+                    "nodes": l.nodes or []
+                })
+                
+        transformed_nodes.append({
+            "id": new_id,
+            "title": node.title.strip(),
+            "description": node.description.strip(),
+            "characters": node.characters or [],
+            "locations": node.locations or [],
+            "weapons": node.weapons or [],
+            "techniques": node.techniques or [],
+            "tone": node.tone or "bình thường",
+            "resolved_thread": res_thread,
+            "links": links,
+            "x": 100 + (idx * 250),
+            "y": 200
+        })
+        
+    transformed_connections = []
+    for conn in suggested_data.connections:
+        from_id = node_id_map.get(conn.from_node)
+        to_id = node_id_map.get(conn.to_node)
+        if from_id and to_id:
+            transformed_connections.append({
+                "from_node": from_id,
+                "to_node": to_id
+            })
+            
+    return {
+        "nodes": transformed_nodes,
+        "connections": transformed_connections
+    }
+
 
 # ----------------------------------------------------
 # Real-time Chapter Generation API (LangGraph trigger)
@@ -1759,10 +1893,12 @@ def generate_chapter(story_uuid):
 
     data = request.json or {}
     user_idea = data.get('user_idea')
-    if not user_idea:
-        return jsonify({'error': 'Missing user_idea in payload'}), 400
-    if isinstance(user_idea, str) and not user_idea.strip():
-        return jsonify({'error': 'Missing user_idea in payload'}), 400
+    auto_mode = data.get('auto_mode', False)
+    if not auto_mode:
+        if not user_idea:
+            return jsonify({'error': 'Missing user_idea in payload'}), 400
+        if isinstance(user_idea, str) and not user_idea.strip():
+            return jsonify({'error': 'Missing user_idea in payload'}), 400
 
     # Resolve story metadata and ledger
     try:
@@ -1796,65 +1932,138 @@ def generate_chapter(story_uuid):
         return jsonify({'error': 'Tiến trình sáng tác đang hoạt động cho truyện này.'}), 400
 
     selected_model = data.get('model') or meta_data.get('model') or 'gemini-2.5-flash'
+    max_chaps = data.get('max_chapters') or meta_data.get('max_chapters', 10)
+    target_words = data.get('target_words') or meta_data.get('max_words_per_chapter', 2000)
+
+    # Helper cleanup function for cancellation
+    def clean_up_after_cancel(story_uuid, chapter_num):
+        temp_draft_path = config.get_temp_draft_path(story_uuid)
+        if temp_draft_path.exists():
+            try:
+                temp_draft_path.unlink()
+                print("✓ Dọn dẹp file nháp tạm temp_draft.md sau khi hủy.")
+            except Exception as ex:
+                print(f"Warning: Không thể xóa file nháp tạm: {ex}")
+        emit_event("agent_status", {
+            "story_uuid": story_uuid,
+            "chapter_num": chapter_num,
+            "status": "cancelled",
+            "message": "Tiến trình sáng tác đã bị hủy bởi tác giả."
+        })
+        session_manager.remove_session(story_uuid)
 
     # Create background thread to run LangGraph
     def run_graph_flow():
-        print(f"Background thread started for story {story_uuid}, Chapter {next_chap_num}")
-        # Create API session
-        session = session_manager.create_session(story_uuid, next_chap_num)
+        print(f"Background thread started for story {story_uuid}, starting Chapter {next_chap_num}, auto_mode={auto_mode}")
         
-        initial_state: AgentState = {
-            "story_uuid": story_uuid,
-            "chapter_num": next_chap_num,
-            "user_idea": user_idea,
-            "original_user_idea": user_idea,
-            "model": selected_model,
-            "meta": meta_data,
-            "ledger": ledger_data,
-            "story_bible": "",
-            "analyzed_requirements": "",
-            "scenes_to_write": [],
-            "current_scene_index": 0,
-            "scene_drafts": [],
-            "draft_content": "",
-            "revision_feedback": "",
-            "auditor_feedback": "",
-            "warnings": [],
-            "conflict_resolutions": [],
-            "verification_mode": "",
-            "is_done": False
-        }
-        
-        try:
-            # Execute graph app
-            graph_app.invoke(initial_state)
-            print(f"Background thread finished successfully for story {story_uuid}")
-        except SessionCancelledError as e:
-            print(f"LangGraph execution cancelled for story {story_uuid}: {e}")
-            # Clean up temp_draft.md
-            temp_draft_path = config.get_temp_draft_path(story_uuid)
-            if temp_draft_path.exists():
+        current_chap = next_chap_num
+        current_user_idea = user_idea
+        current_meta = meta_data
+        current_ledger = ledger_data
+
+        while True:
+            from src.utils.llm import check_cancellation
+            try:
+                check_cancellation(story_uuid)
+            except SessionCancelledError as e:
+                clean_up_after_cancel(story_uuid, current_chap)
+                break
+
+            if current_chap > max_chaps:
+                print(f"Auto generation completed up to chapter {max_chaps}")
+                break
+
+            if current_chap > next_chap_num or not current_user_idea:
                 try:
-                    temp_draft_path.unlink()
-                    print("✓ Dọn dẹp file nháp tạm temp_draft.md sau khi hủy.")
-                except Exception as ex:
-                    print(f"Warning: Không thể xóa file nháp tạm: {ex}")
-            emit_event("agent_status", {
+                    print(f"Auto suggesting nodes for Chapter {current_chap}...")
+                    emit_event("agent_status", {
+                        "story_uuid": story_uuid,
+                        "chapter_num": current_chap,
+                        "status": "suggesting_nodes",
+                        "message": f"Đang tự động thiết lập sơ đồ sự kiện cho Chương {current_chap}..."
+                    })
+                    current_user_idea = auto_suggest_chapter_nodes(story_uuid, current_chap, current_meta, current_ledger)
+                except Exception as e:
+                    print(f"Error auto suggesting nodes for Chapter {current_chap}: {e}")
+                    emit_event("agent_status", {
+                        "story_uuid": story_uuid,
+                        "chapter_num": current_chap,
+                        "status": "error",
+                        "message": f"Gặp lỗi khi tự động thiết lập sơ đồ sự kiện Chương {current_chap}: {str(e)}"
+                    })
+                    break
+
+            # Create session for the current chapter
+            session = session_manager.create_session(story_uuid, current_chap)
+            
+            initial_state: AgentState = {
                 "story_uuid": story_uuid,
-                "chapter_num": next_chap_num,
-                "status": "cancelled",
-                "message": "Tiến trình sáng tác đã bị hủy bởi tác giả."
-            })
-            session_manager.remove_session(story_uuid)
-        except Exception as e:
-            print(f"Error in background LangGraph execution: {e}")
-            emit_event("agent_status", {
-                "story_uuid": story_uuid,
-                "chapter_num": next_chap_num,
-                "status": "error",
-                "message": f"Gặp lỗi trong quá trình sáng tác: {str(e)}"
-            })
-            session_manager.remove_session(story_uuid)
+                "chapter_num": current_chap,
+                "user_idea": current_user_idea,
+                "original_user_idea": current_user_idea,
+                "model": selected_model,
+                "meta": current_meta,
+                "ledger": current_ledger,
+                "story_bible": "",
+                "analyzed_requirements": "",
+                "scenes_to_write": [],
+                "current_scene_index": 0,
+                "scene_drafts": [],
+                "draft_content": "",
+                "revision_feedback": "",
+                "auditor_feedback": "",
+                "warnings": [],
+                "conflict_resolutions": [],
+                "verification_mode": "",
+                "is_done": False,
+                "auto_mode": auto_mode,
+                "max_chapters": max_chaps,
+                "target_words": target_words
+            }
+            
+            try:
+                # Execute graph app
+                graph_app.invoke(initial_state)
+                print(f"Chapter {current_chap} finished successfully")
+                
+                check_cancellation(story_uuid)
+                
+                if not auto_mode:
+                    break
+                    
+                # Load updated metadata and ledger for the next chapter
+                meta_path = config.get_meta_path(story_uuid)
+                if meta_path.exists():
+                    try:
+                        current_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                    except Exception as e:
+                        print(f"Failed to read updated meta: {e}")
+                        
+                ledger_path = config.get_ledger_path(story_uuid)
+                if ledger_path.exists():
+                    try:
+                        current_ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+                    except Exception as e:
+                        print(f"Failed to read updated ledger: {e}")
+                
+                # Increment chapter and reset user idea to auto-suggest
+                current_chap += 1
+                current_user_idea = None
+                
+            except SessionCancelledError as e:
+                print(f"LangGraph execution cancelled for story {story_uuid} at Chapter {current_chap}: {e}")
+                clean_up_after_cancel(story_uuid, current_chap)
+                break
+            except Exception as e:
+                print(f"Error in background LangGraph execution for Chapter {current_chap}: {e}")
+                emit_event("agent_status", {
+                    "story_uuid": story_uuid,
+                    "chapter_num": current_chap,
+                    "status": "error",
+                    "message": f"Gặp lỗi trong quá trình sáng tác Chương {current_chap}: {str(e)}"
+                })
+                session_manager.remove_session(story_uuid)
+                break
 
     # Launch background task via socketio to ensure compatibility with eventlet/gevent
     socketio.start_background_task(run_graph_flow)

@@ -243,6 +243,7 @@ export default function ChapterGenerator({
   const [cancelling, setCancelling] = useState(false);
   const [status, setStatus] = useState('idle'); // idle, running, etc.
   const [messages, setMessages] = useState([]);
+  const [autoMode, setAutoMode] = useState(false);
 
   // --- Annotation Selection States ---
   const [selectionPopup, setSelectionPopup] = useState({
@@ -384,8 +385,21 @@ export default function ChapterGenerator({
 
       if (data.status === 'completed') {
         setStatus('completed');
-        setGenerating(false);
-        if (onGenerationComplete) onGenerationComplete(data.chapter_num);
+        const maxChaps = storyMeta?.max_chapters || 10;
+        if (autoMode && data.chapter_num < maxChaps) {
+          if (onGenerationComplete) onGenerationComplete(data.chapter_num, true);
+          setMessages((prev) => [...prev, {
+            id: `auto-next-${Date.now()}`,
+            sender: 'system',
+            type: 'system_log',
+            text: `Chương ${data.chapter_num} đã hoàn thành. Tự động chuyển tiếp sáng tác Chương ${data.chapter_num + 1}...`,
+            level: 'success',
+            time: new Date().toLocaleTimeString()
+          }]);
+        } else {
+          setGenerating(false);
+          if (onGenerationComplete) onGenerationComplete(data.chapter_num);
+        }
       } else if (data.status === 'error') {
         setStatus('error');
         setGenerating(false);
@@ -518,7 +532,7 @@ export default function ChapterGenerator({
       socket.off('conflict_review_needed', onConflictReviewNeeded);
       socket.off('llm_error_select_model', onLlmErrorSelectModel);
     };
-  }, [socket, storyUuid, onGenerationComplete]);
+  }, [socket, storyUuid, onGenerationComplete, autoMode, storyMeta]);
 
   // --- Node Graph Canvas Drag and Drop Handlers ---
   const handleNodeMouseDown = (e, nodeId) => {
@@ -942,7 +956,7 @@ export default function ChapterGenerator({
       const res = await fetch(`http://127.0.0.1:5000/api/stories/${storyUuid}/chapters/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_idea: finalIdea, model: model })
+        body: JSON.stringify({ user_idea: finalIdea, model: model, auto_mode: autoMode })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -2161,7 +2175,19 @@ export default function ChapterGenerator({
               </div>
             )}
 
-            <div className="form-row" style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
+            <div className="form-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input 
+                  type="checkbox" 
+                  id="autoModeCheckbox"
+                  checked={autoMode}
+                  onChange={(e) => setAutoMode(e.target.checked)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <label htmlFor="autoModeCheckbox" style={{ fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'var(--text-bright)' }}>
+                  Tự động tạo toàn bộ truyện (Không cần kiểm duyệt, lặp đến chương cuối)
+                </label>
+              </div>
               <button type="submit" className="btn-primary btn-generate" disabled={generating} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', fontSize: '14px' }}>
                 <Sparkles className="icon-xs" /> <span>Bắt đầu Sáng tác</span>
               </button>
