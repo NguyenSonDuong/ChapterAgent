@@ -86,7 +86,7 @@
   ],
   "max_chapters": 400,
   "max_words_per_chapter": 800,
-  "model": "gemini-3.1-flash-lite",
+  "model": "Chapter",
   "cultivation_stages": [
     {
       "name": "Luyện Khí",

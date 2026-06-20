@@ -8,7 +8,7 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
   const [tagsStr, setTagsStr] = useState('');
   const [maxChapters, setMaxChapters] = useState(10);
   const [maxWords, setMaxWords] = useState(2000);
-  const [model, setModel] = useState('gemini-2.5-flash');
+  const [model, setModel] = useState('Chapter');
   const [cultivationStages, setCultivationStages] = useState([
     { name: 'Luyện Khí', description: 'Giai đoạn tích lũy linh khí vào cơ thể.' },
     { name: 'Trúc Cơ', description: 'Xây dựng nền móng tu tiên vững chắc.' },
@@ -240,7 +240,8 @@ export default function NewStoryModal({ onClose, onCreateStory }) {
             <div className="form-group flex-1">
               <label className="form-label">Model AI</label>
               <select className="form-select" value={model} onChange={e => setModel(e.target.value)}>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Mặc định)</option>
+                <option value="Chapter">Chapter (9router Local - Mặc định)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                 <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                 <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
                 <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>

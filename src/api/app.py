@@ -212,7 +212,7 @@ def create_story():
         tags=[t.strip() for t in data.get('tags', []) if t.strip()],
         max_chapters=data.get('max_chapters', 10),
         max_words_per_chapter=data.get('max_words_per_chapter', 2000),
-        model=data.get('model', 'gemini-2.5-flash'),
+        model=data.get('model', 'Chapter'),
         cultivation_stages=parse_request_cultivation_stages(data.get('cultivation_stages', []))
     )
 

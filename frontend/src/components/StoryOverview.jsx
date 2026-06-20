@@ -657,6 +657,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                 className="form-select-sm"
                 style={{ background: '#121621', color: 'var(--text-primary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '4px 10px', fontSize: '13px' }}
               >
+                <option value="Chapter">Chapter (9router Local)</option>
                 <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                 <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                 <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
@@ -1942,6 +1943,7 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
                   onChange={e => setEditedStory({ ...editedStory, model: e.target.value })}
                   style={{ width: '100%', background: '#151a24', color: '#fff', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '8px 12px', fontSize: '13px' }}
                 >
+                  <option value="Chapter">Chapter (9router Local)</option>
                   <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                   <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                   <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>

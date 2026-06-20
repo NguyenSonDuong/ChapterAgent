@@ -197,35 +197,82 @@ export default function App() {
         {storyMeta ? (
           <>
             {/* Top Navigation tabs bar */}
-            <div className="top-nav-tabs glass">
-              <button 
-                className={`nav-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => setActiveTab('overview')}
-              >
-                <LayoutDashboard className="icon-xs" />
-                <span>Tổng Quan</span>
-              </button>
-              <button 
-                className={`nav-tab-btn ${activeTab === 'reader' ? 'active' : ''}`}
-                onClick={() => setActiveTab('reader')}
-              >
-                <BookOpen className="icon-xs" />
-                <span>Đọc Tác Phẩm</span>
-              </button>
-              <button 
-                className={`nav-tab-btn ${activeTab === 'generator' ? 'active' : ''}`}
-                onClick={() => setActiveTab('generator')}
-              >
-                <Sparkles className="icon-xs" />
-                <span>Sáng Tác Chương Mới</span>
-              </button>
-              <button 
-                className={`nav-tab-btn ${activeTab === 'flow' ? 'active' : ''}`}
-                onClick={() => setActiveTab('flow')}
-              >
-                <Share2 className="icon-xs" />
-                <span>Sơ Đồ Cốt Truyện</span>
-              </button>
+            <div className="top-nav-tabs glass" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                  className={`nav-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('overview')}
+                >
+                  <LayoutDashboard className="icon-xs" />
+                  <span>Tổng Quan</span>
+                </button>
+                <button 
+                  className={`nav-tab-btn ${activeTab === 'reader' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('reader')}
+                >
+                  <BookOpen className="icon-xs" />
+                  <span>Đọc Tác Phẩm</span>
+                </button>
+                <button 
+                  className={`nav-tab-btn ${activeTab === 'generator' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('generator')}
+                >
+                  <Sparkles className="icon-xs" />
+                  <span>Sáng Tác Chương Mới</span>
+                </button>
+                <button 
+                  className={`nav-tab-btn ${activeTab === 'flow' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('flow')}
+                >
+                  <Share2 className="icon-xs" />
+                  <span>Sơ Đồ Cốt Truyện</span>
+                </button>
+              </div>
+
+              {/* Quick Model Selector */}
+              <div className="quick-model-selector" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '8px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>Model:</span>
+                <select
+                  value={storyMeta?.model || 'Chapter'}
+                  onChange={async (e) => {
+                    const newModel = e.target.value;
+                    try {
+                      const res = await fetch(`${BACKEND_URL}/api/stories/${selectedStoryId}/model`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ model: newModel })
+                      });
+                      if (res.ok) {
+                        setStoryMeta(prev => ({ ...prev, model: newModel }));
+                      } else {
+                        const errData = await res.json();
+                        alert(errData.error || "Không thể cập nhật model AI.");
+                      }
+                    } catch (err) {
+                      console.error("Lỗi cập nhật model:", err);
+                      alert("Không thể kết nối đến máy chủ.");
+                    }
+                  }}
+                  style={{
+                    background: '#151a24',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Chapter">Chapter (9router Local)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                  <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
+                  <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                  <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                </select>
+              </div>
             </div>
 
             <div className="tab-content-container" style={{ position: 'relative' }}>

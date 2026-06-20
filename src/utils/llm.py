@@ -3,6 +3,27 @@ import time
 import sys
 from pathlib import Path
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.output_parsers import StrOutputParser, BaseOutputParser
+import json
+import re
+from typing import Any
+
+class SafePydanticParser(BaseOutputParser):
+    pydantic_schema: Any
+    
+    def parse(self, text: str) -> Any:
+        cleaned_text = text.strip()
+        if cleaned_text.startswith("```"):
+            match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", cleaned_text)
+            if match:
+                cleaned_text = match.group(1).strip()
+        try:
+            data = json.loads(cleaned_text)
+        except Exception as e:
+            raise ValueError(f"Không thể giải mã JSON từ kết quả trả về của AI: {e}. Nội dung thô: {cleaned_text}")
+        
+        return self.pydantic_schema.model_validate(data)
+
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
@@ -22,12 +43,22 @@ def check_cancellation(story_uuid: str):
     if session and session.cancel_event.is_set():
         raise SessionCancelledError("Tiến trình sáng tác đã bị hủy bởi người dùng.")
 
-def get_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.7):
+def get_llm(model_name: str = "Chapter", temperature: float = 0.7):
+    if not model_name:
+        model_name = "Chapter"
+        
+    if model_name == "Chapter":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model="Chapter",
+            temperature=temperature,
+            openai_api_key="sk-7a94d94b493e898d-inj9ns-808bcc24",
+            openai_api_base="http://localhost:20128/v1"
+        )
+        
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY environment variable not set. Please check your .env file.")
-    if not model_name:
-        model_name = "gemini-2.5-flash"
         
     return ChatGoogleGenerativeAI(
         model=model_name,
@@ -114,10 +145,17 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
     
     while True:
         check_cancellation(story_uuid)
-        model_name = state.get("model", "gemini-2.5-flash")
+        model_name = state.get("model", "Chapter")
         try:
             llm = get_llm(model_name, temperature)
-            runnable = llm.with_structured_output(output_schema) if output_schema else llm
+            if output_schema:
+                if model_name == "Chapter":
+                    runnable = llm | StrOutputParser() | SafePydanticParser(pydantic_schema=output_schema)
+                else:
+                    runnable = llm.with_structured_output(output_schema)
+            else:
+                runnable = llm
+
         except Exception as e:
             console.print(f"[bold red]Lỗi khi khởi tạo LLM: {e}[/bold red]")
             code = classify_exception(e)

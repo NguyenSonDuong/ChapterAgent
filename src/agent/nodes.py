@@ -25,6 +25,7 @@ from src.utils.context import (
     to_characters_markdown,
     to_simple_list_markdown,
 )
+from src.agent.prompts import load_prompt
 
 console = Console()
 
@@ -258,27 +259,12 @@ def requirement_analyzer_node(state: AgentState) -> Dict[str, Any]:
     current_idea = format_user_idea(user_idea, state["story_uuid"])
     
     while loop_count < max_loops:
-        prompt = f"""
-Bạn là một chuyên gia phân tích kịch bản. Nhiệm vụ của bạn là phân tích ý tưởng viết Chương {chapter_num} của tác giả dưới đây, đối chiếu với bối cảnh truyện và tiến trình cốt truyện đã diễn ra để chuẩn bị bản yêu cầu viết chương chi tiết.
-
-THÔNG TIN TRUYỆN:
-{meta_str}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-{ledger_str}
-
-TRẠNG THÁI CHƯƠNG TRƯỚC:
-{prev_state_str}
-
-Ý TƯỞNG CỦA TÁC GIẢ CHO CHƯƠNG {chapter_num}:
-{current_idea}
-
-Hãy phân tích và trả về kết quả cấu trúc:
-1. Đối chiếu xem các địa điểm xuất hiện, binh khí/pháp khí sử dụng, và công pháp thi triển được hoạch định trong các sự kiện (node) có hợp lý và nhất quán với thông tin nhân vật cũng như bối cảnh thế giới hiện có hay không. Nếu phát hiện sự bất hợp lý (ví dụ: nhân vật sử dụng pháp khí chưa sở hữu, thi triển công pháp không thuộc hệ phái của họ, hoặc di chuyển đến địa điểm quá xa mà không có phương tiện hỗ trợ hợp lý), hãy đặt câu hỏi làm rõ trong `missing_info_questions`.
-2. Nếu ý tưởng còn sơ sài, thiếu logic cốt lõi khác (ví dụ: giải quyết mâu thuẫn thế nào, động cơ nhân vật), hãy đưa ra các câu hỏi ngắn gọn để làm rõ trong `missing_info_questions`.
-3. Nếu thông tin đã đầy đủ hoặc sau khi tác giả đã trả lời thêm, hãy tổng hợp bản yêu cầu chi tiết nhất trong `analyzed_requirements`, nêu rõ yêu cầu tích hợp các địa điểm, pháp khí, và công pháp cụ thể đã được hoạch định vào nội dung chương truyện.
-4. Trong `analyzed_requirements`, hãy đặc biệt hướng dẫn viết chương truyện theo phong cách tiểu thuyết dài kỳ (serial novel): bắt đầu trực tiếp nối tiếp chương trước và khép lại chương lấp lửng (cliffhanger), tuyệt đối tránh cấu trúc đóng kiểu bài văn (không có tóm tắt mở đầu, không có kết luận/tổng kết diễn biến ở cuối chương).
-"""
+        prompt = load_prompt("requirement_analyzer.md") \
+            .replace("{chapter_num}", str(chapter_num)) \
+            .replace("{meta_str}", meta_str) \
+            .replace("{ledger_str}", ledger_str) \
+            .replace("{prev_state_str}", prev_state_str) \
+            .replace("{current_idea}", current_idea)
         result = invoke_with_retry(state, prompt, temperature=0.7, output_schema=RequirementAnalysisResult)
             
         # If there are missing info questions, ask user
@@ -385,25 +371,10 @@ Hãy phân tích và trả về kết quả cấu trúc:
             emit_agent_log(state["story_uuid"], f"Tác giả yêu cầu sửa đổi yêu cầu tại đoạn: \"{text_selected}\" -> Chú thích: \"{comment}\"")
             console.print(f"Đang hiệu chỉnh yêu cầu chương tại đoạn bôi đen...")
             
-            refine_prompt = f"""
-Bạn là một chuyên gia kịch bản xuất sắc. Nhiệm vụ của bạn là chỉnh sửa bản yêu cầu viết chương chi tiết dưới đây dựa trên ý kiến đóng góp của tác giả về một đoạn văn cụ thể.
-
-BẢN YÊU CẦU HIỆN TẠI:
----
-{current_requirements}
----
-
-ĐOẠN VĂN ĐƯỢC CHỌN ĐỂ CHỈNH SỬA:
-"{text_selected}"
-
-Ý KIẾN ĐÓNG GÓP/BÌNH LUẬN CỦA TÁC GIẢ:
-"{comment}"
-
-Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm bảo:
-1. Chỉ sửa đổi/cập nhật thông tin xung quanh đoạn văn được chọn để đáp ứng đúng ý kiến đóng góp của tác giả.
-2. Giữ nguyên cấu trúc, phong cách và các thông tin khác của bản yêu cầu.
-3. Trả về trực tiếp bản yêu cầu chi tiết mới bằng tiếng Việt, không kèm theo bất kỳ lời bình luận, giải thích hay markdown code block nào khác.
-"""
+            refine_prompt = load_prompt("requirement_refine_selection.md") \
+                .replace("{current_requirements}", current_requirements) \
+                .replace("{text_selected}", text_selected) \
+                .replace("{comment}", comment)
             refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
             current_requirements = ensure_string(refine_response.content).strip()
             emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
@@ -412,22 +383,9 @@ Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm b�
             emit_agent_log(state["story_uuid"], f"Tác giả gửi ý kiến đóng góp chung cho yêu cầu: \"{comment_str}\"")
             console.print(f"Đang sửa đổi yêu cầu chương theo ý kiến đóng góp chung...")
             
-            refine_prompt = f"""
-Bạn là một chuyên gia kịch bản xuất sắc. Nhiệm vụ của bạn là chỉnh sửa bản yêu cầu viết chương chi tiết dưới đây dựa trên ý kiến đóng góp chung của tác giả.
-
-BẢN YÊU CẦU HIỆN TẠI:
----
-{current_requirements}
----
-
-Ý KIẾN ĐÓNG GÓP CỦA TÁC GIẢ:
-"{comment_str}"
-
-Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm bảo:
-1. Chỉnh sửa bản yêu cầu để đáp ứng đúng ý kiến đóng góp của tác giả.
-2. Giữ nguyên cấu trúc, phong cách và các thông tin khác của bản yêu cầu.
-3. Trả về trực tiếp bản yêu cầu chi tiết mới bằng tiếng Việt, không kèm theo bất kỳ lời bình luận, giải thích hay markdown code block nào khác.
-"""
+            refine_prompt = load_prompt("requirement_refine_comment.md") \
+                .replace("{current_requirements}", current_requirements) \
+                .replace("{comment_str}", comment_str)
             refine_response = invoke_with_retry(state, refine_prompt, temperature=0.7)
             current_requirements = ensure_string(refine_response.content).strip()
             emit_agent_log(state["story_uuid"], "✓ Đã cập nhật xong bản yêu cầu chương.")
@@ -439,33 +397,10 @@ Hãy chỉnh sửa lại bản yêu cầu viết chương chi tiết. Đảm b�
     console.print("[bold cyan]Đang xây dựng sơ đồ phân cảnh chi tiết cho chương truyện (Scene Decomposition)...[/bold cyan]")
     emit_agent_log(state["story_uuid"], "Đang phân rã cốt truyện thành danh sách phân cảnh kịch bản chi tiết...")
     
-    decomp_prompt = f"""
-Hãy phân rã ý tưởng chương mới và bản yêu cầu chi tiết dưới đây thành một danh sách các phân cảnh (Scenes) kịch bản chi tiết theo trình tự kể truyện từ đầu đến cuối chương.
-
-BỐI CẢNH TRUYỆN (SỔ TAY TÁC GIẢ):
-{state.get("story_bible")}
-
-Ý TƯỞNG GỐC CỦA TÁC GIẢ:
-{format_user_idea(current_idea, state["story_uuid"])}
-
-YÊU CẦU CHI TIẾT ĐÃ ĐƯỢC PHÂN TÍCH:
-{current_requirements}
-
-YÊU CẦU PHÂN RÃ:
-1. Chia chương truyện thành các phân cảnh nhỏ hơn (thường từ 3 đến 5 phân cảnh tùy độ dài chương).
-2. Sắp xếp các phân cảnh theo trình tự thời gian / mạch truyện tuyến tính chính xác nhất. Nếu ý tưởng gốc là sơ đồ sự kiện (Canvas), hãy bảo lưu các sự kiện (nodes) và sắp xếp chúng theo đúng luồng kết nối (connections) từ node đầu tiên đến node cuối cùng.
-3. Với mỗi phân cảnh, hãy điền:
-   - `id`: id duy nhất của phân cảnh (ví dụ: scene-1, scene-2...) hoặc giữ nguyên id node nếu nó là sơ đồ sự kiện.
-   - `title`: tiêu đề phân cảnh.
-   - `description`: diễn biến chi tiết xảy ra trong phân cảnh.
-   - `characters`: danh sách nhân vật tham gia (chọn từ danh sách nhân vật truyện).
-   - `locations`: danh sách địa điểm (chọn từ địa điểm truyện).
-   - `weapons`: danh sách binh khí/pháp khí sử dụng.
-   - `techniques`: danh sách công pháp thi triển.
-   - `tone`: văn phong yêu cầu (hài hước, trang nghiêm, bi thương...).
-   - `resolved_thread`: giải quyết nút thắt (nếu có, khớp với cấu trúc SuggestedNodeResolvedThread).
-   - `links`: liên kết chương cũ (nếu có, khớp với cấu trúc SuggestedNodeLink).
-"""
+    decomp_prompt = load_prompt("scene_decomposition.md") \
+        .replace("{story_bible}", state.get("story_bible", "")) \
+        .replace("{current_idea}", format_user_idea(current_idea, state["story_uuid"])) \
+        .replace("{current_requirements}", current_requirements)
     try:
         scenes_result = invoke_with_retry(state, decomp_prompt, temperature=0.2, output_schema=ScenarioScenelist)
         scenes_to_write = [scene.model_dump() for scene in scenes_result.scenes]
@@ -595,44 +530,23 @@ def scene_drafter_node(state: AgentState) -> Dict[str, Any]:
     if current_idx == 0:
         first_scene_header = f"Lưu ý: Vì đây là phân cảnh đầu tiên, dòng đầu tiên của văn bản trả về BẮT BUỘC phải là tiêu đề chương dạng `# Chương {chapter_num}: [Tên tiêu đề chương]`. Các phân cảnh sau không được thêm tiêu đề chương này."
 
-    prompt = f"""
-Bạn là một nhà văn mạng tài ba đang viết tiểu thuyết dài kỳ (serial novel). Hãy sáng tác phần tiếp theo của truyện tương ứng với Phân cảnh kịch bản chi tiết dưới đây.
-
-SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
-{state.get("story_bible")}
-
-YÊU CẦU CHI TIẾT CỦA CHƯƠNG {chapter_num}:
-{state.get("analyzed_requirements")}
-
-THÔNG TIN PHÂN CẢNH HIỆN TẠI CẦN VIẾT (Phân cảnh {current_idx + 1}/{len(scenes)}):
-- Tiêu đề phân cảnh: {scene.get('title')}
-- Mô tả diễn biến chi tiết: {scene.get('description')}
-- Nhân vật tham gia: {', '.join(scene.get('characters', []))}
-- Địa điểm xuất hiện: {', '.join(scene.get('locations', []))}
-- Binh khí sử dụng: {', '.join(scene.get('weapons', []))}
-- Công pháp thi triển: {', '.join(scene.get('techniques', []))}
-- Văn phong yêu cầu (Tone): {scene.get('tone', 'bình thường')}
-{scene_links_str}
-{rolling_memory}
-
-{unselected_entities_text}
-
-LUẬT RÀNG BUỘC THỰC THỂ CỰC KỲ KHẮT KHE (ENTITY CONSTRAINTS):
-1. Chỉ có những nhân vật, địa điểm, binh khí/pháp khí, công pháp được chọn cụ thể trong phần "THÔNG TIN PHÂN CẢNH HIỆN TẠI CẦN VIẾT" ở trên (hoặc các nhân vật, địa điểm, pháp khí, công pháp HOÀN TOÀN MỚI phát sinh trong phân cảnh này) mới được phép xuất hiện.
-2. TUYỆT ĐỐI KHÔNG để bất kỳ thực thể nào nằm trong "DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN" ở trên xuất hiện hay được nhắc tên dưới mọi hình thức (kể cả nhắc trong suy nghĩ, lời đối thoại gián tiếp hay so sánh). Đây là yêu cầu bắt buộc và tối quan trọng.
-
-YÊU CẦU HÀNH VĂN (Kỹ thuật Pacing Control & Show, Don't Tell):
-1. TUYỆT ĐỐI KHÔNG viết tóm tắt hành động nhảy cóc (Ví dụ: KHÔNG viết "Sau một hồi chiến đấu, hắn đã thắng"). Bạn phải tả từng đường kiếm, từng nhịp thở, cảm giác đau đớn, mệt mỏi, áp lực không gian xung quanh.
-2. Triển khai phân bổ nội dung theo tỷ lệ cấu trúc sau:
-   - 30% Thời lượng: Tả cảnh vật, không khí, nhiệt độ, áp lực không gian xung quanh để tạo chiều sâu (ví dụ: bụi mù bay lượn, gió rít lạnh lẽo, tàn tro rụng xuống...).
-   - 20% Thời lượng: Biểu cảm khuôn mặt, ánh mắt, ngôn ngữ cơ thể, phản ứng cơ lý vật lý của các nhân vật trước sự kiện.
-   - 30% Thời lượng: Hội thoại sinh động, mang đậm cá tính riêng của từng nhân vật (ví dụ: nhân vật sư phụ thì nói năng lười biếng, tếu táo; nam chính Diệp Trần thì điềm tĩnh, mộc mạc; kẻ phản diện thì khinh khỉnh).
-   - 20% Thời lượng: Hành động thực tế kết hợp suy nghĩ nội tâm độc thoại của nhân vật.
-3. RÀNG BUỘC KẾT THÚC LỬNG LƠ (CLIFFHANGER):
-   - Phân cảnh phải kết thúc ở một trạng thái mở, một bí ẩn chưa giải quyết, một nguy hiểm đang lơ lửng, hoặc một câu thoại lấp lửng để làm tiền đề chuyển tiếp mượt mà và gây tò mò cho phân cảnh tiếp theo. Tuyệt đối KHÔNG viết câu chốt đóng lại vấn đề hay tóm tắt bài học ở cuối phân cảnh.
-4. {first_scene_header}
-5. Trả về trực tiếp nội dung truyện thực tế bằng Markdown, không thêm bất kỳ lời bình luận hay giải thích nào khác của AI.
-"""
+    prompt = load_prompt("scene_drafter.md") \
+        .replace("{story_bible}", state.get("story_bible", "")) \
+        .replace("{analyzed_requirements}", state.get("analyzed_requirements", "")) \
+        .replace("{chapter_num}", str(chapter_num)) \
+        .replace("{current_idx_plus_1}", str(current_idx + 1)) \
+        .replace("{scenes_count}", str(len(scenes))) \
+        .replace("{scene_title}", str(scene.get('title'))) \
+        .replace("{scene_description}", str(scene.get('description'))) \
+        .replace("{scene_characters}", ', '.join(scene.get('characters', []))) \
+        .replace("{scene_locations}", ', '.join(scene.get('locations', []))) \
+        .replace("{scene_weapons}", ', '.join(scene.get('weapons', []))) \
+        .replace("{scene_techniques}", ', '.join(scene.get('techniques', []))) \
+        .replace("{scene_tone}", str(scene.get('tone', 'bình thường'))) \
+        .replace("{scene_links_str}", scene_links_str) \
+        .replace("{rolling_memory}", rolling_memory) \
+        .replace("{unselected_entities_text}", unselected_entities_text) \
+        .replace("{first_scene_header}", first_scene_header)
     
     response = invoke_with_retry(state, prompt, temperature=0.8)
     scene_draft = ensure_string(response.content)
@@ -887,47 +801,22 @@ def reviser_node(state: AgentState) -> Dict[str, Any]:
                 emit_agent_log(state["story_uuid"], f"Chỉnh sửa nội dung cho Sự kiện [{node_id}]: {node_title}")
                 console.print(f"Đang tiến hành sửa đổi Sự kiện [{node_id}] theo yêu cầu...")
                 
-                prompt = f"""
-Bạn là một nhà văn mạng tài ba đang viết tiểu thuyết dài kỳ (serial novel) kiêm biên tập viên văn học xuất sắc. Nhiệm vụ của bạn là sửa đổi bản thảo của một Sự kiện (Node) cụ thể trong Chương {chapter_num} để khắc phục lỗi logic hoặc đáp ứng ý kiến đóng góp của tác giả.
-
-SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
-{story_bible}
-
-YÊU CẦU CHI TIẾT CỦA CHƯƠNG {chapter_num}:
-{reqs}
-
-DIỄN BIẾN CÁC SỰ KIỆN TRƯỚC ĐÓ TRONG CHƯƠNG (Để đảm bảo tính liên tục):
-{prev_scenes_context}
-
-SỰ KIỆN ĐANG SỬA ĐỔI:
-- ID sự kiện: {node_id}
-- Tiêu đề: {node_title}
-- Mô tả diễn biến dự kiến: {node_desc}
-- Nhân vật tham gia: {', '.join(node_characters)}
-- Địa điểm: {', '.join(node_locations)}
-- Binh khí: {', '.join(node_weapons)}
-- Công pháp: {', '.join(node_techniques)}
-
-BẢN THẢO HIỆN TẠI CỦA SỰ KIỆN NÀY:
----
-{node_draft}
----
-
-Ý KIẾN ĐÓNG GÓP / HƯỚNG DẪN SỬA ĐỔI CỦA TÁC GIẢ:
-"{comment}"
-{node_warnings_context}
-
-{unselected_entities_text}
-
-LUẬT RÀNG BUỘC THỰC THỂ CỰC KỲ KHẮT KHE (ENTITY CONSTRAINTS):
-1. Chỉ có những nhân vật, địa điểm, binh khí/pháp khí, công pháp được chọn cụ thể trong phần "SỰ KIỆN ĐANG SỬA ĐỔI" ở trên (hoặc các nhân vật, địa điểm, pháp khí, công pháp HOÀN TOÀN MỚI phát sinh trong phân cảnh này) mới được phép xuất hiện.
-2. TUYỆT ĐỐI KHÔNG để bất kỳ thực thể nào nằm trong "DANH SÁCH THỰC THỂ CŨ CẤM XUẤT HIỆN" ở trên xuất hiện hay được nhắc tên dưới mọi hình thức (kể cả nhắc trong suy nghĩ, lời đối thoại gián tiếp hay so sánh).
-
-YÊU CẦU HÀNH VĂN:
-1. Sửa đổi bản thảo của sự kiện này để đáp ứng đúng ý kiến đóng góp của tác giả.
-2. Giữ nguyên định dạng, phong cách hành văn và tính liên tục mạch truyện.
-3. Trả về trực tiếp nội dung truyện thực tế đã sửa đổi bằng Markdown, không thêm bất kỳ lời bình luận hay giải thích nào khác của AI.
-"""
+                prompt = load_prompt("reviser_node_specific.md") \
+                    .replace("{chapter_num}", str(chapter_num)) \
+                    .replace("{story_bible}", story_bible) \
+                    .replace("{reqs}", reqs) \
+                    .replace("{prev_scenes_context}", prev_scenes_context) \
+                    .replace("{node_id}", str(node_id)) \
+                    .replace("{node_title}", str(node_title)) \
+                    .replace("{node_desc}", str(node_desc)) \
+                    .replace("{node_characters}", ', '.join(node_characters)) \
+                    .replace("{node_locations}", ', '.join(node_locations)) \
+                    .replace("{node_weapons}", ', '.join(node_weapons)) \
+                    .replace("{node_techniques}", ', '.join(node_techniques)) \
+                    .replace("{node_draft}", node_draft) \
+                    .replace("{comment}", comment) \
+                    .replace("{node_warnings_context}", node_warnings_context) \
+                    .replace("{unselected_entities_text}", unselected_entities_text)
                 response = invoke_with_retry(state, prompt, temperature=0.7)
                 revised_node_content = ensure_string(response.content)
                 
@@ -962,63 +851,29 @@ YÊU CẦU HÀNH VĂN:
         emit_agent_log(state["story_uuid"], f"Sửa đổi cục bộ tại đoạn bôi đen: \"{text_selected}\" -> Chú thích: \"{comment}\"")
         console.print(f"Đang sửa đổi cục bộ bản nháp theo yêu cầu bôi đen...")
         
-        prompt = f"""
-Bạn là một biên tập viên văn học xuất sắc. Nhiệm vụ của bạn là chỉnh sửa một đoạn văn cụ thể trong bản nháp chương truyện dưới đây theo yêu cầu của tác giả, giữ nguyên toàn bộ các phần khác của bản nháp.
-
-SỔ TAY TÁC GIẢ (STORY BIBLE):
-{state.get("story_bible")}
-
-BẢN NHÁP CHƯƠNG HIỆN TẠI:
----
-{draft_content}
----
-
-ĐOẠN VĂN ĐƯỢC TÁC GIẢ BÔI ĐEN ĐỂ SỬA ĐỔI:
-"{text_selected}"
-
-YÊU CẦU CHỈNH SỬA CHO ĐOẠN VĂN TRÊN:
-"{comment}"
-{warnings_context}
-
-Hãy chỉnh sửa lại chương truyện. Đảm bảo:
-1. Chỉ thay thế/chỉnh sửa nội dung của đoạn văn được bôi đen ở trên để đáp ứng đúng yêu cầu của tác giả và sửa lỗi logic nếu có.
-2. Mạch truyện trước và sau đoạn văn đó phải kết nối tự nhiên, mượt mà, đúng văn phong {meta.get('style')}.
-3. Tuyệt đối GIỮ NGUYÊN toàn bộ nội dung của các đoạn văn khác trong bản nháp chương hiện tại. Không tự ý viết thêm hay bớt các tình tiết khác không liên quan.
-4. Trả về trực tiếp toàn bộ nội dung chương truyện đã chỉnh sửa bằng định dạng Markdown (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`), không kèm theo bất kỳ lời bình luận hay giải thích nào của AI.
-"""
+        prompt = load_prompt("reviser_local_edit.md") \
+            .replace("{chapter_num}", str(chapter_num)) \
+            .replace("{story_bible}", state.get("story_bible", "")) \
+            .replace("{draft_content}", draft_content) \
+            .replace("{text_selected}", text_selected) \
+            .replace("{comment}", comment) \
+            .replace("{warnings_context}", warnings_context) \
+            .replace("{style}", str(meta.get('style', '')))
     else:
         comment_str = feedback_data.get("comment", str(feedback_data)) if isinstance(feedback_data, dict) else str(feedback_data)
         
         emit_agent_log(state["story_uuid"], f"Sửa đổi toàn bộ bản thảo theo đóng góp: \"{comment_str}\"")
         console.print(f"Đang tiến hành chỉnh sửa toàn bộ bản thảo...")
         
-        prompt = f"""
-Bạn là một biên tập viên xuất sắc. Nhiệm vụ của bạn là dựa vào bản nháp hiện tại của Chương {chapter_num}, yêu cầu chỉnh sửa của tác giả và cảnh báo lỗi logic từ Auditor (nếu có) để viết lại bản nháp sao cho đáp ứng đúng yêu cầu đó và nhất quán cốt truyện.
-
-SỔ TAY TÁC GIẢ (STORY BIBLE):
-{state.get("story_bible")}
-
-SƠ ĐỒ SỰ KIỆN GỐC (Ý tưởng của tác giả):
-{format_user_idea(original_user_idea, state["story_uuid"])}
-
-YÊU CẦU CHI TIẾT ĐÃ PHÂN TÍCH:
-{reqs}
-
-YÊU CẦU CHỈNH SỬA CỦA TÁC GIẢ:
-"{comment_str}"
-{warnings_context}
-
-BẢN NHÁP HIỆN TẠI CỦA CHƯƠNG:
----
-{draft_content}
----
-
-Hãy viết lại bản thảo chương truyện. Đảm bảo:
-1. Sửa đổi đúng theo ý tác giả và giải quyết triệt để các cảnh báo lỗi logic được chỉ ra.
-2. Đảm bảo giữ nguyên phong cách hành văn: {meta.get('style')}.
-3. Giữ nguyên cấu trúc truyện dài kỳ: không thêm tóm tắt đầu chương, không thêm tổng kết cuối chương. Giữ nguyên kết thúc mở hoặc kết thúc lửng lơ ở cuối chương.
-4. Trả về trực tiếp nội dung chương mới bằng định dạng Markdown (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`), không kèm theo lời bình luận hay giải thích.
-"""
+        prompt = load_prompt("reviser_global_edit.md") \
+            .replace("{chapter_num}", str(chapter_num)) \
+            .replace("{story_bible}", state.get("story_bible", "")) \
+            .replace("{original_user_idea}", format_user_idea(original_user_idea, state["story_uuid"])) \
+            .replace("{reqs}", reqs) \
+            .replace("{comment_str}", comment_str) \
+            .replace("{warnings_context}", warnings_context) \
+            .replace("{draft_content}", draft_content) \
+            .replace("{style}", str(meta.get('style', '')))
     
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
@@ -1100,51 +955,20 @@ def auditor_node(state: AgentState) -> Dict[str, Any]:
             console.print(f"Đang kiểm duyệt Sự kiện {idx + 1}/{len(scenes)}: {node_title}...")
             emit_agent_log(state["story_uuid"], f"Đang kiểm duyệt Sự kiện {idx + 1}/{len(scenes)}: {node_title}...")
             
-            prompt = f"""
-Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu nội dung bản thảo của một Sự kiện (Node) cụ thể trong Chương {chapter_num} với thông tin bối cảnh thế giới, nhân vật, sổ cái toàn cục, trạng thái chương trước, và diễn biến của các Sự kiện trước đó để tìm ra các lỗi logic tiềm ẩn.
-
-SỔ TAY TÁC GIẢ (BỐI CẢNH CHUNG):
-{story_bible}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-{to_ledger_markdown(ledger)}
-
-TRẠNG THÁI CHƯƠNG TRƯỚC:
-{prev_state_str}
-
-DIỄN BIẾN CÁC SỰ KIỆN TRƯỚC ĐÓ TRONG CHƯƠNG:
-{prev_scenes_context}
-
-SỰ KIỆN ĐANG KIỂM DUYỆT:
-- ID sự kiện: {node_id}
-- Tiêu đề: {node_title}
-- Mô tả diễn biến dự kiến: {node_desc}
-- Nhân vật tham gia: {', '.join(node_characters)}
-- Địa điểm: {', '.join(node_locations)}
-- Binh khí: {', '.join(node_weapons)}
-- Công pháp: {', '.join(node_techniques)}
-
-BẢN THẢO HIỆN TẠI CỦA SỰ KIỆN NÀY:
----
-{node_draft}
----
-
-Hãy phân tích kỹ Sự kiện này và chỉ ra các lỗi mâu thuẫn logic như:
-1. Có nhân vật, địa điểm, pháp khí, hoặc công pháp nào xuất hiện ngoài những thứ được chỉ định trong phần "SỰ KIỆN ĐANG KIỂM DUYỆT" mà không có sự giải thích hợp lý (không phải thực thể mới tạo ra)?
-2. Diễn biến hoặc hành động của nhân vật mâu thuẫn với bối cảnh tu vi, binh khí sở hữu, hoặc trạng thái từ chương trước và các sự kiện trước đó hay không?
-3. Có lỗi logic nào về địa lý hay quan hệ nhân vật không?
-
-Hãy quét kỹ lỗi "Chênh lệch nhận thức" (Cognitive Dissonance) của Nam chính:
-- Đảm bảo Nam chính thực sự nghĩ hành động nghịch thiên của mình chỉ là "mẹo vặt nông thôn" bình thường.
-- Nếu trong bản thảo xuất hiện tình tiết Nam chính cố tình kiêu ngạo, tự đắc hoặc biết mình là cao nhân, hãy cảnh báo lỗi logic (ConflictWarning) ngay lập tức.
-
-Trả về kết quả có cấu trúc:
-1. `warnings`: Danh sách các đối tượng mâu thuẫn logic phát hiện được. Mỗi đối tượng gồm:
-   - `warning`: Câu cảnh báo lỗi cụ thể, ngắn gọn (ví dụ: "Nhân vật A sử dụng kiếm đã mất ở chương 2").
-   - `conflicting_chapter`: Số chương gây mâu thuẫn trực tiếp nếu phát hiện được.
-   Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
-2. `auditor_feedback`: Đánh giá chi tiết của kiểm duyệt viên cho riêng Sự kiện này.
-"""
+            prompt = load_prompt("auditor_node_specific.md") \
+                .replace("{chapter_num}", str(chapter_num)) \
+                .replace("{story_bible}", story_bible) \
+                .replace("{ledger_markdown}", to_ledger_markdown(ledger)) \
+                .replace("{prev_state_str}", prev_state_str) \
+                .replace("{prev_scenes_context}", prev_scenes_context) \
+                .replace("{node_id}", str(node_id)) \
+                .replace("{node_title}", str(node_title)) \
+                .replace("{node_desc}", str(node_desc)) \
+                .replace("{node_characters}", ', '.join(node_characters)) \
+                .replace("{node_locations}", ', '.join(node_locations)) \
+                .replace("{node_weapons}", ', '.join(node_weapons)) \
+                .replace("{node_techniques}", ', '.join(node_techniques)) \
+                .replace("{node_draft}", node_draft)
             result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
             
             for w in result.warnings:
@@ -1162,44 +986,13 @@ Trả về kết quả có cấu trúc:
         auditor_feedback_summary = f"Đã hoàn thành kiểm duyệt {len(scenes)} sự kiện.\n" + auditor_feedback_str
         
     else:
-        prompt = f"""
-Bạn là một kiểm duyệt viên cốt truyện cực kỳ nghiêm khắc. Nhiệm vụ của bạn là đối chiếu bản nháp cuối cùng của Chương {chapter_num} với thông tin bối cảnh thế giới, nhân vật, sổ cái toàn cục, và trạng thái chương trước đó để tìm ra các lỗi logic tiềm ẩn.
-
-SỔ TAY TÁC GIẢ (STORY BIBLE):
-{story_bible}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-{to_ledger_markdown(ledger)}
-
-TRẠNG THÁI CHƯƠNG TRƯỚC:
-{prev_state_str}
-
-SƠ ĐỒ SỰ KIỆN GỐC ĐƯỢC HOẠCH ĐỊNH (Ý tưởng của tác giả):
-{format_user_idea(original_user_idea, state["story_uuid"])}
-
-NỘI DUNG CHƯƠNG MỚI:
----
-{draft_content}
----
-
-Hãy phân tích kỹ chương mới và chỉ ra các lỗi mâu thuẫn cốt truyện như:
-- Không tuân thủ hoặc bỏ sót các sự kiện chính, địa điểm xuất hiện, binh khí/pháp khí sử dụng, hoặc công pháp thi triển đã được chỉ định trong SƠ ĐỒ SỰ KIỆN GỐC ĐƯỢC HOẠCH ĐỊNH.
-- Sự thay đổi vô lý về vị trí địa lý của nhân vật (ví dụ: chương trước đang ở trong ngục, chương này tự nhiên đi dạo phố không lời giải thích).
-- Sai lệch trạng thái vật phẩm (chương trước làm mất kiếm, chương này vẫn dùng kiếm đó).
-- Quan hệ nhân vật thay đổi đột ngột không có tình tiết dẫn dắt.
-- Nhân vật đã chết hoặc bị trọng thương bỗng nhiên khỏe mạnh bình thường.
-
-Hãy quét kỹ lỗi "Chênh lệch nhận thức" (Cognitive Dissonance) của Nam chính:
-- Đảm bảo Nam chính thực sự nghĩ hành động nghịch thiên của mình chỉ là "mẹo vặt nông thôn" bình thường.
-- Nếu trong bản thảo xuất hiện tình tiết Nam chính cố tình kiêu ngạo, tự đắc hoặc biết mình là cao nhân, hãy cảnh báo lỗi logic (ConflictWarning) ngay lập tức.
-
-Trả về kết quả có cấu trúc:
-1. `warnings`: Danh sách các đối tượng mâu thuẫn logic phát hiện được. Mỗi đối tượng gồm:
-   - `warning`: Câu cảnh báo lỗi cụ thể, ngắn gọn (ví dụ: "Nhân vật A sử dụng kiếm đã mất ở chương 2").
-   - `conflicting_chapter`: Số chương gây mâu thuẫn trực tiếp nếu phát hiện được (ví dụ: chương trước làm mất kiếm là chương 2 thì điền 2. Nếu mâu thuẫn với cấu hình bối cảnh hoặc nhân vật nói chung thì để trống/null).
-   Nếu mọi thứ hợp lý, hãy để danh sách này rỗng.
-2. `auditor_feedback`: Đánh giá tổng quan về chất lượng logic chương mới này.
-"""
+        prompt = load_prompt("auditor_global.md") \
+            .replace("{chapter_num}", str(chapter_num)) \
+            .replace("{story_bible}", story_bible) \
+            .replace("{ledger_markdown}", to_ledger_markdown(ledger)) \
+            .replace("{prev_state_str}", prev_state_str) \
+            .replace("{original_user_idea}", format_user_idea(original_user_idea, state["story_uuid"])) \
+            .replace("{draft_content}", draft_content)
         result = invoke_with_retry(state, prompt, temperature=0.2, output_schema=AuditResult)
         
         warnings_dict = [
@@ -1263,21 +1056,8 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
     ledger = state["ledger"]
     
     # Generate ChapterState by analyzing draft_content
-    prompt = f"""
-Hãy phân tích chương truyện sau đây và trích xuất thông tin trạng thái theo mô hình ChapterState.
-
-NỘI DUNG CHƯƠNG:
----
-{draft_content}
----
-
-Hãy điền đầy đủ:
-1. `chapter_title`: Tiêu đề chương (loại bỏ phần '# Chương X:').
-2. `summary`: Tóm tắt chi tiết 1-2 đoạn văn ngắn về diễn biến chính.
-3. `character_statuses`: Trạng thái các nhân vật chính sau chương này (ví dụ: "Kim: Đã thoát khỏi hầm ngục, đang bị thương nhẹ ở vai trái, giữ bản đồ cổ").
-4. `threads_resolved`: Danh sách các mối nối/bí ẩn đã được chương này giải đáp (ví dụ: "Tiết lộ kẻ phản bội là quản gia").
-5. `threads_introduced`: Danh sách các nút thắt/manh mối mới mở ra (ví dụ: "Bản đồ cổ chỉ dẫn tới một ngôi đền vô danh ở phía Bắc").
-"""
+    prompt = load_prompt("state_extractor.md") \
+        .replace("{draft_content}", draft_content)
     chap_state = invoke_with_retry(state, prompt, temperature=0.2, output_schema=ChapterState)
         
     # 1. Ghi chap_[n]_content.md
@@ -1351,23 +1131,10 @@ Hãy điền đầy đủ:
             console.print("\n[bold cyan]Đang phân tách nội dung chương truyện theo từng sự kiện (node)...[/bold cyan]")
             emit_agent_log(story_uuid, "Đang phân tách nội dung chương truyện theo từng sự kiện (node)...")
             
-            mapping_prompt = f"""
-Hãy đọc nội dung Chương {chapter_num} dưới đây và phân tách/ánh xạ các đoạn văn (hoặc nội dung câu chữ thực tế) tương ứng với từng sự kiện (node) đã được lên kịch bản.
-
-DANH SÁCH CÁC SỰ KIỆN (NODES) KỊCH BẢN:
-{to_nodes_list_markdown(nodes_list)}
-
-NỘI DUNG CHƯƠNG {chapter_num}:
----
-{draft_content}
----
-
-YÊU CẦU:
-1. Phân tách chính xác nội dung chương truyện đã hoàn thiện ở trên thành các phần tương ứng với danh sách sự kiện (nodes) kịch bản.
-2. Với mỗi sự kiện, trích xuất nguyên văn hoặc đầy đủ đoạn câu chữ trong truyện mô tả sự kiện đó. Nội dung phải là văn bản truyện thực tế (câu kể, thoại, miêu tả cảnh vật/nội tâm...), không phải là mô tả kịch bản tóm tắt.
-3. Nếu một sự kiện không có nội dung trực tiếp tương ứng (hoặc bị gộp), hãy gán nội dung phù hợp nhất hoặc để trống.
-4. Trả về dưới cấu trúc dữ liệu JSON chứa mảng các đối tượng có trường "node_id" và "content" (nội dung câu chữ thực tế).
-"""
+            mapping_prompt = load_prompt("scene_mapping.md") \
+                .replace("{chapter_num}", str(chapter_num)) \
+                .replace("{nodes_list_markdown}", to_nodes_list_markdown(nodes_list)) \
+                .replace("{draft_content}", draft_content)
             mapping_result = invoke_with_retry(
                 state, 
                 mapping_prompt, 
@@ -1450,28 +1217,11 @@ YÊU CẦU:
     # Prepare old unresolved list under Markdown format
     old_threads_markdown = to_unresolved_threads_markdown([ut.model_dump() for ut in ledger_model.unresolved_threads])
 
-    refine_prompt = f"""
-Dựa trên danh sách các nút thắt chưa giải quyết cũ (mỗi nút thắt có nội dung "thread" và chương xuất hiện "chapter"):
-{old_threads_markdown}
-
-Các nút thắt vừa được giải quyết trong chương {chapter_num} mới này:
-{to_simple_list_markdown(chap_state.threads_resolved)}
-
-Các nút thắt mới được giới thiệu trong chương {chapter_num} này:
-{to_simple_list_markdown(chap_state.threads_introduced)}
-
-Hãy cập nhật danh sách các nút thắt chưa giải quyết:
-1. Loại bỏ những nút thắt cũ đã được giải quyết ở chương này hoặc không còn phù hợp.
-2. Giữ lại các nút thắt cũ chưa được giải quyết và GIỮ NGUYÊN chương xuất hiện ban đầu của chúng (không thay đổi "chapter" của chúng).
-3. Thêm các nút thắt mới được giới thiệu trong chương này với chương xuất hiện "chapter" là {chapter_num}.
-
-Trả về mảng JSON chứa các đối tượng có thuộc tính "thread" và "chapter" (số nguyên hoặc null) dưới dạng:
-[
-  {{"thread": "nội dung nút thắt", "chapter": {chapter_num}}},
-  ...
-]
-Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay markdown code block nào.
-"""
+    refine_prompt = load_prompt("unresolved_threads_updater.md") \
+        .replace("{chapter_num}", str(chapter_num)) \
+        .replace("{old_threads_markdown}", old_threads_markdown) \
+        .replace("{threads_resolved_markdown}", to_simple_list_markdown(chap_state.threads_resolved)) \
+        .replace("{threads_introduced_markdown}", to_simple_list_markdown(chap_state.threads_introduced))
     refine_response = invoke_with_retry(state, refine_prompt, temperature=0.2)
     try:
         content_text = ensure_string(refine_response.content).strip()
@@ -1560,36 +1310,12 @@ Chỉ trả về JSON, không thêm bất kỳ văn bản giải thích hay mark
     console.print("\n[bold cyan]Đang phân tích sổ cái thế giới và cập nhật trạng thái nhân vật...[/bold cyan]")
     emit_agent_log(story_uuid, "Đang trích xuất thông tin Địa điểm, Binh khí, Công pháp và cập nhật trạng thái nhân vật từ chương...")
 
-    world_prompt = f"""
-Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và trích xuất thông tin về thế giới tiên hiệp bao gồm: các địa điểm mới, các binh khí/pháp khí mới, các công pháp mới, và cập nhật trạng thái tu vi, địa điểm đi qua, địa điểm hiện tại, trạng thái (an toàn, nguy hiểm...), binh khí và công pháp của các nhân vật tham gia chương này.
-
-HỆ THỐNG TU VI THẾ GIỚI:
-[{cult_stages_str}]
-{cult_stages_detail}
-
-DANH SÁCH NHÂN VẬT HIỆN CÓ:
-[{char_list_str}]
-
-NỘI DUNG CHƯƠNG {chapter_num}:
----
-{draft_content}
----
-
-YÊU CẦU TRÍCH XUẤT:
-1. Địa điểm mới: Trích xuất các địa điểm cụ thể xuất hiện hoặc được nhắc đến trong chương (ví dụ: Vạn Tượng Sơn, Độc Cô Cốc...).
-2. Binh khí mới: Trích xuất các binh khí, pháp khí hoặc thần binh xuất hiện trong chương (ví dụ: Hỏa Diễm Đao, Tru Tiên Kiếm...).
-3. Công pháp mới: Trích xuất các công pháp, chiêu thức, bí tịch xuất hiện trong chương (ví dụ: Hỏa Diễm Đao Pháp, Thái Cực Kiếm...).
-4. Cập nhật nhân vật: 
-   - Với mỗi nhân vật tham gia hoặc được nhắc tới trong chương:
-     - Xác định xem họ có đột phá tu vi hay thăng tiến tu vi trong chương này không. Hệ thống tu vi được sắp xếp từ thấp đến cao theo đúng thứ tự trong danh sách HỆ THỐNG TU VI THẾ GIỚI. Chỉ ghi nhận tu vi mới nếu nó mạnh hơn/cao hơn so với tu vi hiện tại của nhân vật (ví dụ: Trúc Cơ kỳ cao hơn Luyện Khí kỳ, Trúc Cơ tầng 5 cao hơn Trúc Cơ tầng 2). Không hạ cấp tu vi của nhân vật. Để trống (None) nếu không thăng cấp.
-     - Xác định binh khí họ đang sử dụng/cầm trong chương này.
-     - Xác định binh khí mới họ nhặt được, chế tạo hoặc sở hữu thêm trong chương này.
-     - Xác định công pháp họ đang sử dụng hoặc thi triển trong chương này.
-     - Xác định công pháp mới họ học được hoặc sở hữu thêm trong chương này.
-     - Xác định địa điểm họ đã đi qua/ghé thăm trong chương này.
-     - Xác định địa điểm hiện tại của họ sau khi kết thúc chương này.
-     - Xác định trạng thái của họ sau chương này. Phải chọn chính xác 1 trong: Mới xuất hiện, Đang an toàn, Đang nguy hiểm, Nguy hiểm tính mạng, Đã chết. Ví dụ, nếu nhân vật đang bị truy sát hoặc đánh nhau ác liệt thì ghi "Đang nguy hiểm" hoặc "Nguy hiểm tính mạng", nếu bị giết chết thì ghi "Đã chết", nếu đang ở nơi an toàn/tu luyện thì ghi "Đang an toàn".
-"""
+    world_prompt = load_prompt("world_entity_extractor.md") \
+        .replace("{chapter_num}", str(chapter_num)) \
+        .replace("{cult_stages_str}", cult_stages_str) \
+        .replace("{cult_stages_detail}", cult_stages_detail) \
+        .replace("{char_list_str}", char_list_str) \
+        .replace("{draft_content}", draft_content)
     try:
         world_extraction = invoke_with_retry(state, world_prompt, temperature=0.2, output_schema=WorldEntityExtraction)
         
@@ -1786,25 +1512,11 @@ YÊU CẦU TRÍCH XUẤT:
     console.print("\n[bold cyan]Đang phân tích xem có nhân vật mới nào xuất hiện trong chương này hay không...[/bold cyan]")
     emit_agent_log(story_uuid, "Đang kiểm tra xem có nhân vật mới nào xuất hiện trong chương...")
     
-    char_prompt = f"""
-Hãy đọc nội dung Chương {chapter_num} của bộ truyện dưới đây và tìm xem có nhân vật MỚI nào (có tên riêng cụ thể) xuất hiện lần đầu trong chương này hay không.
-
-THÔNG TIN TRUYỆN:
-- Tên truyện: {meta_data.get('name')}
-- Danh sách các nhân vật ĐÃ CÓ từ trước: {", ".join(existing_names)}
-
-NỘI DUNG CHƯƠNG {chapter_num}:
----
-{draft_content}
----
-
-YÊU CẦU:
-1. Đối chiếu kỹ lưỡng các nhân vật xuất hiện trong chương với danh sách nhân vật ĐÃ CÓ.
-2. Chỉ trích xuất các nhân vật MỚI xuất hiện lần đầu trong chương này mà chưa có trong danh sách đã có.
-3. Bỏ qua các nhân vật không có tên cụ thể (ví dụ: "thủ hạ", "người qua đường", "tên cướp", "đám đông").
-4. Bỏ qua các nhân vật có tên là cách gọi khác của các nhân vật đã có (ví dụ: "Linh Nhi" hoặc "Linh nhi" chính là "Chu Linh Nhi").
-5. Mô tả hoàn cảnh gặp gỡ, thời điểm gặp gỡ và sự kiện chính đang xảy ra ở chương này khi họ xuất hiện trong `appearance_context`.
-"""
+    char_prompt = load_prompt("new_character_extractor.md") \
+        .replace("{chapter_num}", str(chapter_num)) \
+        .replace("{story_name}", str(meta_data.get('name', ''))) \
+        .replace("{existing_names}", ", ".join(existing_names)) \
+        .replace("{draft_content}", draft_content)
     try:
         extraction_result = invoke_with_retry(state, char_prompt, temperature=0.2, output_schema=NewCharactersExtraction)
         new_extracted_chars = extraction_result.new_characters
@@ -2018,28 +1730,14 @@ def conflict_resolver_node(state: AgentState) -> Dict[str, Any]:
     chapter_num = state["chapter_num"]
     reqs = state.get("analyzed_requirements", "")
     
-    prompt = f"""
-Bạn là một nhà văn và biên tập viên xuất sắc. Nhiệm vụ của bạn là sửa đổi bản thảo Chương {chapter_num} để khắc phục triệt để các mâu thuẫn logic cốt truyện được liệt kê dưới đây.
-
-DANH SÁCH MÂU THUẪN LOGIC CẦN GIẢI QUYẾT:
-{resolutions_text}
-
-THÔNG TIN TRUYỆN THAM KHẢO:
-- Tên truyện: {meta.get('name')}
-- Nhân vật: {to_characters_markdown(meta.get('characters'))}
-- Phong cách hành văn: {meta.get('style')}
-- Bối cảnh: {meta.get('context')}
-
-BẢN NHÁP HIỆN TẠI CỦA CHƯƠNG {chapter_num}:
----
-{draft_content}
----
-
-Hãy viết lại bản thảo này sao cho:
-1. Giải quyết và sửa đổi tất cả các mâu thuẫn logic được nêu ở trên theo đúng hướng dẫn giải quyết tương ứng (nếu có) hoặc tự sửa đổi một cách logic nhất (nếu không có hướng dẫn cụ thể).
-2. Giữ nguyên định dạng Markdown của chương truyện (Tiêu đề bắt đầu bằng `# Chương {chapter_num}: [Tên]`).
-3. Đảm bảo đúng phong cách hành văn dài kỳ và không thêm lời bình luận cá nhân của AI vào đầu hoặc cuối bản viết. Chỉ trả về nội dung chương truyện.
-"""
+    prompt = load_prompt("conflict_resolver.md") \
+        .replace("{chapter_num}", str(chapter_num)) \
+        .replace("{resolutions_text}", resolutions_text) \
+        .replace("{story_name}", str(meta.get('name', ''))) \
+        .replace("{characters_markdown}", to_characters_markdown(meta.get('characters'))) \
+        .replace("{style}", str(meta.get('style', ''))) \
+        .replace("{context}", str(meta.get('context', ''))) \
+        .replace("{draft_content}", draft_content)
     response = invoke_with_retry(state, prompt, temperature=0.7)
     revised_content = ensure_string(response.content)
     emit_agent_log(state["story_uuid"], "Đã tự động sửa xong các lỗi mâu thuẫn cốt truyện.")

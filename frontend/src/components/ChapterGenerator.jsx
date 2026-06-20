@@ -74,7 +74,7 @@ function ReviewReplyForm({ onSubmit }) {
 
 function ModelChangeForm({ onSubmit, currentModel }) {
   const standardModels = [
-    'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-lite',
+    'Chapter', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-lite',
     'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.1-pro', 'gemini-2.5-flash-lite',
     'gemini-3.0-flash', 'gemma-4-26b-it', 'gemma-4-31b-it', 'gemini-1.5-flash', 'gemini-1.5-pro'
   ];
@@ -101,7 +101,9 @@ function ModelChangeForm({ onSubmit, currentModel }) {
             value={selectedOption} 
             onChange={e => setSelectedOption(e.target.value)}
           >
+            <option value="Chapter">Chapter (9router Local)</option>
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+
             <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
             <option value="gemini-2.0-flash">Gemini 2 Flash (2.0)</option>
             <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
@@ -1596,7 +1598,9 @@ export default function ChapterGenerator({
               <div className="form-group" style={{ width: '100%', maxWidth: '320px' }}>
                 <label className="form-label" style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Model AI</label>
                 <select className="form-select" value={model} onChange={e => setModel(e.target.value)}>
+                  <option value="Chapter">Chapter (9router Local)</option>
                   <option value="gemini-2.5-flash">Gemini 2.5 Flash (Khuyên dùng)</option>
+
                   <option value="gemini-2.5-pro">Gemini 2.5 Pro (Chất lượng cao)</option>
                   <option value="gemini-2.0-flash">Gemini 2 Flash (2.0) (Mới)</option>
                   <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
