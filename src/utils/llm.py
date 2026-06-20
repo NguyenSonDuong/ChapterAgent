@@ -342,6 +342,33 @@ def invoke_with_retry(state: AgentState, prompt, temperature: float = 0.7, outpu
                     raise RuntimeError(f"Lỗi máy chủ Google {code} và không chọn model mới.")
                     
         elif code == 429:
+            if state.get("auto_mode"):
+                models_pool = ["gemma-4-31b", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3-flash", "gemini-3.5-flash"]
+                current_model = state.get("model", "gemini-2.5-flash")
+                try:
+                    curr_idx = models_pool.index(current_model)
+                    next_idx = (curr_idx + 1) % len(models_pool)
+                except ValueError:
+                    next_idx = 0
+                new_model = models_pool[next_idx]
+                
+                state["model"] = new_model
+                if "meta" in state:
+                    state["meta"]["model"] = new_model
+                    if story_uuid:
+                        meta_path = config.get_meta_path(story_uuid)
+                        try:
+                            story_meta = StoryMeta(**state["meta"])
+                            meta_path.write_text(story_meta.model_dump_json(indent=2), encoding="utf-8")
+                        except Exception:
+                            pass
+                if story_uuid:
+                    emit_agent_log(story_uuid, f"[Auto Mode] Phát hiện lỗi 429 (Rate Limit). Tự động chuyển model sang '{new_model}'...", level="warning")
+                rate_limit_retries = 0
+                server_retries = 0
+                auth_retries = 0
+                continue
+
             rate_limit_retries += 1
             if rate_limit_retries <= 3:
                 console.print(f"\n[bold yellow]⚠️ Lỗi quá giới hạn lưu lượng (Rate Limit - Lỗi 429).[/bold yellow]")

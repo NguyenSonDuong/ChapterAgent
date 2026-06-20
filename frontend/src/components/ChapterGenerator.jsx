@@ -2175,19 +2175,7 @@ export default function ChapterGenerator({
               </div>
             )}
 
-            <div className="form-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input 
-                  type="checkbox" 
-                  id="autoModeCheckbox"
-                  checked={autoMode}
-                  onChange={(e) => setAutoMode(e.target.checked)}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <label htmlFor="autoModeCheckbox" style={{ fontSize: '14px', fontWeight: '500', cursor: 'pointer', color: 'var(--text-bright)' }}>
-                  Tự động tạo toàn bộ truyện (Không cần kiểm duyệt, lặp đến chương cuối)
-                </label>
-              </div>
+            <div className="form-row" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '16px', marginTop: '16px' }}>
               <button type="submit" className="btn-primary btn-generate" disabled={generating} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', fontSize: '14px' }}>
                 <Sparkles className="icon-xs" /> <span>Bắt đầu Sáng tác</span>
               </button>

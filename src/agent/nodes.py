@@ -1080,7 +1080,9 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
     console.print("Đang trích xuất trạng thái và cập nhật sổ cái toàn cục...")
     emit_agent_log(state["story_uuid"], "Đang trích xuất tóm tắt, trạng thái nhân vật và nút thắt từ chương truyện mới...")
     
-    draft_content = state["draft_content"]
+    draft_content = state.get("draft_content")
+    if not draft_content:
+        draft_content = "\n\n".join(state.get("scene_drafts", []))
     story_uuid = state["story_uuid"]
     chapter_num = state["chapter_num"]
     ledger = state["ledger"]
@@ -1632,7 +1634,7 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
         emit_agent_log(story_uuid, f"🎉 Hoàn thành sáng tác Chương {chapter_num}!", level="success")
         session_manager.remove_session(story_uuid)
         
-    return {"meta": meta_data, "is_done": True}
+    return {"meta": meta_data, "is_done": True, "draft_content": draft_content}
 
 
 def conflict_review_node(state: AgentState) -> Dict[str, Any]:

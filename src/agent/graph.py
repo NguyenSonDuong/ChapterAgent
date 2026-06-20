@@ -30,6 +30,8 @@ def route_after_scene_drafter(state: AgentState) -> str:
     if current_idx < len(scenes):
         return "scene_drafter"
     else:
+        if state.get("auto_mode"):
+            return "updater"
         return "human_review"
 
 # Hàm kiểm tra logic rẽ nhánh có điều kiện sau Human Review
@@ -78,7 +80,8 @@ workflow.add_conditional_edges(
     route_after_scene_drafter,
     {
         "scene_drafter": "scene_drafter",
-        "human_review": "human_review"
+        "human_review": "human_review",
+        "updater": "updater"
     }
 )
 

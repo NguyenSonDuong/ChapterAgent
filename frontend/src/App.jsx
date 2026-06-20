@@ -284,6 +284,8 @@ export default function App() {
                   storyLedger={storyLedger} 
                   backendUrl={BACKEND_URL}
                   onRefreshDetails={() => fetchStoryDetails(selectedStoryId)}
+                  socket={socket}
+                  onGenerationComplete={handleGenerationComplete}
                 />
               </div>
               <div style={{ display: activeTab === 'reader' ? 'flex' : 'none', flexDirection: 'column', flex: 1 }}>

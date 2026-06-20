@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Tag, HelpCircle, History, BookOpen, UserCheck, Edit, Trash2, Plus, Check, X, Sparkles, Sword, Shield, Book, MapPin, Settings, ArrowUp, ArrowDown } from 'lucide-react';
 
 const getStatusBadgeStyle = (status) => {
@@ -18,7 +18,7 @@ const getStatusBadgeStyle = (status) => {
   }
 };
 
-export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRefreshDetails }) {
+export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRefreshDetails, socket, onGenerationComplete }) {
   const [isEditingModel, setIsEditingModel] = useState(false);
   const [selectedModel, setSelectedModel] = useState('');
 
@@ -36,6 +36,153 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     max_words_per_chapter: 2000,
     cultivation_stages: []
   });
+
+  // Auto Generation States
+  const [showAutoModal, setShowAutoModal] = useState(false);
+  const [autoGenerating, setAutoGenerating] = useState(false);
+  const [autoStatus, setAutoStatus] = useState('idle');
+  const [autoMessages, setAutoMessages] = useState([]);
+  const [autoCancelling, setAutoCancelling] = useState(false);
+  const [autoCurrentChapter, setAutoCurrentChapter] = useState(null);
+
+  useEffect(() => {
+    if (!socket || !storyMeta?.uuid || !autoGenerating) return;
+
+    const onAgentStatus = (data) => {
+      if (data.story_uuid !== storyMeta.uuid) return;
+      
+      if (data.status !== 'completed' && data.status !== 'error' && data.status !== 'cancelled') {
+        setAutoStatus(data.status);
+      }
+
+      if (data.status === 'completed') {
+        setAutoCurrentChapter(data.chapter_num);
+        const maxChaps = storyMeta?.max_chapters || 10;
+        if (data.chapter_num < maxChaps) {
+          setAutoMessages((prev) => [...prev, {
+            id: `auto-next-${Date.now()}`,
+            text: `Chương ${data.chapter_num} đã hoàn thành. Tự động chuyển tiếp sáng tác Chương ${data.chapter_num + 1}...`,
+            level: 'success',
+            time: new Date().toLocaleTimeString()
+          }]);
+          if (onRefreshDetails) onRefreshDetails();
+        } else {
+          setAutoStatus('completed');
+          setAutoGenerating(false);
+          if (onGenerationComplete) onGenerationComplete(data.chapter_num, true);
+          if (onRefreshDetails) onRefreshDetails();
+        }
+      } else if (data.status === 'error') {
+        setAutoStatus('error');
+        setAutoGenerating(false);
+      } else if (data.status === 'cancelled') {
+        setAutoStatus('idle');
+        setAutoGenerating(false);
+        setAutoCancelling(false);
+        setShowAutoModal(false);
+        if (onRefreshDetails) onRefreshDetails();
+      }
+    };
+
+    const onAgentLog = (data) => {
+      if (data.story_uuid !== storyMeta.uuid) return;
+      setAutoMessages((prev) => [...prev, {
+        id: `log-${Date.now()}-${Math.random()}`,
+        text: data.message,
+        level: data.level || 'info',
+        time: data.time || new Date().toLocaleTimeString()
+      }]);
+    };
+
+    socket.on('agent_status', onAgentStatus);
+    socket.on('agent_log', onAgentLog);
+
+    return () => {
+      socket.off('agent_status', onAgentStatus);
+      socket.off('agent_log', onAgentLog);
+    };
+  }, [socket, storyMeta, autoGenerating, onRefreshDetails, onGenerationComplete]);
+
+  const handleStartAutoGenerate = async () => {
+    setAutoGenerating(true);
+    setAutoStatus('starting');
+    setShowAutoModal(true);
+    setAutoMessages([
+      {
+        id: `start-log-${Date.now()}`,
+        text: 'Bắt đầu gửi yêu cầu sáng tác tự động toàn bộ truyện...',
+        level: 'info',
+        time: new Date().toLocaleTimeString()
+      }
+    ]);
+
+    try {
+      const res = await fetch(`${backendUrl}/api/stories/${storyMeta.uuid}/chapters/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          auto_mode: true,
+          model: storyMeta.model
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAutoMessages((prev) => [...prev, {
+          id: `error-log-${Date.now()}`,
+          text: data.error || 'Lỗi không xác định khi bắt đầu sinh truyện.',
+          level: 'error',
+          time: new Date().toLocaleTimeString()
+        }]);
+        setAutoGenerating(false);
+        setAutoStatus('error');
+      }
+    } catch (err) {
+      setAutoMessages((prev) => [...prev, {
+        id: `error-log-${Date.now()}`,
+        text: `Không thể kết nối đến backend API: ${err.message}`,
+        level: 'error',
+        time: new Date().toLocaleTimeString()
+      }]);
+      setAutoGenerating(false);
+      setAutoStatus('error');
+    }
+  };
+
+  const handleCancelAutoGenerate = async () => {
+    if (!storyMeta?.uuid) return;
+    setAutoCancelling(true);
+    setAutoMessages((prev) => [...prev, {
+      id: `cancel-start-${Date.now()}`,
+      text: 'Đang gửi yêu cầu hủy tiến trình sáng tác...',
+      level: 'warning',
+      time: new Date().toLocaleTimeString()
+    }]);
+
+    try {
+      const res = await fetch(`${backendUrl}/api/stories/${storyMeta.uuid}/chapters/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setAutoMessages((prev) => [...prev, {
+          id: `cancel-err-${Date.now()}`,
+          text: `Không thể hủy tiến trình: ${data.error || 'Lỗi từ máy chủ.'}`,
+          level: 'error',
+          time: new Date().toLocaleTimeString()
+        }]);
+        setAutoCancelling(false);
+      }
+    } catch (err) {
+      setAutoMessages((prev) => [...prev, {
+        id: `cancel-err-${Date.now()}`,
+        text: `Lỗi kết nối khi hủy tiến trình: ${err.message}`,
+        level: 'error',
+        time: new Date().toLocaleTimeString()
+      }]);
+      setAutoCancelling(false);
+    }
+  };
 
   // Character States
   const [isAddingCharacter, setIsAddingCharacter] = useState(false);
@@ -636,6 +783,31 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
     }
   };
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'starting': return { background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' };
+      case 'analyzing_requirements': return { background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.3)' };
+      case 'drafting': return { background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid rgba(168, 85, 247, 0.3)' };
+      case 'updating': return { background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)' };
+      case 'completed': return { background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' };
+      case 'error': return { background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' };
+      default: return { background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255, 255, 255, 0.1)' };
+    }
+  };
+
+  const getFriendlyStatusText = (status) => {
+    switch (status) {
+      case 'starting': return 'Đang khởi động';
+      case 'analyzing_requirements': return 'Phân tích yêu cầu';
+      case 'drafting': return 'Đang sáng tác phân cảnh';
+      case 'updating': return 'Cập nhật Sổ cái & File';
+      case 'completed': return 'Đã hoàn thành truyện';
+      case 'error': return 'Gặp lỗi';
+      case 'idle': return 'Sẵn sàng';
+      default: return status;
+    }
+  };
+
   return (
     <div className="story-overview fade-in">
       <div className="overview-header glass" style={{ position: 'relative' }}>
@@ -703,6 +875,30 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
               <span key={idx} className="tag-item">{tag}</span>
             ))}
           </div>
+        </div>
+        <div className="story-actions-quick" style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
+          <button 
+            onClick={handleStartAutoGenerate}
+            disabled={autoGenerating}
+            className="btn-primary" 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              padding: '10px 20px', 
+              fontSize: '13px', 
+              background: 'linear-gradient(135deg, var(--color-cyan) 0%, #a855f7 100%)',
+              color: '#10141f',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              boxShadow: '0 0 15px rgba(6, 182, 212, 0.4)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Sparkles className="icon-xs" style={{ strokeWidth: 2.5 }} />
+            <span style={{ fontWeight: '600' }}>Tự động tạo toàn bộ truyện</span>
+          </button>
         </div>
       </div>
 
@@ -1984,6 +2180,260 @@ export default function StoryOverview({ storyMeta, storyLedger, backendUrl, onRe
             <button type="button" onClick={() => setIsEditingStory(false)} className="btn-secondary-sm" style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>Hủy</button>
             <button type="button" onClick={handleSaveStory} className="btn-primary-sm" style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--color-cyan)', color: '#10141f', border: 'none', fontWeight: '600' }}>Lưu</button>
           </div>
+        </div>
+      </div>
+    )}
+
+    {showAutoModal && (
+      <div className="modal-overlay" style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(8, 10, 16, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        animation: 'fadeIn 0.3s ease-out'
+      }}>
+        <div className="modal-content glass" style={{
+          width: '100%',
+          maxWidth: '750px',
+          background: 'rgba(21, 26, 36, 0.8)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '16px',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '85vh',
+          animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+        }}>
+          {/* Modal Header */}
+          <div style={{
+            padding: '20px 24px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%)',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Sparkles size={18} className="text-cyan" style={{ animation: autoGenerating ? 'pulse 2s infinite' : 'none' }} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: '#fff' }}>
+                  Tiến Trình Tự Động Tạo Truyện
+                </h3>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  {storyMeta?.name} &bull; Model AI: <span style={{ color: 'var(--color-cyan)', fontWeight: '600' }}>{storyMeta?.model}</span>
+                </span>
+              </div>
+            </div>
+            {(!autoGenerating || autoStatus === 'completed' || autoStatus === 'error') && (
+              <button 
+                onClick={() => { setShowAutoModal(false); setAutoMessages([]); setAutoStatus('idle'); }} 
+                className="btn-icon"
+                style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(255, 255, 255, 0.02)', color: 'var(--text-secondary)' }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Modal Body */}
+          <div style={{ padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+            
+            {/* Status Card & Progress bar */}
+            <div className="glass-light" style={{
+              padding: '16px 20px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.01)',
+              border: '1px solid rgba(255, 255, 255, 0.03)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                  Trạng thái hiện tại:
+                </span>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  ...getStatusStyle(autoStatus)
+                }}>
+                  {getFriendlyStatusText(autoStatus)}
+                </span>
+              </div>
+
+              {/* Progress Tracker */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                  <span>Tiến độ chương:</span>
+                  <span style={{ fontWeight: '600', color: '#fff' }}>
+                    Chương {autoCurrentChapter || timeline.length} / {storyMeta?.max_chapters || 10}
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${((autoCurrentChapter || timeline.length) / (storyMeta?.max_chapters || 10)) * 100}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, var(--color-cyan) 0%, #a855f7 100%)',
+                    boxShadow: '0 0 10px rgba(6, 182, 212, 0.5)',
+                    transition: 'width 0.4s ease-out'
+                  }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Logs Terminal console */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minHeight: '200px' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                Nhật ký tiến trình hoạt động (AI Generator Logs):
+              </span>
+              <div 
+                className="logs-terminal"
+                style={{
+                  flex: 1,
+                  background: '#090d16',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '10px',
+                  padding: '16px',
+                  fontFamily: 'Consolas, Monaco, "Courier New", Courier, monospace',
+                  fontSize: '12px',
+                  color: '#e2e8f0',
+                  overflowY: 'auto',
+                  maxHeight: '320px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)'
+                }}
+              >
+                {autoMessages.map((msg) => (
+                  <div key={msg.id} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    lineHeight: '1.5',
+                    borderBottom: '1px solid rgba(255,255,255,0.02)',
+                    paddingBottom: '4px'
+                  }}>
+                    <span style={{ color: 'var(--text-muted)', flexShrink: 0 }}>[{msg.time}]</span>
+                    <span style={{
+                      color: msg.level === 'error' ? '#ef4444' :
+                             msg.level === 'warning' ? '#f59e0b' :
+                             msg.level === 'success' ? '#10b981' :
+                             'var(--color-cyan)',
+                      fontWeight: msg.level === 'error' || msg.level === 'success' ? '700' : 'normal',
+                      wordBreak: 'break-all'
+                    }}>
+                      {msg.text}
+                    </span>
+                  </div>
+                ))}
+                {autoMessages.length === 0 && (
+                  <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
+                    Chưa có hoạt động nào được ghi nhận. Đang khởi động...
+                  </div>
+                )}
+                {/* Scroll Anchor */}
+                <div ref={(el) => { if (el) el.scrollIntoView({ behavior: 'smooth' }); }} />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Modal Footer */}
+          <div style={{
+            padding: '16px 24px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(18, 22, 31, 0.5)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              {autoGenerating && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="spinner-dots" style={{ display: 'flex', gap: '3px' }}>
+                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-cyan)', display: 'inline-block', animation: 'bounce 1.4s infinite ease-in-out both' }} />
+                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-cyan)', display: 'inline-block', animation: 'bounce 1.4s infinite ease-in-out both 0.2s' }} />
+                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-cyan)', display: 'inline-block', animation: 'bounce 1.4s infinite ease-in-out both 0.4s' }} />
+                  </div>
+                  <span>Đang thực hiện tự động trong nền...</span>
+                </div>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {autoGenerating && (
+                <button
+                  type="button"
+                  onClick={handleCancelAutoGenerate}
+                  disabled={autoCancelling}
+                  className="btn-danger-sm"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: autoCancelling ? 'not-allowed' : 'pointer',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    color: '#ef4444',
+                    border: '1px solid rgba(239, 68, 68, 0.3)'
+                  }}
+                >
+                  <X size={14} />
+                  <span>{autoCancelling ? 'Đang dừng...' : 'Hủy Tiến Trình'}</span>
+                </button>
+              )}
+              
+              {!autoGenerating && (
+                <button
+                  type="button"
+                  onClick={() => { setShowAutoModal(false); setAutoMessages([]); }}
+                  className="btn-primary-sm"
+                  style={{
+                    padding: '8px 20px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    background: autoStatus === 'completed' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                    color: autoStatus === 'completed' ? '#10b981' : '#fff',
+                    border: autoStatus === 'completed' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
+                  }}
+                >
+                  Đóng
+                </button>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     )}
