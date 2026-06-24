@@ -89,7 +89,7 @@ def get_llm(model_name: str = "Chapter", temperature: float = 0.7):
     if not is_gemini:
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
-            model=model_name,
+            model="qwen/qwen3-14b",
             temperature=temperature,
             openai_api_key=open_api_key,
             openai_api_base=open_api_base

@@ -1,13 +1,137 @@
 {
-  "timeline": [],
-  "unresolved_threads": [
+  "timeline": [
     {
-      "thread": "Bắt đầu cuộc phiêu lưu của nhân vật.",
-      "chapter": null
+      "chapter": 1,
+      "title": "Vực sâu vẫy gọi",
+      "summary": "Diệp Lạc, một kẻ bị gia tộc ruồng bỏ vì không thể tụ khí, bị các tộc nhân truy sát đến đường cùng tại vực thẳm Núi Quỷ Mị. Thay vì chịu chết dưới lưỡi kiếm của họ, hắn gieo mình xuống vực sâu. Dù trọng thương và gãy xương, Diệp Lạc vẫn sống sót nhờ sự bảo hộ kỳ lạ của miếng ngọc bội gia truyền. Hắn lê thân đến một sơn cốc cổ quái, nơi máu của hắn vô tình đánh thức một pho tượng đá chứa đựng ma khí cổ xưa, dẫn đến một sự kết nối đầy nguy hiểm giữa hắn và một thực thể bí ẩn.",
+      "nodes": [
+        {
+          "id": "node-1782033003878",
+          "title": "Cái bẫy chết người tại núi Quỷ Mị",
+          "description": "Diệp Lạc nhận nhiệm vụ gia tộc đi cứu một đứa bé bị lạc tại núi Quỷ Mị, nhưng thực chất đây là âm mưu của tộc nhân nhằm trừ khử hắn. Bị đám sát thủ dồn vào đường cùng tại vách đá, Diệp Lạc dù bị thương nặng vẫn giữ tấm lòng lương thiện, quyết định gieo mình xuống vực thay vì để chúng sát hạt vì so với việc để kẻ khác giết thì nhảy xuống núi vẫn có cơ hội sống hơn.",
+          "characters": [
+            "Diệp Lạc"
+          ],
+          "resolved_thread": {
+            "thread": "Bắt đầu cuộc phiêu lưu của nhân vật",
+            "resolution_note": "Diệp Lạc đối mặt với sự phản bội của gia tộc, quyết định tự sát để thoát khỏi sự truy sát, mở ra hành trình tại vực sâu."
+          },
+          "links": [],
+          "locations": [
+            "núi Quỷ Mị"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "kịch tính",
+          "x": 150,
+          "y": 200
+        },
+        {
+          "id": "node-1782033003879",
+          "title": "Sự bảo hộ huyền bí dưới đáy vực",
+          "description": "Sau khi rơi xuống vực, Diệp Lạc hôn mê suốt hai ngày. Nhờ miếng ngọc bội mẹ để lại, các loài linh thú trong vực sâu không tấn công mà vây quanh bảo vệ hắn. Khi tỉnh dậy, Diệp Lạc nén đau đớn, lê đôi chân gãy tìm lối thoát.",
+          "characters": [
+            "Diệp Lạc"
+          ],
+          "resolved_thread": {
+            "resolution_note": "",
+            "thread": ""
+          },
+          "links": [],
+          "locations": [
+            "đáy vực sâu"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "bi thương",
+          "x": 450,
+          "y": 260
+        },
+        {
+          "id": "node-1782033003880",
+          "title": "Phát hiện pho tượng ma quái",
+          "description": "Trong lúc mò mẫm tìm đường ra khỏi vực, Diệp Lạc vô tình rơi vào một sơn cốc hoang vu. Tại đây, hắn kinh hãi phát hiện một pho tượng cổ đen kịt, không ngừng tỏa ra luồng ma khí lạnh lẽo, đáng sợ.",
+          "characters": [
+            "Diệp Lạc"
+          ],
+          "resolved_thread": {
+            "thread": "",
+            "resolution_note": ""
+          },
+          "links": [],
+          "locations": [
+            "sơn cốc"
+          ],
+          "weapons": [],
+          "techniques": [],
+          "tone": "kịch tính",
+          "x": 750,
+          "y": 200
+        }
+      ],
+      "connections": [
+        {
+          "from": "node-1782033003878",
+          "to": "node-1782033003879"
+        },
+        {
+          "from": "node-1782033003879",
+          "to": "node-1782033003880"
+        }
+      ]
     }
   ],
-  "resolved_threads": [],
-  "locations": [],
-  "weapons": [],
+  "unresolved_threads": [
+    {
+      "thread": "Danh tính và mục đích thực sự của thực thể ẩn giấu trong pho tượng đá cổ quái.",
+      "chapter": 1
+    },
+    {
+      "thread": "Mối quan hệ giữa huyết mạch của Diệp Lạc và thực thể ma quái vừa trỗi dậy.",
+      "chapter": 1
+    },
+    {
+      "thread": "Hậu quả của việc ma khí chiếm hữu tâm thức đối với tính cách và sức mạnh của Diệp Lạc trong tương lai.",
+      "chapter": 1
+    }
+  ],
+  "resolved_threads": [
+    {
+      "thread": "Bắt đầu cuộc phiêu lưu của nhân vật",
+      "chapter_introduced": null,
+      "chapter_resolved": 1,
+      "resolution_note": "Diệp Lạc đối mặt với sự phản bội của gia tộc, quyết định tự sát để thoát khỏi sự truy sát, mở ra hành trình tại vực sâu."
+    },
+    {
+      "thread": "Bắt đầu cuộc phiêu lưu của nhân vật.",
+      "chapter_introduced": null,
+      "chapter_resolved": 1,
+      "resolution_note": "Tự động phát hiện giải quyết bởi AI."
+    }
+  ],
+  "locations": [
+    {
+      "name": "Núi Quỷ Mị",
+      "chapter": 1,
+      "description": "Nơi tử địa với sương mù dày đặc, vách đá dựng đứng và vực sâu thăm thẳm."
+    },
+    {
+      "name": "Sơn cốc",
+      "chapter": 1,
+      "description": "Một thung lũng âm u nằm dưới đáy vực, nơi có pho tượng đá cổ quái."
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Trường kiếm",
+      "chapter": 1,
+      "description": "Thanh kiếm của tên tộc nhân sử dụng để uy hiếp Diệp Lạc."
+    },
+    {
+      "name": "Ngọc bội gia truyền",
+      "chapter": 1,
+      "description": "Vật phẩm của Diệp Lạc, có khả năng phát sáng và chứa đựng bí ẩn liên quan đến pho tượng đá."
+    }
+  ],
   "techniques": []
 }

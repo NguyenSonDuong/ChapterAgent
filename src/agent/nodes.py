@@ -3,7 +3,7 @@ import json
 import time
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, cast
 from pydantic import BaseModel, Field
 from rich.console import Console
 from rich.prompt import Prompt
@@ -1167,12 +1167,12 @@ def state_ledger_updater_node(state: AgentState) -> Dict[str, Any]:
                 .replace("{chapter_num}", str(chapter_num)) \
                 .replace("{nodes_list_markdown}", to_nodes_list_markdown(nodes_list)) \
                 .replace("{draft_content}", draft_content)
-            mapping_result = invoke_with_retry(
+            mapping_result = cast(ChapterNodeContentExtraction, invoke_with_retry(
                 state, 
                 mapping_prompt, 
                 temperature=0.2, 
                 output_schema=ChapterNodeContentExtraction
-            )
+            ))
             
             # Cập nhật trường content vào các node của canvas_data
             mapping_dict = {m.node_id: m.content for m in mapping_result.mappings}

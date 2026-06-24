@@ -8,14 +8,17 @@
       "description": "Ngoại hình: Vẻ ngoài gầy gò do chịu khổ từ nhỏ, gương mặt thanh tú, đôi mắt sáng sủa, kiên định và chứa đựng sự ấm áp. Khi vận dụng Ma công, quanh thân xuất hiện ma khí đen tuyền nhưng thần thái vẫn chính trực, không có vẻ tà ác. Tính cách: Lương thiện bẩm sinh, bao dung, có chính kiến và cực kỳ kiên cường. Dù bị gia tộc ruồng bỏ nhưng không oán trời trách đất, luôn nhìn vào mặt tốt của mọi việc. Sức mạnh: Sau khi nhảy vực, nhận được truyền thừa chí cao của Ma Tôn. Sở hữu thể chất Ma Thần ẩn và thần thức cực mạnh nhờ quá trình \"đấu trí, cảm hóa\" Ma Tôn hàng ngày. Có thể sử dụng Ma công hủy diệt nhưng áp dụng vào việc cứu người và hành hiệp trượng nghĩa.",
       "first_chapter": null,
       "appearance_context": null,
-      "visited_locations": [],
+      "visited_locations": [
+        "Núi Quỷ Mị",
+        "Sơn cốc"
+      ],
       "active_weapon": null,
       "weapons_owned": [],
       "active_technique": null,
       "techniques_owned": [],
       "current_cultivation": "Phàm nhân (Kinh mạch khiếm khuyết, không thể tụ khí)",
-      "current_location": null,
-      "status": "Mới xuất hiện"
+      "current_location": "Sơn cốc",
+      "status": "Nguy hiểm tính mạng"
     },
     {
       "name": "Vân Hi",
@@ -38,28 +41,15 @@
       "description": "Ngoại hình: Thường xuất hiện trong viễn cảnh tâm thức dưới hình ảnh một vĩ nhân cao lớn, tóc đen tung bay, ánh mắt đầy ngạo nghễ và bá đạo. Tính cách: Kiêu ngạo, thô lỗ, nhìn đời bằng nửa con mắt, ban đầu luôn thúc giục nam chính giết chóc. Sau đó bị sự lương thiện của nam chính làm cho \"phát điên\" nhưng dần dần bị cảm hóa, trở nên bao che khuyết điểm và hết lòng chỉ dạy cho nam chính. Sức mạnh: Nắm giữ toàn bộ kho tàng công pháp ma đạo, kinh nghiệm chiến đấu phong phú và nhãn quang đỉnh cấp của một vị đại năng vạn năm.",
       "first_chapter": null,
       "appearance_context": null,
-      "visited_locations": [],
+      "visited_locations": [
+        "Sơn cốc"
+      ],
       "active_weapon": null,
       "weapons_owned": [],
       "active_technique": null,
       "techniques_owned": [],
       "current_cultivation": "Linh hồn tàn khuyết (Bản thể từng là Độ Kiếp Kỳ đỉnh phong / Từng xưng Đế nửa bước)",
-      "current_location": null,
-      "status": "Mới xuất hiện"
-    },
-    {
-      "name": "Diệp Hùng",
-      "role": "Phản diện (Trưởng lão gia tộc)",
-      "description": "Ngoại hình: Trung niên cao lớn, nét mặt nghiêm nghị nhưng ánh mắt xảo quyệt, thích mặc hoa phục thể hiện quyền lực. Tính cách: Lạnh lùng, hám lợi, đặt lợi ích gia tộc và bản thân lên trên hết, coi trọng thiên phú linh căn, xem nam chính là rác rưởi làm ô uế thanh danh dòng họ. Sức mạnh: Tu luyện công pháp hộ tộc \"Thanh Phong Quyết\", có thực lực cao nể tại tòa thành ban đầu. Chính là kẻ trực tiếp ép nam chính vào đường cùng dẫn đến việc nhảy vực tự sát. Tên này sẽ là cột mốc đầu tiên để nam chính quay về vạch trần bộ mặt ngụy quân tử.",
-      "first_chapter": null,
-      "appearance_context": null,
-      "visited_locations": [],
-      "active_weapon": null,
-      "weapons_owned": [],
-      "active_technique": null,
-      "techniques_owned": [],
-      "current_cultivation": "Trúc Cơ Kỳ tầng 9",
-      "current_location": null,
+      "current_location": "Sơn cốc",
       "status": "Mới xuất hiện"
     }
   ],
@@ -76,7 +66,7 @@
   ],
   "max_chapters": 300,
   "max_words_per_chapter": 800,
-  "model": "gemma-4-31b-it",
+  "model": "gemini-3.1-flash-lite",
   "cultivation_stages": [
     {
       "name": "Luyện Khí",

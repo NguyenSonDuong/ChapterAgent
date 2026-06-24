@@ -53,6 +53,23 @@ def parse_request_cultivation_stages(raw_stages):
                 })
     return parsed
 
+def load_api_prompt(tag: str) -> str:
+    """Loads a prompt template from suggest_templates.md based on tag."""
+    path = Path(__file__).resolve().parent / "prompts" / "suggest_templates.md"
+    if not path.exists():
+        raise FileNotFoundError(f"API prompt template file not found: {path}")
+    content = path.read_text(encoding="utf-8")
+    
+    start_tag = f"<{tag}>"
+    end_tag = f"</{tag}>"
+    
+    if start_tag not in content or end_tag not in content:
+        raise ValueError(f"Tag {tag} not found in template file: {path}")
+        
+    start_idx = content.find(start_tag) + len(start_tag)
+    end_idx = content.find(end_tag)
+    return content[start_idx:end_idx].strip()
+
 app = Flask(__name__)
 # Enable CORS for all routes (important for ReactJS frontend connection)
 CORS(app)
@@ -1110,48 +1127,24 @@ def suggest_chapter_nodes(story_uuid, chapter_num):
             pass
 
     # Build system prompt and user query
-    prompt = f"""
-Bạn là một chuyên gia xây dựng kịch bản và sơ đồ sự kiện cho tiểu thuyết dài kỳ. Nhiệm vụ của bạn là thiết lập danh sách {num_nodes} node sự kiện tuần tự nối tiếp nhau cho Chương {chapter_num} của câu chuyện dưới đây.
-
-THÔNG TIN TÁC PHẨM:
-- Tên truyện: {meta_data.get('name')}
-- Bối cảnh chính: {meta_data.get('context')}
-- Phong cách hành văn: {meta_data.get('style')}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-- Lịch sử cốt truyện:
-{to_timeline_markdown(ledger_data.get('timeline', []))}
-- Các nút thắt chưa giải quyết:
-{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
-
-BỐI CẢNH SỰ KIỆN CHƯƠNG TRƯỚC / CHƯƠNG LIÊN KẾT ĐỂ TẠO SỰ LIỀN MẠCH:
-{prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ."}
-
-YÊU CẦU CHO CHƯƠNG {chapter_num}:
-- Tạo chính xác {num_nodes} node sự kiện được nối kết tuần tự.
-- Các nhân vật sẽ xuất hiện trong chương này: {', '.join(characters) if characters else 'Không chỉ định'}
-- Các địa điểm nhân vật sẽ tới hoặc ở: {', '.join(locations) if locations else 'Không chỉ định'}
-- Các công pháp sẽ sử dụng: {', '.join(techniques) if techniques else 'Không chỉ định'}
-- Binh khí/Pháp khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
-- Nút thắt sẽ giải quyết (nếu có, hãy tự nghĩ phương án giải quyết và điền vào resolution_note): {', '.join(resolved_threads) if resolved_threads else 'Không chỉ định'}
-- Văn phong mong muốn của tác giả: {tone if tone else 'Không chỉ định (bình thường)'}
-- Lưu ý/chú thích của tác giả: "{notes}"
-
-HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
-1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) with node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
-2. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, TRẬN PHÁP, ĐỊA ĐIỂM...):
-   - Hãy phân bổ đều các nhân vật, địa điểm, công pháp, binh khí đã được chỉ định ở trên vào các node sao cho tự nhiên nhất.
-   - Chỉ cho phép các thực thể đã được chỉ định cụ thể ở yêu cầu đầu vào phía trên (Nhân vật sẽ xuất hiện, Địa điểm nhân vật tới, Công pháp sẽ sử dụng, Binh khí/Pháp khí sử dụng) HOẶC các thực thể hoàn toàn mới được tự động tạo thêm xuất hiện trong các node.
-   - Tuyệt đối CẤM cho xuất hiện hay nhắc tên bất kỳ thực thể cũ nào khác có sẵn trong tác phẩm mà không được chỉ định trong yêu cầu đầu vào ở trên.
-3. Nếu có giải quyết nút thắt, hãy chọn đúng nút thắt đó và mô tả cách giải quyết chi tiết trong trường `resolved_thread.resolution_note`.
-4. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
-5. Đề xuất một Văn Phong (tone) cụ thể và phù hợp cho mỗi node tại trường `tone` (ví dụ: "hài hước", "bi thương", "đau khổ tuyệt vọng", "tình cảm", "kịch tính", "bình thường").
-   ĐẶC BIỆT: Nếu tác giả có chỉ định "Văn phong mong muốn của tác giả" cụ thể ở trên (khác với không chỉ định/bình thường), bạn BẮT BUỘC phải tạo ra ít nhất 50% số lượng node (ví dụ: tối thiểu 2 node nếu tổng số là 3 hoặc 4 node) có văn phong (`tone`) chính xác như yêu cầu đó của tác giả. Các node còn lại hãy tự dựa vào nội dung và nhịp điệu của câu chuyện để lựa chọn văn phong phù hợp nhất.
-6. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
-   - Sơ đồ các node sự kiện KHÔNG được thiết kế theo cấu trúc đóng của một bài văn độc lập (không tạo node chỉ để 'mở bài/giới thiệu hoàn cảnh' ở đầu, và không tạo node chỉ để 'kết luận/tổng kết diễn biến/rút ra bài học' ở cuối chương).
-   - Node đầu tiên phải là sự kiện trực tiếp bắt đầu nối tiếp ngay vào diễn biến trước đó.
-   - Node cuối cùng của chương phải mở ra một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để chuẩn bị cho chương tiếp theo, tuyệt đối tránh kết thúc đóng hay mang tính khép lại toàn bộ.
-"""
+    prompt = (
+        load_api_prompt("suggest_chapter_nodes")
+        .replace("{num_nodes}", str(num_nodes))
+        .replace("{chapter_num}", str(chapter_num))
+        .replace("{story_name}", meta_data.get('name', ''))
+        .replace("{context}", meta_data.get('context', ''))
+        .replace("{style}", meta_data.get('style', ''))
+        .replace("{timeline}", to_timeline_markdown(ledger_data.get('timeline', [])))
+        .replace("{unresolved_threads}", to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', [])))
+        .replace("{prev_nodes_ctx}", prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ.")
+        .replace("{characters}", ', '.join(characters) if characters else 'Không chỉ định')
+        .replace("{locations}", ', '.join(locations) if locations else 'Không chỉ định')
+        .replace("{techniques}", ', '.join(techniques) if techniques else 'Không chỉ định')
+        .replace("{weapons}", ', '.join(weapons) if weapons else 'Không chỉ định')
+        .replace("{resolved_threads}", ', '.join(resolved_threads) if resolved_threads else 'Không chỉ định')
+        .replace("{tone}", tone if tone else 'Không chỉ định (bình thường)')
+        .replace("{notes}", notes)
+    )
 
     try:
         from src.utils.llm import invoke_with_retry
@@ -1286,40 +1279,22 @@ def suggest_node_details(story_uuid, chapter_num):
             resolved_thread_str += f" (Gợi ý cách giải quyết: {resolved_thread.get('resolution_note')})"
 
     # Build system prompt and user query
-    prompt = f"""
-Bạn là một chuyên gia xây dựng kịch bản tiểu thuyết dài kỳ. Hãy gợi ý Tiêu đề (title) ngắn gọn và Mô tả kịch bản (description) chi tiết diễn biến cho một sự kiện (node) cụ thể trong Chương {chapter_num} của câu chuyện dưới đây.
-
-THÔNG TIN TÁC PHẨM:
-- Tên truyện: {meta_data.get('name')}
-- Bối cảnh chính: {meta_data.get('context')}
-- Phong cách hành văn: {meta_data.get('style')}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER) THAM KHẢO:
-- Các nút thắt chưa giải quyết:
-{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
-
-CÁC THÔNG SỐ ĐẦU VÀO CỦA SỰ KIỆN NÀY (BẮT BUỘC PHẢI DỰA VÀO ĐỂ TẠO NỘI DUNG):
-- Nhân vật tham gia: {', '.join(characters) if characters else 'Không chỉ định'}
-- Địa điểm diễn ra: {', '.join(locations) if locations else 'Không chỉ định'}
-- Công pháp thi triển: {', '.join(techniques) if techniques else 'Không chỉ định'}
-- Binh khí sử dụng: {', '.join(weapons) if weapons else 'Không chỉ định'}
-{resolved_thread_str}
-- Văn phong yêu cầu cho sự kiện này: {tone if tone else 'Không chỉ định (bình thường)'}
-- Ghi chú thêm từ tác giả: "{notes if notes else 'Không có'}"
-
-BỐI CẢNH CỦA CÁC SỰ KIỆN LIÊN KẾT TRONG CÙNG CHƯƠNG (BẮT BUỘC PHẢI ĐẢM BẢO TÍNH LIỀN MẠCH):
-{linked_nodes_ctx or "Không có sự kiện liên kết trực tiếp trong chương."}
-
-YÊU CẦU:
-1. Tạo tiêu đề (title) ngắn gọn, súc tích (dưới 10 từ).
-2. Tạo mô tả kịch bản (description) chi tiết diễn biến (khoảng 50-150 từ), viết mạch lạc và hấp dẫn, kết nối hợp lý với bối cảnh sự kiện trước/sau (nếu có).
-3. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, TRẬN PHÁP, ĐỊA ĐIỂM...):
-   - Chỉ được phép xuất hiện hoặc nhắc đến các thực thể đã được CHỈ ĐỊNH rõ ràng trong danh sách đầu vào ở trên (Nhân vật tham gia, Địa điểm diễn ra, Công pháp thi triển, Binh khí sử dụng) HOẶC những thực thể hoàn toàn mới được tự động tạo thêm trong sự kiện này.
-   - Tuyệt đối CẤM xuất hiện, nhắc tên hoặc cho tham gia bất kỳ thực thể cũ nào khác có trong tác phẩm (nhân vật cũ, địa điểm cũ, vũ khí cũ, công pháp cũ, trận pháp cũ...) nếu chúng không nằm trong danh sách đầu vào ở trên. Không tự ý thêm thắt các thực thể cũ ngoài danh sách.
-4. KHÔNG tạo mô tả kịch bản mang tính chất "kết bài", tổng kết hay khép lại câu chuyện (như 'kết thúc hành trình...', 'khép lại chương này...'). Nếu đây là sự kiện cuối cùng của chương, hãy tập trung tạo sự kiện chuyển tiếp lấp lửng (cliffhanger) hoặc một chi tiết kết mở để dẫn dắt tiếp tục sang chương sau.
-5. Hãy đảm bảo Tiêu đề (title) và Mô tả kịch bản (description) được gợi ý phải thể hiện đúng Văn phong yêu cầu (ví dụ: hài hước, bi thương, đau khổ tuyệt vọng, tình cảm...).
-6. Trả về đúng định dạng có cấu trúc chứa title và description.
-"""
+    prompt = (
+        load_api_prompt("suggest_node_details")
+        .replace("{chapter_num}", str(chapter_num))
+        .replace("{story_name}", meta_data.get('name', ''))
+        .replace("{context}", meta_data.get('context', ''))
+        .replace("{style}", meta_data.get('style', ''))
+        .replace("{unresolved_threads}", to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', [])))
+        .replace("{characters}", ', '.join(characters) if characters else 'Không chỉ định')
+        .replace("{locations}", ', '.join(locations) if locations else 'Không chỉ định')
+        .replace("{techniques}", ', '.join(techniques) if techniques else 'Không chỉ định')
+        .replace("{weapons}", ', '.join(weapons) if weapons else 'Không chỉ định')
+        .replace("{resolved_thread_str}", resolved_thread_str)
+        .replace("{tone}", tone if tone else 'Không chỉ định (bình thường)')
+        .replace("{notes}", notes if notes else 'Không có')
+        .replace("{linked_nodes_ctx}", linked_nodes_ctx or "Không có sự kiện liên kết trực tiếp trong chương.")
+    )
 
     try:
         from src.utils.llm import invoke_with_retry
@@ -1520,6 +1495,7 @@ YÊU CẦU:
 """
 
     try:
+        from typing import cast
         from src.utils.llm import invoke_with_retry
         state = {
             "story_uuid": story_uuid,
@@ -1527,12 +1503,12 @@ YÊU CẦU:
         }
         
         # Call LLM with output schema ChapterNodeContentExtraction
-        mapping_result = invoke_with_retry(
+        mapping_result = cast(models.ChapterNodeContentExtraction, invoke_with_retry(
             state, 
             prompt, 
             temperature=0.2, 
             output_schema=models.ChapterNodeContentExtraction
-        )
+        ))
         
         # Map back to nodes
         mapping_dict = {m.node_id: m.content for m in mapping_result.mappings}
@@ -1771,43 +1747,20 @@ def auto_suggest_chapter_nodes(story_uuid, chapter_num, meta_data, ledger_data):
             except Exception:
                 pass
 
-    prompt = f"""
-Bạn là một chuyên gia xây dựng kịch bản và sơ đồ sự kiện cho tiểu thuyết dài kỳ. Nhiệm vụ của bạn là thiết lập danh sách 3 node sự kiện tuần tự nối tiếp nhau cho Chương {chapter_num} của câu chuyện dưới đây.
-
-THÔNG TIN TÁC PHẨM:
-- Tên truyện: {meta_data.get('name')}
-- Bối cảnh chính: {meta_data.get('context')}
-- Phong cách hành văn: {meta_data.get('style')}
-
-SỔ CÁI TOÀN CỤC (GLOBAL LEDGER):
-- Lịch sử cốt truyện:
-{to_timeline_markdown(ledger_data.get('timeline', []))}
-- Các nút thắt chưa giải quyết:
-{to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', []))}
-
-BỐI CẢNH SỰ KIỆN CHƯƠNG TRƯỚC:
-{prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ."}
-
-YÊU CẦU CHO CHƯƠNG {chapter_num}:
-- Tạo chính xác 3 node sự kiện được nối kết tuần tự.
-- Hãy khéo léo lựa chọn và phân bổ các nhân vật: {', '.join(characters) if characters else 'Không chỉ định'}
-- Lựa chọn các địa điểm phù hợp: {', '.join(locations) if locations else 'Không chỉ định'}
-- Lựa chọn các công pháp phù hợp: {', '.join(techniques) if techniques else 'Không chỉ định'}
-- Lựa chọn binh khí/pháp khí phù hợp: {', '.join(weapons) if weapons else 'Không chỉ định'}
-- Hãy cố gắng giải quyết một hoặc vài nút thắt chưa giải quyết ở trên nếu hợp lý, mô tả cách giải quyết trong resolution_note.
-
-HƯỚNG DẪN TẠO SƠ ĐỒ NODE:
-1. Đảm bảo luồng kể truyện mạch lạc. Node đầu tiên của Chương {chapter_num} nên liên kết logic (qua trường `links`) với node cuối cùng của Chương {chapter_num-1} (nếu có ở danh sách bối cảnh phía trên).
-2. RÀNG BUỘC THỰC THỂ NGHIÊM NGẶT (NHÂN VẬT, VŨ KHÍ, CÔNG PHÁP, ĐỊA ĐIỂM...):
-   - Chỉ cho phép các thực thể đã biết ở trên HOẶC các thực thể hoàn toàn mới được tạo ra xuất hiện trong các node.
-   - Tuyệt đối CẤM cho xuất hiện hay nhắc tên bất kỳ thực thể cũ nào khác có sẵn trong tác phẩm mà không có ở trên.
-3. Mỗi node bắt buộc phải có Tiêu đề / Tiến trình (title) ngắn gọn, súc tích và Mô tả kịch bản (description) chi tiết diễn biến.
-4. Đề xuất một Văn Phong (tone) cụ thể và phù hợp cho mỗi node (ví dụ: "hài hước", "bi thương", "đau khổ tuyệt vọng", "tình cảm", "kịch tính", "bình thường").
-5. ĐẶC BIỆT LƯU Ý VỀ CẤU TRÚC TRUYỆN DÀI KỲ (SERIAL NOVEL):
-   - Sơ đồ các node sự kiện KHÔNG được thiết kế theo cấu trúc đóng của một bài văn độc lập. Node đầu tiên phải bắt đầu nối tiếp diễn biến trước đó.
-   - Node cuối cùng của chương phải mở ra một sự kiện chuyển tiếp lấp lửng (cliffhanger / transition) để chuẩn bị cho chương tiếp theo, tuyệt đối tránh kết thúc đóng.
-   - LƯU Ý ĐẶC BIỆT: Nếu Chương {chapter_num} này là chương cuối cùng của bộ truyện (dựa theo max_chapters), hãy thiết kế các node sao cho giải quyết toàn bộ các mâu thuẫn chính và kết thúc câu chuyện trọn vẹn, không tạo cliffhanger ở node cuối cùng nữa.
-"""
+    prompt = (
+        load_api_prompt("auto_suggest_chapter_nodes")
+        .replace("{chapter_num}", str(chapter_num))
+        .replace("{story_name}", meta_data.get('name', ''))
+        .replace("{context}", meta_data.get('context', ''))
+        .replace("{style}", meta_data.get('style', ''))
+        .replace("{timeline}", to_timeline_markdown(ledger_data.get('timeline', [])))
+        .replace("{unresolved_threads}", to_unresolved_threads_markdown(ledger_data.get('unresolved_threads', [])))
+        .replace("{prev_nodes_ctx}", prev_nodes_ctx or "Chưa có chương cũ hoặc chưa viết sơ đồ sự kiện cho chương cũ.")
+        .replace("{characters}", ', '.join(characters) if characters else 'Không chỉ định')
+        .replace("{locations}", ', '.join(locations) if locations else 'Không chỉ định')
+        .replace("{techniques}", ', '.join(techniques) if techniques else 'Không chỉ định')
+        .replace("{weapons}", ', '.join(weapons) if weapons else 'Không chỉ định')
+    )
     from src.utils.llm import invoke_with_retry
     state = {
         "story_uuid": story_uuid,

@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "node-1782033003878",
+      "title": "Cái bẫy chết người tại núi Quỷ Mị",
+      "description": "Diệp Lạc nhận nhiệm vụ gia tộc đi cứu một đứa bé bị lạc tại núi Quỷ Mị, nhưng thực chất đây là âm mưu của tộc nhân nhằm trừ khử hắn. Bị đám sát thủ dồn vào đường cùng tại vách đá, Diệp Lạc dù bị thương nặng vẫn giữ tấm lòng lương thiện, quyết định gieo mình xuống vực thay vì để chúng sát hạt vì so với việc để kẻ khác giết thì nhảy xuống núi vẫn có cơ hội sống hơn.",
+      "characters": [
+        "Diệp Lạc"
+      ],
+      "resolved_thread": {
+        "thread": "Bắt đầu cuộc phiêu lưu của nhân vật",
+        "resolution_note": "Diệp Lạc đối mặt với sự phản bội của gia tộc, quyết định tự sát để thoát khỏi sự truy sát, mở ra hành trình tại vực sâu."
+      },
+      "links": [],
+      "locations": [
+        "núi Quỷ Mị"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Diệp Lạc lảo đảo lùi lại phía sau, gót giày dẫm lên lớp lá khô mục nát, phát ra tiếng sột soạt khô khốc. Hắn đưa tay lau vệt máu nóng hổi đang rỉ ra từ vết thương trên trán, tầm nhìn dần trở nên nhòe đi. Trước mặt hắn, ba bóng người mặc trang phục gia tộc đang dàn hàng ngang, ánh mắt lộ rõ vẻ khinh miệt xen lẫn sát khí. \"Diệp Lạc, ngươi đừng cố chấp nữa,\" kẻ cầm đầu cười gằn, thanh trường kiếm trong tay hắn lóe lên tia sáng lạnh lẽo. \"Gia tộc đã sớm không còn chỗ cho một kẻ phế vật không thể tụ khí như ngươi. Hôm nay, cái chết của ngươi chính là món quà tốt nhất dành cho dòng họ.\" Diệp Lạc hít một hơi thật sâu, lồng ngực đau nhói như bị hàng ngàn mũi kim châm. Hắn nhìn thẳng vào đôi mắt vô cảm của những người vốn được gọi là \"tộc nhân\", trong lòng không một chút oán hận, chỉ thấy một nỗi buồn man mác. Hắn chậm rãi lên tiếng, giọng khàn đặc nhưng vẫn giữ được sự bình thản lạ thường: \"Nếu mạng sống của ta có thể khiến các người hài lòng, vậy thì xin cứ lấy đi. Chỉ mong sau này, đừng vì những tranh đoạt vô nghĩa mà đánh mất đi bản tính sơ khai.\" \"Nực cười! Kẻ sắp chết còn ra vẻ đạo mạo!\" Tên tộc nhân vung kiếm lao tới. Diệp Lạc không tránh né. Hắn xoay người, nhìn xuống vực thẳm đen ngòm phía sau. Gió lốc từ dưới vực thốc ngược lên, làm tung bay mái tóc rối bời của hắn. Thay vì chờ đợi lưỡi kiếm xuyên qua ngực, hắn chủ động ngả người ra sau. Cảm giác trọng lực mất kiểm soát ập đến trong tích tắc. Thân hình gầy gò của Diệp Lạc rơi tự do giữa không trung. Những cành cây khô nhô ra từ vách đá quất mạnh vào người hắn, tạo nên những vết rách dài trên da thịt, máu tươi bắn ra nhuộm đỏ lớp rêu phong. Cơn đau thấu xương tủy khiến hắn gần như ngất đi, nhưng ý chí sinh tồn mãnh liệt vẫn khiến hắn gắng gượng níu chặt lấy một nhành cây cổ thụ mọc ngang vách đá. Rắc! Cành cây chịu không nổi sức nặng, gãy lìa. Diệp Lạc rơi xuống, va đập liên hồi vào các mỏm đá nhọn trước khi thân thể rệu rã rơi xuống đáy thung lũng đầy sỏi đá.",
+      "tone": "kịch tính",
+      "x": 150,
+      "y": 200
+    },
+    {
+      "id": "node-1782033003879",
+      "title": "Sự bảo hộ huyền bí dưới đáy vực",
+      "description": "Sau khi rơi xuống vực, Diệp Lạc hôn mê suốt hai ngày. Nhờ miếng ngọc bội mẹ để lại, các loài linh thú trong vực sâu không tấn công mà vây quanh bảo vệ hắn. Khi tỉnh dậy, Diệp Lạc nén đau đớn, lê đôi chân gãy tìm lối thoát.",
+      "characters": [
+        "Diệp Lạc"
+      ],
+      "resolved_thread": {
+        "resolution_note": "",
+        "thread": ""
+      },
+      "links": [],
+      "locations": [
+        "đáy vực sâu"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "tone": "bi thương",
+      "x": 450,
+      "y": 260,
+      "content": "Hắn nằm đó, hơi thở thoi thóp, tay chân gãy gập, miếng ngọc bội gia truyền treo trước ngực bỗng nóng rực lên, phát ra ánh sáng đỏ kỳ dị. [...] Đôi mắt hắn khép hờ, hơi thở yếu ớt đến mức gần như lịm tắt giữa cái lạnh buốt giá. Cơn đau từ cánh tay trái bị gãy gập và đôi chân không còn cảm giác truyền thẳng lên đại não, khiến cơ thể hắn co giật trong cơn mê man kéo dài suốt hai ngày đêm. Thế nhưng, trong sự tĩnh lặng của cái chết, miếng ngọc bội gia truyền treo trước ngực bỗng nhiên tỏa ra một luồng hơi ấm kỳ lạ. Nhiệt lượng ấy lan tỏa từ lồng ngực, xuyên qua từng thớ thịt đang tổn thương, len lỏi vào những kinh mạch bế tắc, cố gắng duy trì một tia sinh cơ cuối cùng cho cơ thể đang dần nguội lạnh. Khi Diệp Lạc tỉnh lại, thứ đầu tiên hắn cảm nhận được là sự đau đớn dữ dội như bị hàng vạn con kiến cắn xé. Hắn cố gắng cử động, nhưng tiếng xương gãy kêu lên răng rắc khiến hắn phải cắn chặt môi đến bật máu. Mồ hôi lạnh vã ra như tắm, làm ướt đẫm mái tóc bết dính. Hắn không kêu lên một tiếng, đôi mắt kiên định nhìn thẳng vào vách đá sừng sững trước mặt. \"Vẫn còn sống...\" Hắn thầm thì, giọng nói khô khốc như tiếng lá khô bị vò nát. Diệp Lạc chống tay phải xuống mặt đất đầy đá dăm, dùng hết sức lực còn lại để lê thân thể rệu rã về phía sơn cốc phía trước. Mỗi một tấc di chuyển là một lần hắn phải đối mặt với nỗi đau thấu tâm can."
+    },
+    {
+      "id": "node-1782033003880",
+      "title": "Phát hiện pho tượng ma quái",
+      "description": "Trong lúc mò mẫm tìm đường ra khỏi vực, Diệp Lạc vô tình rơi vào một sơn cốc hoang vu. Tại đây, hắn kinh hãi phát hiện một pho tượng cổ đen kịt, không ngừng tỏa ra luồng ma khí lạnh lẽo, đáng sợ.",
+      "characters": [
+        "Diệp Lạc"
+      ],
+      "resolved_thread": {
+        "thread": "",
+        "resolution_note": ""
+      },
+      "links": [],
+      "locations": [
+        "sơn cốc"
+      ],
+      "weapons": [],
+      "techniques": [],
+      "content": "Hắn bò qua những gốc cây cổ thụ đã mục nát, vượt qua những vũng nước đọng đen ngòm, ánh mắt vẫn không rời khỏi pho tượng đá cổ quái đang đứng sừng sững giữa sơn cốc. Pho tượng ấy mang hình dáng một nam tử cao lớn, dù đã bị thời gian bào mòn nhưng vẫn toát lên khí thế ngạo nghễ, bất chấp trời đất. Khi những ngón tay đẫm máu của Diệp Lạc run rẩy chạm vào bệ đá, miếng ngọc bội trước ngực bỗng nhiên bừng sáng, hòa quyện với những vết nứt trên pho tượng. Một luồng khí đen tuyền, lạnh lẽo và đầy cuồng bạo bất ngờ trào ra từ khe nứt, cuộn xoáy quanh thân thể hắn như những con rắn độc.",
+      "tone": "kịch tính",
+      "x": 750,
+      "y": 200
+    }
+  ],
+  "connections": [
+    {
+      "from": "node-1782033003878",
+      "to": "node-1782033003879"
+    },
+    {
+      "from": "node-1782033003879",
+      "to": "node-1782033003880"
+    }
+  ]
+}
